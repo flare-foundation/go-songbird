@@ -4,8 +4,8 @@
 package avm
 
 import (
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
 )
 
 // ID that this VM uses when labeled

@@ -7,9 +7,9 @@ import (
 	"container/list"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/api"
-	"github.com/ava-labs/avalanchego/chains/atomic"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/api"
+	"github.com/flare-foundation/flare/chains/atomic"
+	"github.com/flare-foundation/flare/ids"
 )
 
 // Returns:

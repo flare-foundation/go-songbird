@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 func BenchmarkEncodings(b *testing.B) {

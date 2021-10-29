@@ -1,7 +1,7 @@
 package propertyfx
 
 import (
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 type Credential struct {

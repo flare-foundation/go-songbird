@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ava-labs/avalanchego/app/entry"
-	"github.com/ava-labs/avalanchego/config"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/flare-foundation/flare/app/entry"
+	"github.com/flare-foundation/flare/config"
+	"github.com/flare-foundation/flare/version"
 )
 
 func main() {

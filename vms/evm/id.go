@@ -3,7 +3,7 @@
 
 package evm
 
-import "github.com/ava-labs/avalanchego/ids"
+import "github.com/flare-foundation/flare/ids"
 
 // ID that this VM uses when labeled
 var ID = ids.ID{'e', 'v', 'm'}

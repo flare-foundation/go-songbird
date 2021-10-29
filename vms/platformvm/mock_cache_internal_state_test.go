@@ -3,10 +3,10 @@
 package platformvm
 
 import (
-	database "github.com/ava-labs/avalanchego/database"
-	avax "github.com/ava-labs/avalanchego/vms/components/avax"
+	database "github.com/flare-foundation/flare/database"
+	avax "github.com/flare-foundation/flare/vms/components/avax"
 
-	ids "github.com/ava-labs/avalanchego/ids"
+	ids "github.com/flare-foundation/flare/ids"
 
 	mock "github.com/stretchr/testify/mock"
 

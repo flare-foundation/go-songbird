@@ -17,8 +17,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/chains"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/chains"
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestSetChainConfigs(t *testing.T) {

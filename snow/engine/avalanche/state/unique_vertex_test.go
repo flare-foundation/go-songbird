@@ -8,13 +8,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowstorm"
-	"github.com/ava-labs/avalanchego/snow/engine/avalanche/vertex"
-	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/consensus/snowstorm"
+	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 func newSerializer(t *testing.T, parse func([]byte) (snowstorm.Tx, error)) *Serializer {

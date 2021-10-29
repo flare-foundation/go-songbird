@@ -6,7 +6,7 @@ package platformvm
 import (
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/flare-foundation/flare/utils/constants"
 )
 
 // Health implements the common.VM interface

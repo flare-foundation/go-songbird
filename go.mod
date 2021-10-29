@@ -1,4 +1,4 @@
-module github.com/ava-labs/avalanchego
+module github.com/flare-foundation/flare
 
 // Changes to the minimum golang version must also be replicated in
 // scripts/ansible/roles/golang_based/defaults/main.yml

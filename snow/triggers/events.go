@@ -4,8 +4,8 @@
 package triggers
 
 import (
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
 )
 
 // Acceptor is implemented when a struct is monitoring if a message is accepted

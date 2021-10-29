@@ -6,8 +6,8 @@ package metercacher
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/utils/timer"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/utils/timer"
 )
 
 var _ cache.Cacher = &Cache{}

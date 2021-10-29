@@ -6,10 +6,10 @@ package snowstorm
 import (
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
 
-	sbcon "github.com/ava-labs/avalanchego/snow/consensus/snowball"
+	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
 // Consensus is a snowball instance deciding between an unbounded number of

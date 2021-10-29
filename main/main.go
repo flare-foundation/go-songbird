@@ -8,11 +8,11 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/ava-labs/avalanchego/app/process"
-	"github.com/ava-labs/avalanchego/config"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/flare-foundation/flare/app/process"
+	"github.com/flare-foundation/flare/config"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/version"
 )
 
 // main is the entry point to AvalancheGo.

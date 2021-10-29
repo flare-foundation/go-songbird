@@ -3,7 +3,7 @@ package bloom
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/utils/units"
 	"github.com/stretchr/testify/assert"
 )
 

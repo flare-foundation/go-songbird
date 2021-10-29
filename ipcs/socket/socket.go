@@ -14,9 +14,9 @@ import (
 	"sync/atomic"
 	"syscall"
 
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/units"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/units"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 const (

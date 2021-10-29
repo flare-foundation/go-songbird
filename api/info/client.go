@@ -6,9 +6,9 @@ package info
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/network"
-	"github.com/ava-labs/avalanchego/utils/rpc"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/network"
+	"github.com/flare-foundation/flare/utils/rpc"
 )
 
 // Client is an Info API Client

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer"
 )
 
 var (

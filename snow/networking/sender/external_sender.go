@@ -6,7 +6,7 @@ package sender
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/ids"
 )
 
 // ExternalSender sends consensus messages to other validators

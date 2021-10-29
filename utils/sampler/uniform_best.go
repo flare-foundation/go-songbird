@@ -8,7 +8,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer"
 )
 
 var errNoValidUniformSamplers = errors.New("no valid uniform samplers found")

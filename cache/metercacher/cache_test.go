@@ -5,7 +5,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/cache"
+	"github.com/flare-foundation/flare/cache"
 )
 
 func TestInterface(t *testing.T) {

@@ -14,10 +14,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/compression"
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/compression"
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 func TestCodecPackInvalidOp(t *testing.T) {

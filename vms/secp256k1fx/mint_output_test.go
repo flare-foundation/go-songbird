@@ -6,7 +6,7 @@ package secp256k1fx
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/vms/components/verify"
+	"github.com/flare-foundation/flare/vms/components/verify"
 )
 
 func TestMintOutputVerifyNil(t *testing.T) {

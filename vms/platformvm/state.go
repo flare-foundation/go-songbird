@@ -7,10 +7,10 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/vms/components/avax"
 
-	safemath "github.com/ava-labs/avalanchego/utils/math"
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 // getPaginatedUTXOs returns UTXOs such that at least one of the addresses in

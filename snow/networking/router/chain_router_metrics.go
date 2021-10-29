@@ -4,7 +4,7 @@
 package router
 
 import (
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

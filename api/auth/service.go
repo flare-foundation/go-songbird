@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 
-	"github.com/ava-labs/avalanchego/api"
+	"github.com/flare-foundation/flare/api"
 )
 
 // service that serves the Auth API functionality.

@@ -15,11 +15,11 @@ import (
 
 	"github.com/gorilla/rpc/v2"
 
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/password"
-	"github.com/ava-labs/avalanchego/utils/timer"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/password"
+	"github.com/flare-foundation/flare/utils/timer"
 
-	cjson "github.com/ava-labs/avalanchego/utils/json"
+	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 const (

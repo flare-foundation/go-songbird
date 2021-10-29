@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 var errOpenDNSNoIP = errors.New("opendns returned no ip")

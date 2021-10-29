@@ -1,6 +1,6 @@
 syntax = "proto3";
 package galiaslookupproto;
-option go_package = "github.com/ava-labs/avalanchego/vms/rpcchainvm/galiaslookup/galiaslookupproto";
+option go_package = "github.com/flare-foundation/flare/vms/rpcchainvm/galiaslookup/galiaslookupproto";
 
 message LookupRequest {
     string alias = 1;

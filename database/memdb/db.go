@@ -8,9 +8,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/nodb"
-	"github.com/ava-labs/avalanchego/utils"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/nodb"
+	"github.com/flare-foundation/flare/utils"
 )
 
 const (

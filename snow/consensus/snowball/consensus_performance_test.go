@@ -6,7 +6,7 @@ package snowball
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/utils/sampler"
+	"github.com/flare-foundation/flare/utils/sampler"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

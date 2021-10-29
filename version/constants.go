@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/flare-foundation/flare/utils/constants"
 )
 
 var (

@@ -8,9 +8,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer"
 
-	safemath "github.com/ava-labs/avalanchego/utils/math"
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 var errNoValidWeightedSamplers = errors.New("no valid weighted samplers found")

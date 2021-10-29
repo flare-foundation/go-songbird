@@ -6,8 +6,8 @@ package plugin
 import (
 	"context"
 
-	appproto "github.com/ava-labs/avalanchego/app/plugin/proto"
-	"github.com/ava-labs/avalanchego/app/process"
+	appproto "github.com/flare-foundation/flare/app/plugin/proto"
+	"github.com/flare-foundation/flare/app/process"
 	"google.golang.org/grpc"
 
 	"github.com/hashicorp/go-plugin"

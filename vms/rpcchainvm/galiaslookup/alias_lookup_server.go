@@ -6,9 +6,9 @@ package galiaslookup
 import (
 	"context"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/vms/rpcchainvm/galiaslookup/galiaslookupproto"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/vms/rpcchainvm/galiaslookup/galiaslookupproto"
 )
 
 var _ galiaslookupproto.AliasLookupServer = &Server{}

@@ -3,7 +3,7 @@ package platformvm
 import (
 	"errors"
 
-	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/components/avax"
 )
 
 var errInvalidLocktime = errors.New("invalid locktime")

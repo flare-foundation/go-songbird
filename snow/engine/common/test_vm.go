@@ -7,10 +7,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/ids"
 
-	"github.com/ava-labs/avalanchego/database/manager"
-	"github.com/ava-labs/avalanchego/snow"
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/snow"
 )
 
 var (

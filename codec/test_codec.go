@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 var Tests = []func(c GeneralCodec, t testing.TB){

@@ -11,7 +11,7 @@ set -o pipefail
 SRC_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 DOCKERHUB_REPO="avaplatform/avalanchego"
-REMOTE="https://github.com/ava-labs/avalanchego.git"
+REMOTE="https://github.com/flare-foundation/flare.git"
 BRANCH="master"
 
 if [[ $# -eq 2 ]]; then

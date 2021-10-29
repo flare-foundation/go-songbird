@@ -8,8 +8,8 @@ package rocksdb
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 func TestInterface(t *testing.T) {

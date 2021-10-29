@@ -14,8 +14,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/perms"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/perms"
 )
 
 var filePrefix = fmt.Sprintf("%s/", constants.AppName)

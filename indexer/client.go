@@ -3,7 +3,7 @@ package indexer
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/rpc"
+	"github.com/flare-foundation/flare/utils/rpc"
 )
 
 type Client struct {

@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/vms/components/verify"
 )
 
 const (

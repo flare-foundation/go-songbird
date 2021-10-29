@@ -13,14 +13,14 @@ import (
 
 	"github.com/kardianos/osext"
 
-	"github.com/ava-labs/avalanchego/database/leveldb"
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/database/rocksdb"
-	"github.com/ava-labs/avalanchego/genesis"
-	"github.com/ava-labs/avalanchego/network"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/ulimit"
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/database/leveldb"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/database/rocksdb"
+	"github.com/flare-foundation/flare/genesis"
+	"github.com/flare-foundation/flare/network"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/ulimit"
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 // Results of parsing the CLI

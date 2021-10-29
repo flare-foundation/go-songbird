@@ -1,7 +1,7 @@
 # Ansible for AvalancheGo
 
 [Ansible](https://ansible.com) playbooks, roles, & inventories to install
-[AvalancheGo](https://github.com/ava-labs/avalanchego) as a systemd service.
+[AvalancheGo](https://github.com/flare-foundation/flare) as a systemd service.
 Target(s) can be
 
 - localhost
@@ -18,7 +18,7 @@ To create an AvalancheGo service on localhost
 1. Check you have Ansible 2.9+ (see [Installing](#installing))
 2. Clone the AvalancheGo git repository
     ```
-    $ git clone https://github.com/ava-labs/avalanchego
+    $ git clone https://github.com/flare-foundation/flare
     ```
 
 3. Change to this directory

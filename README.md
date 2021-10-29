@@ -25,8 +25,8 @@ Note that as network usage increases, hardware requirements may change.
 Clone the AvalancheGo repository:
 
 ```sh
-go get -v -d github.com/ava-labs/avalanchego/...
-cd $GOPATH/src/github.com/ava-labs/avalanchego
+go get -v -d github.com/flare-foundation/flare/...
+cd $GOPATH/src/github.com/flare-foundation/flare
 ```
 
 #### Building the Avalanche Executable
@@ -76,7 +76,7 @@ sudo apt install avalanchego
 
 ### Binary Install
 
-Download the [latest build](https://github.com/ava-labs/avalanchego/releases/latest) for your operating system and architecture.
+Download the [latest build](https://github.com/flare-foundation/flare/releases/latest) for your operating system and architecture.
 
 The Avalanche binary to be executed is named `avalanchego`.
 

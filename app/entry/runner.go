@@ -11,12 +11,12 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/ava-labs/avalanchego/app/process"
-	"github.com/ava-labs/avalanchego/node"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/perms"
+	"github.com/flare-foundation/flare/app/process"
+	"github.com/flare-foundation/flare/node"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/perms"
 
-	appPlugin "github.com/ava-labs/avalanchego/app/plugin"
+	appPlugin "github.com/flare-foundation/flare/app/plugin"
 )
 
 // Run an AvalancheGo node.

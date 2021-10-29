@@ -9,8 +9,8 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 // DefaultLogDirectory is the default directory where logs are saved

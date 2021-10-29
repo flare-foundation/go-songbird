@@ -8,13 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/linkedhashmap"
+	"github.com/flare-foundation/flare/utils/linkedhashmap"
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/metric"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/metric"
 )
 
 type pollHolder interface {
