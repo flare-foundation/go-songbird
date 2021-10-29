@@ -1,5 +1,12 @@
+// (c) 2021, Flare Networks Limited. All rights reserved.
+//
+// This file is a derived work, based on the avalanchego library whose original
+// notice appears below. It is distributed under a license compatible with the
+// licensing terms of the original code from which it is derived.
+// Please see the file LICENSE_AVALABS for licensing terms of the original work.
+// Please see the file LICENSE for licensing terms.
+//
 // (c) 2021 Ava Labs, Inc. All rights reserved.
-// See the file LICENSE for licensing terms.
 
 package config
 
@@ -25,7 +32,7 @@ import (
 
 // Results of parsing the CLI
 var (
-	defaultNetworkName     = constants.MainnetName
+	defaultNetworkName     = constants.FujiName
 	homeDir                = os.ExpandEnv("$HOME")
 	prefixedAppName        = fmt.Sprintf(".%s", constants.AppName)
 	defaultDataDir         = filepath.Join(homeDir, prefixedAppName)
@@ -91,7 +98,7 @@ func addNodeFlags(fs *flag.FlagSet) {
 	fs.Uint64(CreateBlockchainTxFeeKey, genesis.LocalParams.CreateBlockchainTxFee, "Transaction fee, in nAVAX, for transactions that create new blockchains")
 
 	// Database
-	fs.String(DBTypeKey, leveldb.Name, fmt.Sprintf("Database type to use. Should be one of {%s, %s, %s}", leveldb.Name, rocksdb.Name, memdb.Name))
+	fs.String(DBTypeKey, rocksdb.Name, fmt.Sprintf("Database type to use. Should be one of {%s, %s, %s}", leveldb.Name, rocksdb.Name, memdb.Name))
 	fs.String(DBPathKey, defaultDBDir, "Path to database directory")
 
 	// Coreth config
