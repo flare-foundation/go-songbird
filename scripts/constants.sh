@@ -8,19 +8,13 @@
 AVALANCHE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd ) # Directory above this script
 
 # Set the PATHS
-GOPATH="$(go env GOPATH)"
-coreth_path="$GOPATH/pkg/mod/github.com/ava-labs/coreth@$coreth_version"
+coreth_path="$AVALANCHE_PATH/coreth"
 
 # Where AvalancheGo binary goes
 build_dir="$AVALANCHE_PATH/build"
 avalanchego_path="$build_dir/avalanchego"
 plugin_dir="$build_dir/plugins"
 evm_path="$plugin_dir/evm"
-
-# Avalabs docker hub
-# avaplatform/avalanchego - defaults to local as to avoid unintentional pushes
-# You should probably set it - export DOCKER_REPO='avaplatform/avalanchego'
-avalanchego_dockerhub_repo=${DOCKER_REPO:-"avalanchego"}
 
 # Current branch
 current_branch=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
