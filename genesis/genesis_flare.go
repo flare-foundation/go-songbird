@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	mainnetGenesisConfigJSON = `{
+	flareGenesisConfigJSON = `{
 		"networkID": 1,
 		"allocations": [
 			{
@@ -175769,8 +175769,8 @@ var (
 		"message": "From Snowflake to Avalanche. Per consensum ad astra."
 	}`
 
-	// MainnetParams are the params used for mainnet
-	MainnetParams = Params{
+	// FlareParams are the params used for the Flare main network.
+	FlareParams = Params{
 		TxFeeConfig: TxFeeConfig{
 			TxFee:                 units.MilliAvax,
 			CreateAssetTxFee:      10 * units.MilliAvax,

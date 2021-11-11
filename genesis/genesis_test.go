@@ -43,21 +43,21 @@ func TestValidateConfig(t *testing.T) {
 		config    *Config
 		err       string
 	}{
-		"mainnet": {
+		"flare": {
 			networkID: 1,
-			config:    &MainnetConfig,
+			config:    &FlareConfig,
 		},
-		"fuji": {
+		"songbird": {
 			networkID: 5,
-			config:    &FujiConfig,
+			config:    &SongbirdConfig,
 		},
 		"local": {
 			networkID: 12345,
 			config:    &LocalConfig,
 		},
-		"mainnet (networkID mismatch)": {
+		"flare (networkID mismatch)": {
 			networkID: 2,
-			config:    &MainnetConfig,
+			config:    &FlareConfig,
 			err:       "networkID 2 specified but genesis config contains networkID 1",
 		},
 		"invalid start time": {
@@ -126,7 +126,7 @@ func TestValidateConfig(t *testing.T) {
 		"initial staked funds not in allocations": {
 			networkID: 5,
 			config: func() *Config {
-				thisConfig := FujiConfig
+				thisConfig := SongbirdConfig
 				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, LocalConfig.InitialStakedFunds[0])
 				return &thisConfig
 			}(),
@@ -256,18 +256,18 @@ func TestGenesis(t *testing.T) {
 		err             string
 		expected        string
 	}{
-		"mainnet": {
-			networkID: constants.MainnetID,
+		"flare": {
+			networkID: constants.FlareID,
 			expected:  "3e6662fdbd88bcf4c7dd82cb4699c0807f1d7315d493bc38532697e11b226276",
 		},
-		"fuji": {
-			networkID: constants.FujiID,
+		"songbird": {
+			networkID: constants.SongbirdID,
 			expected:  "2e6b699298a664793bff42dae9c1af8d9c54645d8b376fd331e0b67475578e0a",
 		},
-		"fuji (with custom specified)": {
-			networkID:    constants.FujiID,
+		"songbird (with custom specified)": {
+			networkID:    constants.SongbirdID,
 			customConfig: localGenesisConfigJSON, // won't load
-			err:          "cannot override genesis config for standard network fuji (5)",
+			err:          "cannot override genesis config for standard network songbird (5)",
 		},
 		"local": {
 			networkID: constants.LocalID,
@@ -342,7 +342,7 @@ func TestVMGenesis(t *testing.T) {
 		vmTest    []vmTest
 	}{
 		{
-			networkID: constants.MainnetID,
+			networkID: constants.FlareID,
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
@@ -355,7 +355,7 @@ func TestVMGenesis(t *testing.T) {
 			},
 		},
 		{
-			networkID: constants.FujiID,
+			networkID: constants.SongbirdID,
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
@@ -415,11 +415,11 @@ func TestAVAXAssetID(t *testing.T) {
 		expectedID string
 	}{
 		{
-			networkID:  constants.MainnetID,
+			networkID:  constants.FlareID,
 			expectedID: "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z",
 		},
 		{
-			networkID:  constants.FujiID,
+			networkID:  constants.SongbirdID,
 			expectedID: "U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK",
 		},
 		{

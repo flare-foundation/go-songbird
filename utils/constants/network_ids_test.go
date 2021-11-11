@@ -13,16 +13,16 @@ func TestGetHRP(t *testing.T) {
 		hrp string
 	}{
 		{
-			id:  MainnetID,
-			hrp: MainnetHRP,
+			id:  FlareID,
+			hrp: FlareHRP,
 		},
 		{
 			id:  TestnetID,
-			hrp: FujiHRP,
+			hrp: SongbirdHRP,
 		},
 		{
-			id:  FujiID,
-			hrp: FujiHRP,
+			id:  SongbirdID,
+			hrp: SongbirdHRP,
 		},
 		{
 			id:  LocalID,
@@ -49,16 +49,16 @@ func TestNetworkName(t *testing.T) {
 		name string
 	}{
 		{
-			id:   MainnetID,
-			name: MainnetName,
+			id:   FlareID,
+			name: FlareName,
 		},
 		{
 			id:   TestnetID,
-			name: FujiName,
+			name: SongbirdName,
 		},
 		{
-			id:   FujiID,
-			name: FujiName,
+			id:   SongbirdID,
+			name: SongbirdName,
 		},
 		{
 			id:   LocalID,
@@ -86,20 +86,20 @@ func TestNetworkID(t *testing.T) {
 		shouldErr bool
 	}{
 		{
-			name: MainnetName,
-			id:   MainnetID,
+			name: FlareName,
+			id:   FlareID,
 		},
 		{
-			name: "MaInNeT",
-			id:   MainnetID,
+			name: "fLaRe",
+			id:   FlareID,
 		},
 		{
 			name: TestnetName,
 			id:   TestnetID,
 		},
 		{
-			name: FujiName,
-			id:   FujiID,
+			name: SongbirdName,
+			id:   SongbirdID,
 		},
 		{
 			name: LocalName,

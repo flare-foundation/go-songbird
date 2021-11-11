@@ -59,10 +59,10 @@ type Params struct {
 
 func GetEpochConfig(networkID uint32) EpochConfig {
 	switch networkID {
-	case constants.MainnetID:
-		return MainnetParams.EpochConfig
-	case constants.FujiID:
-		return FujiParams.EpochConfig
+	case constants.FlareID:
+		return FlareParams.EpochConfig
+	case constants.SongbirdID:
+		return SongbirdParams.EpochConfig
 	case constants.LocalID:
 		return LocalParams.EpochConfig
 	default:
@@ -72,10 +72,10 @@ func GetEpochConfig(networkID uint32) EpochConfig {
 
 func GetTxFeeConfig(networkID uint32) TxFeeConfig {
 	switch networkID {
-	case constants.MainnetID:
-		return MainnetParams.TxFeeConfig
-	case constants.FujiID:
-		return FujiParams.TxFeeConfig
+	case constants.FlareID:
+		return FlareParams.TxFeeConfig
+	case constants.SongbirdID:
+		return SongbirdParams.TxFeeConfig
 	case constants.LocalID:
 		return LocalParams.TxFeeConfig
 	default:
@@ -85,10 +85,10 @@ func GetTxFeeConfig(networkID uint32) TxFeeConfig {
 
 func GetStakingConfig(networkID uint32) StakingConfig {
 	switch networkID {
-	case constants.MainnetID:
-		return MainnetParams.StakingConfig
-	case constants.FujiID:
-		return FujiParams.StakingConfig
+	case constants.FlareID:
+		return FlareParams.StakingConfig
+	case constants.SongbirdID:
+		return SongbirdParams.StakingConfig
 	case constants.LocalID:
 		return LocalParams.StakingConfig
 	default:

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	fujiGenesisConfigJSON = `{
+	songbirdGenesisConfigJSON = `{
 		"networkID": 5,
 		"allocations": [
 			{
@@ -196,8 +196,8 @@ var (
 		"message": "hi mom"
 	}`
 
-	// FujiParams are the params used for the fuji testnet
-	FujiParams = Params{
+	// SongbirdParams are the params used for the Songbird canary network.
+	SongbirdParams = Params{
 		TxFeeConfig: TxFeeConfig{
 			TxFee:                 units.MilliAvax,
 			CreateAssetTxFee:      10 * units.MilliAvax,

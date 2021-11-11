@@ -141,13 +141,13 @@ func (c *Config) InitialSupply() (uint64, error) {
 }
 
 var (
-	// MainnetConfig is the config that should be used to generate the mainnet
-	// genesis.
-	MainnetConfig Config
+	// FlareConfig is the config that should be used to generate the Flare
+	// main network genesis.
+	FlareConfig Config
 
-	// FujiConfig is the config that should be used to generate the fuji
-	// genesis.
-	FujiConfig Config
+	// SongbirdConfig is the config that should be used to generate the Songbird
+	// canary network genesis.
+	SongbirdConfig Config
 
 	// LocalConfig is the config that should be used to generate a local
 	// genesis.
@@ -155,27 +155,27 @@ var (
 )
 
 func init() {
-	unparsedMainnetConfig := UnparsedConfig{}
-	unparsedFujiConfig := UnparsedConfig{}
+	unparsedFlareConfig := UnparsedConfig{}
+	unparsedSongbirdConfig := UnparsedConfig{}
 	unparsedLocalConfig := UnparsedConfig{}
 
 	errs := wrappers.Errs{}
 	errs.Add(
-		json.Unmarshal([]byte(mainnetGenesisConfigJSON), &unparsedMainnetConfig),
-		json.Unmarshal([]byte(fujiGenesisConfigJSON), &unparsedFujiConfig),
+		json.Unmarshal([]byte(flareGenesisConfigJSON), &unparsedFlareConfig),
+		json.Unmarshal([]byte(songbirdGenesisConfigJSON), &unparsedSongbirdConfig),
 		json.Unmarshal([]byte(localGenesisConfigJSON), &unparsedLocalConfig),
 	)
 	if errs.Errored() {
 		panic(errs.Err)
 	}
 
-	mainnetConfig, err := unparsedMainnetConfig.Parse()
+	flareConfig, err := unparsedFlareConfig.Parse()
 	errs.Add(err)
-	MainnetConfig = mainnetConfig
+	FlareConfig = flareConfig
 
-	fujiConfig, err := unparsedFujiConfig.Parse()
+	songbirdConfig, err := unparsedSongbirdConfig.Parse()
 	errs.Add(err)
-	FujiConfig = fujiConfig
+	SongbirdConfig = songbirdConfig
 
 	localConfig, err := unparsedLocalConfig.Parse()
 	errs.Add(err)
@@ -188,10 +188,10 @@ func init() {
 
 func GetConfig(networkID uint32) *Config {
 	switch networkID {
-	case constants.MainnetID:
-		return &MainnetConfig
-	case constants.FujiID:
-		return &FujiConfig
+	case constants.FlareID:
+		return &FlareConfig
+	case constants.SongbirdID:
+		return &SongbirdConfig
 	case constants.LocalID:
 		return &LocalConfig
 	default:
