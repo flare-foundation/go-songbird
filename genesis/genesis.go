@@ -179,7 +179,7 @@ func Genesis(networkID uint32, filepath string) ([]byte, ids.ID, error) {
 	config := GetConfig(networkID)
 	if len(filepath) > 0 {
 		switch networkID {
-		case constants.FlareID, constants.SongbirdID, constants.LocalID:
+		case constants.FlareID, constants.SongbirdID, constants.CostonID, constants.LocalID:
 			return nil, ids.ID{}, fmt.Errorf(
 				"cannot override genesis config for standard network %s (%d)",
 				constants.NetworkName(networkID),

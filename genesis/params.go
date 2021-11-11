@@ -63,6 +63,8 @@ func GetEpochConfig(networkID uint32) EpochConfig {
 		return FlareParams.EpochConfig
 	case constants.SongbirdID:
 		return SongbirdParams.EpochConfig
+	case constants.CostonID:
+		return CostonParams.EpochConfig
 	case constants.LocalID:
 		return LocalParams.EpochConfig
 	default:
@@ -76,6 +78,8 @@ func GetTxFeeConfig(networkID uint32) TxFeeConfig {
 		return FlareParams.TxFeeConfig
 	case constants.SongbirdID:
 		return SongbirdParams.TxFeeConfig
+	case constants.CostonID:
+		return CostonParams.TxFeeConfig
 	case constants.LocalID:
 		return LocalParams.TxFeeConfig
 	default:
@@ -89,6 +93,8 @@ func GetStakingConfig(networkID uint32) StakingConfig {
 		return FlareParams.StakingConfig
 	case constants.SongbirdID:
 		return SongbirdParams.StakingConfig
+	case constants.CostonID:
+		return CostonParams.StakingConfig
 	case constants.LocalID:
 		return LocalParams.StakingConfig
 	default:

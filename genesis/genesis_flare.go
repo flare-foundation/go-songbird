@@ -175772,7 +175772,7 @@ var (
 	// network.
 	flareCChainGenesis = `{
 		"config": {
-			"chainId": 43114,
+			"chainId": 14,
 			"homesteadBlock": 0,
 			"daoForkBlock": 0,
 			"daoForkSupport": true,

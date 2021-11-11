@@ -51,14 +51,18 @@ func TestValidateConfig(t *testing.T) {
 			networkID: 5,
 			config:    &SongbirdConfig,
 		},
+		"coston": {
+			networkID: 7,
+			config:    &CostonConfig,
+		},
 		"local": {
 			networkID: 12345,
 			config:    &LocalConfig,
 		},
 		"flare (networkID mismatch)": {
-			networkID: 2,
+			networkID: 9,
 			config:    &FlareConfig,
-			err:       "networkID 2 specified but genesis config contains networkID 1",
+			err:       "networkID 9 specified but genesis config contains networkID 1",
 		},
 		"invalid start time": {
 			networkID: 12345,
@@ -258,7 +262,7 @@ func TestGenesis(t *testing.T) {
 	}{
 		"flare": {
 			networkID: constants.FlareID,
-			expected:  "3e6662fdbd88bcf4c7dd82cb4699c0807f1d7315d493bc38532697e11b226276",
+			expected:  "fe52d204cec35980e1881aff8a5e22bed5e485c03abb118586c65043c735747a",
 		},
 		"songbird": {
 			networkID: constants.SongbirdID,
@@ -269,9 +273,18 @@ func TestGenesis(t *testing.T) {
 			customConfig: localGenesisConfigJSON, // won't load
 			err:          "cannot override genesis config for standard network songbird (5)",
 		},
+		"coston": {
+			networkID: constants.CostonID,
+			expected:  "36d390b2ce624f206200dae49d5750ae15a0b9291e807df89bc4e63a488a801e",
+		},
+		"coston (with custom specified)": {
+			networkID:    constants.CostonID,
+			customConfig: localGenesisConfigJSON, // won't load
+			err:          "cannot override genesis config for standard network coston (7)",
+		},
 		"local": {
 			networkID: constants.LocalID,
-			expected:  "7fdadb09543651e4fa0952000d198034aefac33126759238af3d8e3407747e70",
+			expected:  "c0e6288ee6691aeed1f7d7f45101e6f277a31fc92c3957ab06e835b4a192591a",
 		},
 		"local (with custom specified)": {
 			networkID:    constants.LocalID,
@@ -350,7 +363,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5",
+					expectedID: "2iB9avCQeuXNLse4wTA85W4jevQnWTY2QHp3DVoJ4PCSMXa8nP",
 				},
 			},
 		},
@@ -376,7 +389,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU",
+					expectedID: "RrcDUXThuRvFXgALVGQqsTLdCnyqzGLRMsB5ttJspk4B7rkxJ",
 				},
 			},
 		},

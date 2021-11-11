@@ -149,6 +149,10 @@ var (
 	// canary network genesis.
 	SongbirdConfig Config
 
+	// CostonConfig is the config tat should be used to generate the Coston test
+	// network genesis.
+	CostonConfig Config
+
 	// LocalConfig is the config that should be used to generate a local
 	// genesis.
 	LocalConfig Config
@@ -157,12 +161,14 @@ var (
 func init() {
 	unparsedFlareConfig := UnparsedConfig{}
 	unparsedSongbirdConfig := UnparsedConfig{}
+	unparsedCostonConfig := UnparsedConfig{}
 	unparsedLocalConfig := UnparsedConfig{}
 
 	errs := wrappers.Errs{}
 	errs.Add(
 		json.Unmarshal([]byte(flareGenesisConfigJSON), &unparsedFlareConfig),
 		json.Unmarshal([]byte(songbirdGenesisConfigJSON), &unparsedSongbirdConfig),
+		json.Unmarshal([]byte(costonGenesisConfigJSON), &unparsedCostonConfig),
 		json.Unmarshal([]byte(localGenesisConfigJSON), &unparsedLocalConfig),
 	)
 	if errs.Errored() {
@@ -178,6 +184,11 @@ func init() {
 	songbirdConfig.CChainGenesis = songbirdCChainGenesis
 	errs.Add(err)
 	SongbirdConfig = songbirdConfig
+
+	costonConfig, err := unparsedCostonConfig.Parse()
+	costonConfig.CChainGenesis = costonCChainGenesis
+	errs.Add(err)
+	CostonConfig = costonConfig
 
 	localConfig, err := unparsedLocalConfig.Parse()
 	localConfig.CChainGenesis = localCChainGenesis
@@ -195,6 +206,8 @@ func GetConfig(networkID uint32) *Config {
 		return &FlareConfig
 	case constants.SongbirdID:
 		return &SongbirdConfig
+	case constants.CostonID:
+		return &CostonConfig
 	case constants.LocalID:
 		return &LocalConfig
 	default:

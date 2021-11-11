@@ -17,12 +17,12 @@ func TestGetHRP(t *testing.T) {
 			hrp: FlareHRP,
 		},
 		{
-			id:  TestnetID,
+			id:  SongbirdID,
 			hrp: SongbirdHRP,
 		},
 		{
-			id:  SongbirdID,
-			hrp: SongbirdHRP,
+			id:  CostonID,
+			hrp: CostonHRP,
 		},
 		{
 			id:  LocalID,
@@ -53,12 +53,12 @@ func TestNetworkName(t *testing.T) {
 			name: FlareName,
 		},
 		{
-			id:   TestnetID,
+			id:   SongbirdID,
 			name: SongbirdName,
 		},
 		{
-			id:   SongbirdID,
-			name: SongbirdName,
+			id:   CostonID,
+			name: CostonName,
 		},
 		{
 			id:   LocalID,
@@ -94,12 +94,12 @@ func TestNetworkID(t *testing.T) {
 			id:   FlareID,
 		},
 		{
-			name: TestnetName,
-			id:   TestnetID,
-		},
-		{
 			name: SongbirdName,
 			id:   SongbirdID,
+		},
+		{
+			name: CostonName,
+			id:   CostonID,
 		},
 		{
 			name: LocalName,

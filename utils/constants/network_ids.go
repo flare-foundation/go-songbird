@@ -15,20 +15,20 @@ import (
 const (
 	FlareID    uint32 = 1
 	SongbirdID uint32 = 5
-
-	TestnetID  uint32 = SongbirdID
-	UnitTestID uint32 = 10
+	CostonID   uint32 = 7
+	TestingID  uint32 = 10
 	LocalID    uint32 = 12345
 
 	FlareName    = "flare"
 	SongbirdName = "songbird"
-	TestnetName  = "testnet"
-	UnitTestName = "testing"
+	CostonName   = "coston"
+	TestingName  = "testing"
 	LocalName    = "local"
 
 	FlareHRP    = "flare"
 	SongbirdHRP = "songbird"
-	UnitTestHRP = "testing"
+	CostonHRP   = "coston"
+	TestingHRP  = "testing"
 	LocalHRP    = "local"
 	FallbackHRP = "custom"
 )
@@ -41,27 +41,30 @@ var (
 	NetworkIDToNetworkName = map[uint32]string{
 		FlareID:    FlareName,
 		SongbirdID: SongbirdName,
-		UnitTestID: UnitTestName,
+		CostonID:   CostonName,
+		TestingID:  TestingName,
 		LocalID:    LocalName,
 	}
 	NetworkNameToNetworkID = map[string]uint32{
 		FlareName:    FlareID,
 		SongbirdName: SongbirdID,
-		TestnetName:  TestnetID,
-		UnitTestName: UnitTestID,
+		CostonName:   CostonID,
+		TestingName:  TestingID,
 		LocalName:    LocalID,
 	}
 
 	NetworkIDToHRP = map[uint32]string{
 		FlareID:    FlareHRP,
 		SongbirdID: SongbirdHRP,
-		UnitTestID: UnitTestHRP,
+		CostonID:   CostonHRP,
+		TestingID:  TestingHRP,
 		LocalID:    LocalHRP,
 	}
 	NetworkHRPToNetworkID = map[string]uint32{
 		FlareHRP:    FlareID,
 		SongbirdHRP: SongbirdID,
-		UnitTestHRP: UnitTestID,
+		CostonHRP:   CostonID,
+		TestingHRP:  TestingID,
 		LocalHRP:    LocalID,
 	}
 
