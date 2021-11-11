@@ -5,10 +5,7 @@ set -o nounset
 set -o pipefail
 
 # Changes to the minimum golang version must also be replicated in
-# scripts/ansible/roles/golang_based/defaults/main.yml (here)
-# scripts/build_avalanche.sh (here)
-# scripts/local.Dockerfile
-# Dockerfile
+# scripts/build_flare.sh (here)
 # README.md
 # go.mod
 go_version_minimum="1.15.5"
@@ -30,22 +27,22 @@ version_lt() {
 }
 
 if version_lt "$(go_version)" "$go_version_minimum"; then
-    echo "AvalancheGo requires Go >= $go_version_minimum, Go $(go_version) found." >&2
+    echo "Flare requires Go >= $go_version_minimum, Go $(go_version) found." >&2
     exit 1
 fi
 
 # Avalanchego root folder
-AVALANCHE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd )
+FLARE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd )
 # Load the versions
-source "$AVALANCHE_PATH"/scripts/versions.sh
+source "$FLARE_PATH"/scripts/versions.sh
 # Load the constants
-source "$AVALANCHE_PATH"/scripts/constants.sh
+source "$FLARE_PATH"/scripts/constants.sh
 
 # Build with rocksdb allowed only if the environment variable ROCKSDBALLOWED is set
 if [ -z ${ROCKSDBALLOWED+x} ]; then
-    echo "Building FlareGo ..."
-    go build -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$avalanchego_path" "$AVALANCHE_PATH/app/"*.go
+    echo "Building Flare..."
+    go build -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/app/"*.go
 else
-    echo "Building FlareGo with rocksdb enabled..."
-    go build -tags rocksdballowed -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$avalanchego_path" "$AVALANCHE_PATH/app/"*.go
+    echo "Building Flare with rocksdb enabled..."
+    go build -tags rocksdballowed -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/app/"*.go
 fi

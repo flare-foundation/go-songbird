@@ -5,14 +5,14 @@
 # Use the versions.sh to specify versions
 #
 
-AVALANCHE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd ) # Directory above this script
+FLARE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd ) # Directory above this script
 
 # Set the PATHS
-coreth_path="$AVALANCHE_PATH/coreth"
+coreth_path="$FLARE_PATH/coreth"
 
 # Where AvalancheGo binary goes
-build_dir="$AVALANCHE_PATH/build"
-avalanchego_path="$build_dir/avalanchego"
+build_dir="$FLARE_PATH/build"
+flare_path="$build_dir/flare"
 plugin_dir="$build_dir/plugins"
 evm_path="$plugin_dir/evm"
 
