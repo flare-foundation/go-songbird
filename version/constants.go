@@ -27,29 +27,17 @@ var (
 	DatabaseVersion1_4_5 = NewDefaultVersion(1, 4, 5)
 	DatabaseVersion1_0_0 = NewDefaultVersion(1, 0, 0)
 
-	ApricotPhase0Times = map[uint32]time.Time{
-		constants.FlareID:    time.Date(2020, time.December, 8, 3, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2020, time.December, 5, 5, 0, 0, 0, time.UTC),
-	}
-	ApricotPhase0DefaultTime = time.Date(2020, time.December, 5, 5, 0, 0, 0, time.UTC)
+	ApricotPhase0Times       = map[uint32]time.Time{}
+	ApricotPhase0DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
 
-	ApricotPhase1Times = map[uint32]time.Time{
-		constants.FlareID:    time.Date(2021, time.March, 31, 14, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2021, time.March, 26, 14, 0, 0, 0, time.UTC),
-	}
-	ApricotPhase1DefaultTime = time.Date(2020, time.December, 5, 5, 0, 0, 0, time.UTC)
+	ApricotPhase1Times       = map[uint32]time.Time{}
+	ApricotPhase1DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
 
-	ApricotPhase2Times = map[uint32]time.Time{
-		constants.FlareID:    time.Date(2021, time.May, 10, 11, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2021, time.May, 5, 14, 0, 0, 0, time.UTC),
-	}
-	ApricotPhase2DefaultTime = time.Date(2020, time.December, 5, 5, 0, 0, 0, time.UTC)
+	ApricotPhase2Times       = map[uint32]time.Time{}
+	ApricotPhase2DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
 
-	ApricotPhase3Times = map[uint32]time.Time{
-		constants.FlareID:    time.Date(2021, time.August, 24, 14, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2021, time.August, 16, 19, 0, 0, 0, time.UTC),
-	}
-	ApricotPhase3DefaultTime = time.Date(2020, time.December, 5, 5, 0, 0, 0, time.UTC)
+	ApricotPhase3Times       = map[uint32]time.Time{}
+	ApricotPhase3DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
 )
 
 func init() {
