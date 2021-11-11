@@ -170,14 +170,17 @@ func init() {
 	}
 
 	flareConfig, err := unparsedFlareConfig.Parse()
+	flareConfig.CChainGenesis = flareCChainGenesis
 	errs.Add(err)
 	FlareConfig = flareConfig
 
 	songbirdConfig, err := unparsedSongbirdConfig.Parse()
+	songbirdConfig.CChainGenesis = songbirdCChainGenesis
 	errs.Add(err)
 	SongbirdConfig = songbirdConfig
 
 	localConfig, err := unparsedLocalConfig.Parse()
+	localConfig.CChainGenesis = localCChainGenesis
 	errs.Add(err)
 	LocalConfig = localConfig
 
