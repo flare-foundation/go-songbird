@@ -13,12 +13,12 @@ import (
 var (
 	String                       string // Printed when CLI arg --version is used
 	GitCommit                    string // Set in the build script (i.e. at compile time)
-	Current                      = NewDefaultVersion(1, 5, 2)
+	Current                      = NewDefaultVersion(0, 0, 1)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 4, 5)
-	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 1, 1, 0)
-	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 1, 0, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 0, 1)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 0, 0)
+	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 0, 1)
+	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 0, 0)
 	VersionParser                = NewDefaultApplicationParser()
 
 	CurrentDatabase = DatabaseVersion1_4_5

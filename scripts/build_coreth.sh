@@ -19,6 +19,7 @@ if [[ $# -eq 2 ]]; then
     evm_path=$2
 elif [[ $# -eq 0 ]]; then
     if [[ ! -d "$coreth_path" ]]; then
+        echo "Downloading Coreth..."
         git clone --quiet https://github.com/flare-foundation/coreth.git $coreth_path
     fi
 else
@@ -26,7 +27,7 @@ else
     exit 1
 fi
 
-echo "Checking out correct Coreth version..."
+echo "Checking out Coreth @ ${coreth_version} ..."
 cd $coreth_path
 git fetch --quiet --all
 git checkout --quiet $coreth_version
