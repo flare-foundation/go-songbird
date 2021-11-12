@@ -1,15 +1,10 @@
-<div align="center">
-  <img src="resources/AvalancheLogoRed.png?raw=true">
-</div>
+# Flare
 
----
-
-Node implementation for the [Avalanche](https://avax.network) network -
-a blockchains platform with high throughput, and blazing fast transactions.
+Node implementation for the [Flare](https://flare.network) network.
 
 ## Installation
 
-Avalanche is an incredibly lightweight protocol, so the minimum computer requirements are quite modest.
+Flare is an incredibly lightweight protocol, so the minimum computer requirements are quite modest.
 Note that as network usage increases, hardware requirements may change.
 
 - Hardware: 2 GHz or faster CPU, 6 GB RAM, >= 200 GB storage.
@@ -22,117 +17,58 @@ Note that as network usage increases, hardware requirements may change.
 
 ### Native Install
 
-Clone the AvalancheGo repository:
+Clone the Flare repository:
 
 ```sh
-go get -v -d github.com/flare-foundation/flare/...
-cd $GOPATH/src/github.com/flare-foundation/flare
+git clone https://github.com/flare-foundation/flare.git
+cd flare
 ```
 
-#### Building the Avalanche Executable
+#### Building the Flare Executable
 
-Build Avalanche using the build script:
+Build Flare using the build script:
 
 ```sh
 ./scripts/build.sh
 ```
 
-The Avalanche binary, named `avalanchego`, is in the `build` directory.
-
-### Binary Repository
-
-Install AvalancheGo using an `apt` repository.
-
-#### Adding the APT Repository
-
-If you have already added the APT repository, you do not need to add it again.
-
-To add the repository on Ubuntu Bionic distributions, run:
-
-```sh
-sudo su -
-wget -O - https://downloads.avax.network/avalanchego.gpg.key | apt-key add -
-echo "deb https://downloads.avax.network/apt bionic main" > /etc/apt/sources.list.d/avalanche.list
-exit
-```
-
-To add the repository on Ubuntu Focal distributions, run:
-
-```sh
-sudo su -
-wget -O - https://downloads.avax.network/avalanchego.gpg.key | apt-key add -
-echo "deb https://downloads.avax.network/apt focal main" > /etc/apt/sources.list.d/avalanche.list
-exit
-```
-
-#### Installing the Latest Version
-
-After adding the APT repository, install avalanchego by running:
-
-```sh
-sudo apt update
-sudo apt install avalanchego
-```
+The Flare binary, named `flare`, is in the `build` directory.
 
 ### Binary Install
 
 Download the [latest build](https://github.com/flare-foundation/flare/releases/latest) for your operating system and architecture.
 
-The Avalanche binary to be executed is named `avalanchego`.
+The Flare binary to be executed is named `flare`.
 
-### Docker Install
+## Running Flare
 
-Make sure docker is installed on the machine - so commands like `docker run` etc. are available.
+### Connecting to Songbird
 
-Building the docker image of latest avalanchego branch can be done by running:
-
-```sh
-./scripts/build_image.sh
-```
-
-To check the built image, run:
+To connect to the Songbird canary network run:
 
 ```sh
-docker image ls
-```
+./build/flare --network-id=songbird \
+  --bootstrap-ips="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeIP" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.ip")" \
+  --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.nodeID")" \
 
-The image should be tagged as `avaplatform/avalanchego:xxxxxxxx`, where `xxxxxxxx` is the shortened commit of the Avalanche source it was built from. To run the avalanche node, run:
-
-```sh
-docker run -ti -p 9650:9650 -p 9651:9651 avaplatform/avalanchego:xxxxxxxx /avalanchego/build/avalanchego
-```
-
-## Running Avalanche
-
-### Connecting to Mainnet
-
-To connect to the Avalanche Mainnet, run:
-
-```sh
-./build/avalanchego
 ```
 
 You should see some pretty ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
-### Connecting to Fuji
-
-To connect to the Fuji Testnet, run:
-
-```sh
-./build/avalanchego --network-id=fuji
-```
-
-### Creating a Local Testnet
+### Creating a local test network
 
 To create a single node testnet, run:
 
 ```sh
-./build/avalanchego --network-id=local --staking-enabled=false --snow-sample-size=1 --snow-quorum-size=1
+./build/flare --network-id=local \
+  --staking-enabled=false \
+  --snow-sample-size=1 \
+  --snow-quorum-size=1
 ```
 
-This launches an Avalanche network with one node.
+This launches a Flare network with one node.
 
 ### Running protobuf codegen
 
@@ -166,15 +102,8 @@ scripts/protobuf_codegen.sh
 
 For more information, refer to the [GRPC Golang Quick Start Guide](https://grpc.io/docs/languages/go/quickstart/).
 
-### Running protobuf codegen from docker
-
-```sh
-docker build -t avalanche:protobuf_codegen -f Dockerfile.protoc .
-docker run -t -i -v $(pwd):/opt/avalanche -w/opt/avalanche avalanche:protobuf_codegen bash -c "scripts/protobuf_codegen.sh"
-```
-
 ## Security Bugs
 
 **We and our community welcome responsible disclosures.**
 
-If you've discovered a security vulnerabilitiy, please report it via our [bug bounty program](https://hackenproof.com/avalanche/). Valid reports will be eligible for a reward (terms and conditions apply).
+If you've discovered a security vulnerabilitiy, please report it via our [contarct form](https://flare.network/contact). Valid reports will be eligible for a reward (terms and conditions apply).
