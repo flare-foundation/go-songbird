@@ -73,24 +73,6 @@ func TestValidateConfig(t *testing.T) {
 			}(),
 			err: "start time cannot be in the future",
 		},
-		"no initial supply": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.Allocations = []Allocation{}
-				return &thisConfig
-			}(),
-			err: "initial supply must be > 0",
-		},
-		"no initial stakers": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakers = []Staker{}
-				return &thisConfig
-			}(),
-			err: "initial stakers must be > 0",
-		},
 		"invalid initial stake duration": {
 			networkID: 12345,
 			config: func() *Config {
@@ -108,15 +90,6 @@ func TestValidateConfig(t *testing.T) {
 				return &thisConfig
 			}(),
 			err: "initial stake duration is 31536000 but need at least 400000000 with offset of 100000000",
-		},
-		"empty initial staked funds": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakedFunds = []ids.ShortID(nil)
-				return &thisConfig
-			}(),
-			err: "initial staked funds cannot be empty",
 		},
 		"duplicate initial staked funds": {
 			networkID: 12345,
@@ -266,7 +239,7 @@ func TestGenesis(t *testing.T) {
 		},
 		"songbird": {
 			networkID: constants.SongbirdID,
-			expected:  "f58df08e6c9c1ab440d1f987c9bee93a7ce36189da29cc27f549f3b73f39ceec",
+			expected:  "720f918030c89aac45304fa6456fd6d9f2928934855f457d236fb0be832aa745",
 		},
 		"songbird (with custom specified)": {
 			networkID:    constants.SongbirdID,
@@ -372,7 +345,7 @@ func TestVMGenesis(t *testing.T) {
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
-					expectedID: "2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm",
+					expectedID: "7xKYhEvYuUekwDxozgEiMPufzJ3jJPypKbGE8ny6KL84z4RKB",
 				},
 				{
 					vmID:       evm.ID,
@@ -433,7 +406,7 @@ func TestAVAXAssetID(t *testing.T) {
 		},
 		{
 			networkID:  constants.SongbirdID,
-			expectedID: "U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK",
+			expectedID: "1S3PSi4VsVpD8iK2vdykuajxVeuCV2xhjPSkQ4K88mqWGozMP",
 		},
 		{
 			networkID:  constants.LocalID,

@@ -40,10 +40,6 @@ const (
 // This function assumes that NetworkID in *Config has already
 // been checked for correctness.
 func validateInitialStakedFunds(config *Config) error {
-	if len(config.InitialStakedFunds) == 0 {
-		return errors.New("initial staked funds cannot be empty")
-	}
-
 	allocationSet := ids.ShortSet{}
 	initialStakedFundsSet := ids.ShortSet{}
 	for _, allocation := range config.Allocations {
@@ -107,12 +103,9 @@ func validateConfig(networkID uint32, config *Config) error {
 		)
 	}
 
-	initialSupply, err := config.InitialSupply()
-	switch {
-	case err != nil:
+	_, err := config.InitialSupply()
+	if err != nil {
 		return fmt.Errorf("unable to calculate initial supply: %w", err)
-	case initialSupply == 0:
-		return errors.New("initial supply must be > 0")
 	}
 
 	startTime := time.Unix(int64(config.StartTime), 0)
@@ -129,10 +122,6 @@ func validateConfig(networkID uint32, config *Config) error {
 	// 15 minutes.
 	if config.InitialStakeDuration == 0 {
 		return errors.New("initial stake duration must be > 0")
-	}
-
-	if len(config.InitialStakers) == 0 {
-		return errors.New("initial stakers must be > 0")
 	}
 
 	offsetTimeRequired := config.InitialStakeDurationOffset * uint64(len(config.InitialStakers)-1)
@@ -412,6 +401,10 @@ func FromConfig(config *Config) ([]byte, ids.ID, error) {
 }
 
 func splitAllocations(allocations []Allocation, numSplits int) [][]Allocation {
+	if len(allocations) == 0 {
+		return [][]Allocation{}
+	}
+
 	totalAmount := uint64(0)
 	for _, allocation := range allocations {
 		for _, unlock := range allocation.UnlockSchedule {
