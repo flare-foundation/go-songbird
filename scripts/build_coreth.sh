@@ -19,7 +19,7 @@ if [[ $# -eq 2 ]]; then
     evm_path=$2
 elif [[ $# -eq 0 ]]; then
     if [[ ! -d "$coreth_path" ]]; then
-        echo "Downloading EVM..."
+        echo "Downloading Coreth..."
         git clone --quiet https://github.com/flare-foundation/coreth.git $coreth_path
     fi
 else
@@ -27,13 +27,13 @@ else
     exit 1
 fi
 
-echo "Checking out EVM @ ${coreth_version}..."
+echo "Checking out Coreth @ ${coreth_version}..."
 cd $coreth_path
 git fetch --quiet --all
 git checkout --quiet $coreth_version
 
 # Build Coreth
-echo "Building EVM @ ${coreth_version}..."
+echo "Building Coreth @ ${coreth_version}..."
 cd "$coreth_path"
 go build -ldflags "-X github.com/flare-foundation/coreth/plugin/evm.Version=$coreth_version $static_ld_flags" -o "$evm_path" "plugin/"*.go
 cd "$FLARE_PATH"

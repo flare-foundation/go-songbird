@@ -4,16 +4,33 @@
 package genesis
 
 import (
+	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 // getIPs returns the beacon IPs for each network
 func getIPs(networkID uint32) []string {
+	switch networkID {
+	case constants.FlareID:
+		return []string{}
+	case constants.SongbirdID:
+		return []string{}
+	case constants.CostonID:
+		return []string{}
+	}
 	return nil
 }
 
 // getNodeIDs returns the beacon node IDs for each network
 func getNodeIDs(networkID uint32) []string {
+	switch networkID {
+	case constants.FlareID:
+		return []string{}
+	case constants.SongbirdID:
+		return []string{}
+	case constants.CostonID:
+		return []string{}
+	}
 	return nil
 }
 
