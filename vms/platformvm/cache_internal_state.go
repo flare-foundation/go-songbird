@@ -1034,13 +1034,13 @@ func (st *internalStateImpl) writeSingletons() error {
 
 func (st *internalStateImpl) load() error {
 	if err := st.loadSingletons(); err != nil {
-		return err
+		return fmt.Errorf("could not load singletons: %w", err)
 	}
 	if err := st.loadCurrentValidators(); err != nil {
-		return err
+		return fmt.Errorf("could not load current validators: %w", err)
 	}
 	if err := st.loadPendingValidators(); err != nil {
-		return err
+		return fmt.Errorf("could not load pending validators: %w", err)
 	}
 	return nil
 }
@@ -1048,21 +1048,21 @@ func (st *internalStateImpl) load() error {
 func (st *internalStateImpl) loadSingletons() error {
 	timestamp, err := database.GetTimestamp(st.singletonDB, timestampKey)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not get timestamp: %w", err)
 	}
 	st.originalTimestamp = timestamp
 	st.timestamp = timestamp
 
 	currentSupply, err := database.GetUInt64(st.singletonDB, currentSupplyKey)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not get current supply: %w", err)
 	}
 	st.originalCurrentSupply = currentSupply
 	st.currentSupply = currentSupply
 
 	lastAccepted, err := database.GetID(st.singletonDB, lastAcceptedKey)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not get ID: %w", err)
 	}
 	st.originalLastAccepted = lastAccepted
 	st.lastAccepted = lastAccepted
@@ -1082,11 +1082,11 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 		txIDBytes := validatorIt.Key()
 		txID, err := ids.ToID(txIDBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get validator transaction ID (data: %x): %w", txIDBytes, err)
 		}
 		tx, _, err := st.GetTx(txID)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get validator transaction (id: %x): %w", txID, err)
 		}
 
 		uptimeBytes := validatorIt.Value()
@@ -1094,7 +1094,7 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 			txID: txID,
 		}
 		if _, err := GenesisCodec.Unmarshal(uptimeBytes, uptime); err != nil {
-			return err
+			return fmt.Errorf("could not decode validator uptime: %w", err)
 		}
 		uptime.lastUpdated = time.Unix(int64(uptime.LastUpdated), 0)
 
@@ -1120,7 +1120,7 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 	}
 
 	if err := validatorIt.Error(); err != nil {
-		return err
+		return fmt.Errorf("could not iterate validators: %w", err)
 	}
 
 	delegatorIt := st.currentDelegatorList.NewIterator()
@@ -1129,17 +1129,17 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 		txIDBytes := delegatorIt.Key()
 		txID, err := ids.ToID(txIDBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get delegator transaction ID (data: %x): %w", txIDBytes, err)
 		}
 		tx, _, err := st.GetTx(txID)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get delegator transaction (id: %x): %w", txID, err)
 		}
 
 		potentialRewardBytes := delegatorIt.Value()
 		potentialReward, err := database.ParseUInt64(potentialRewardBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not decode delegator uptime: %w", err)
 		}
 
 		addDelegatorTx, ok := tx.UnsignedTx.(*UnsignedAddDelegatorTx)
@@ -1160,7 +1160,7 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 		}
 	}
 	if err := delegatorIt.Error(); err != nil {
-		return err
+		return fmt.Errorf("could not iterate delegators: %w", err)
 	}
 
 	subnetValidatorIt := st.currentSubnetValidatorList.NewIterator()
@@ -1169,11 +1169,11 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 		txIDBytes := subnetValidatorIt.Key()
 		txID, err := ids.ToID(txIDBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get subnet validator transaction ID (data: %x): %w", txIDBytes, err)
 		}
 		tx, _, err := st.GetTx(txID)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get subnet validator transaction (id: %x): %w", txID, err)
 		}
 
 		addSubnetValidatorTx, ok := tx.UnsignedTx.(*UnsignedAddSubnetValidatorTx)
@@ -1192,7 +1192,7 @@ func (st *internalStateImpl) loadCurrentValidators() error {
 		}
 	}
 	if err := subnetValidatorIt.Error(); err != nil {
-		return err
+		return fmt.Errorf("could not iterate subnet validators: %w", err)
 	}
 
 	for _, vdr := range cs.validatorsByNodeID {
@@ -1217,11 +1217,11 @@ func (st *internalStateImpl) loadPendingValidators() error {
 		txIDBytes := validatorIt.Key()
 		txID, err := ids.ToID(txIDBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get pending validator transaction ID (data: %x): %w", txIDBytes, err)
 		}
 		tx, _, err := st.GetTx(txID)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get subnet validator transaction (id: %x): %w", txID, err)
 		}
 
 		addValidatorTx, ok := tx.UnsignedTx.(*UnsignedAddValidatorTx)
@@ -1233,7 +1233,7 @@ func (st *internalStateImpl) loadPendingValidators() error {
 		ps.validatorsByNodeID[addValidatorTx.Validator.NodeID] = addValidatorTx
 	}
 	if err := validatorIt.Error(); err != nil {
-		return err
+		return fmt.Errorf("could not iterate pending validators: %w", err)
 	}
 
 	delegatorIt := st.pendingDelegatorList.NewIterator()
@@ -1242,11 +1242,11 @@ func (st *internalStateImpl) loadPendingValidators() error {
 		txIDBytes := delegatorIt.Key()
 		txID, err := ids.ToID(txIDBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get pending delegator transaction ID (data: %x): %w", txIDBytes, err)
 		}
 		tx, _, err := st.GetTx(txID)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get subnet delegator transaction (id: %x): %w", txID, err)
 		}
 
 		addDelegatorTx, ok := tx.UnsignedTx.(*UnsignedAddDelegatorTx)
@@ -1265,7 +1265,7 @@ func (st *internalStateImpl) loadPendingValidators() error {
 		}
 	}
 	if err := delegatorIt.Error(); err != nil {
-		return err
+		return fmt.Errorf("could not iterate pending delegators: %w", err)
 	}
 
 	subnetValidatorIt := st.pendingSubnetValidatorList.NewIterator()
@@ -1274,11 +1274,11 @@ func (st *internalStateImpl) loadPendingValidators() error {
 		txIDBytes := subnetValidatorIt.Key()
 		txID, err := ids.ToID(txIDBytes)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get pending subnet validator transaction ID (data: %x): %w", txIDBytes, err)
 		}
 		tx, _, err := st.GetTx(txID)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not get pending subnet validator transaction (id: %x): %w", txID, err)
 		}
 
 		addSubnetValidatorTx, ok := tx.UnsignedTx.(*UnsignedAddSubnetValidatorTx)
@@ -1298,7 +1298,7 @@ func (st *internalStateImpl) loadPendingValidators() error {
 		}
 	}
 	if err := subnetValidatorIt.Error(); err != nil {
-		return err
+		return fmt.Errorf("could not iterate pending subnet validators: %w", err)
 	}
 
 	for _, vdr := range ps.validatorExtrasByNodeID {
