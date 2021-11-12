@@ -74,6 +74,14 @@ func (v *application) App() string    { return v.app }
 func (v *application) String() string { return v.str }
 
 func (v *application) Compatible(o Application) error {
+	// NOTE: We hard-code support for our first own tagged version here, so that
+	// we can then upgrade them and they don't drop the new peers that send this
+	// version. This should be removed once we reject Avalanche versions.
+	if o.App() == "flare" &&
+		o.Major() == 0 &&
+		o.Minor() == 2 {
+		return nil
+	}
 	switch {
 	case v.App() != o.App():
 		return errDifferentApps
@@ -85,6 +93,14 @@ func (v *application) Compatible(o Application) error {
 }
 
 func (v *application) Before(o Application) bool {
+	// NOTE: We hard-code support for our first own tagged version here, so that
+	// we can then upgrade them and they don't drop the new peers that send this
+	// version. This should be removed once we reject Avalanche versions.
+	if o.App() == "flare" &&
+		o.Major() == 0 &&
+		o.Minor() == 2 {
+		return true
+	}
 	if v.App() != o.App() {
 		return false
 	}
