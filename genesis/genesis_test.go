@@ -80,7 +80,7 @@ func TestValidateConfig(t *testing.T) {
 				thisConfig.InitialStakeDuration = 0
 				return &thisConfig
 			}(),
-			err: "initial stake duration must be > 0",
+			err: "initial stake duration is 0 but need at least 21600 with offset of 5400",
 		},
 		"invalid stake offset": {
 			networkID: 12345,
@@ -90,24 +90,6 @@ func TestValidateConfig(t *testing.T) {
 				return &thisConfig
 			}(),
 			err: "initial stake duration is 31536000 but need at least 400000000 with offset of 100000000",
-		},
-		"duplicate initial staked funds": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, thisConfig.InitialStakedFunds[0])
-				return &thisConfig
-			}(),
-			err: "duplicated in initial staked funds",
-		},
-		"initial staked funds not in allocations": {
-			networkID: 5,
-			config: func() *Config {
-				thisConfig := SongbirdConfig
-				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, LocalConfig.InitialStakedFunds[0])
-				return &thisConfig
-			}(),
-			err: "does not have an allocation to stake",
 		},
 		"empty C-Chain genesis": {
 			networkID: 12345,
@@ -235,11 +217,11 @@ func TestGenesis(t *testing.T) {
 	}{
 		"flare": {
 			networkID: constants.FlareID,
-			expected:  "fe52d204cec35980e1881aff8a5e22bed5e485c03abb118586c65043c735747a",
+			expected:  "cb197d98f75c9c04935961d411511af5e19161051c03e5a12c3fd6b71f39ede1",
 		},
 		"songbird": {
 			networkID: constants.SongbirdID,
-			expected:  "720f918030c89aac45304fa6456fd6d9f2928934855f457d236fb0be832aa745",
+			expected:  "9899b5146aae46dd87fdf6d7d64d7b83d30e78aa3158e3ea200cec6c2c67c68a",
 		},
 		"songbird (with custom specified)": {
 			networkID:    constants.SongbirdID,
@@ -248,7 +230,7 @@ func TestGenesis(t *testing.T) {
 		},
 		"coston": {
 			networkID: constants.CostonID,
-			expected:  "36d390b2ce624f206200dae49d5750ae15a0b9291e807df89bc4e63a488a801e",
+			expected:  "fe7832c0baf9c8e350bef2ea06c05958805aabc7f9c5cc6598a414f772819529",
 		},
 		"coston (with custom specified)": {
 			networkID:    constants.CostonID,
@@ -257,7 +239,7 @@ func TestGenesis(t *testing.T) {
 		},
 		"local": {
 			networkID: constants.LocalID,
-			expected:  "c0e6288ee6691aeed1f7d7f45101e6f277a31fc92c3957ab06e835b4a192591a",
+			expected:  "53eeb46de39cabe022f7ac9b100c386cc944c384f7cb1a3372729c6f240dda96",
 		},
 		"local (with custom specified)": {
 			networkID:    constants.LocalID,
@@ -267,7 +249,7 @@ func TestGenesis(t *testing.T) {
 		"custom": {
 			networkID:    9999,
 			customConfig: customGenesisConfigJSON,
-			expected:     "a1d1838586db85fe94ab1143560c3356df9ba2445794b796bba050be89f4fcb4",
+			expected:     "59d54c06efb86a678e4b9883fad6e15bf50dc1a1bf6a151e78c1a195ad971653",
 		},
 		"custom (networkID mismatch)": {
 			networkID:    9999,
@@ -332,7 +314,7 @@ func TestVMGenesis(t *testing.T) {
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
-					expectedID: "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM",
+					expectedID: "kuZe3hRrShPqeGbHag3ffGVNUTeca2TgFmbDhKgB9gPyCuvaq",
 				},
 				{
 					vmID:       evm.ID,
@@ -358,7 +340,7 @@ func TestVMGenesis(t *testing.T) {
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
-					expectedID: "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed",
+					expectedID: "ALRkp1tuy7ErVkWuEWFLVd657JAULWDDyQkQBkLKVE94jCaNu",
 				},
 				{
 					vmID:       evm.ID,
@@ -402,7 +384,7 @@ func TestAVAXAssetID(t *testing.T) {
 	}{
 		{
 			networkID:  constants.FlareID,
-			expectedID: "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z",
+			expectedID: "foMCFvzKECiGVJmmkAEHm9Vt43hYjuxreiNX5PfqfecaVsZBT",
 		},
 		{
 			networkID:  constants.SongbirdID,
@@ -410,7 +392,7 @@ func TestAVAXAssetID(t *testing.T) {
 		},
 		{
 			networkID:  constants.LocalID,
-			expectedID: "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe",
+			expectedID: "2RULRJVXVpQNAsV3sBpy4G8LWH1LN3z5Adokv5bVtnZmsBQDCX",
 		},
 	}
 
