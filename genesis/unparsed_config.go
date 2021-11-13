@@ -110,6 +110,16 @@ func (uc UnparsedConfig) Parse() (Config, error) {
 		CChainGenesis:              uc.CChainGenesis,
 		Message:                    uc.Message,
 	}
+	switch c.NetworkID {
+	case constants.FlareID:
+		c.CChainGenesis = flareCChainGenesis
+	case constants.SongbirdID:
+		c.CChainGenesis = songbirdCChainGenesis
+	case constants.CostonID:
+		c.CChainGenesis = costonCChainGenesis
+	case constants.LocalID:
+		c.CChainGenesis = localCChainGenesis
+	}
 	for i, ua := range uc.Allocations {
 		a, err := ua.Parse()
 		if err != nil {
