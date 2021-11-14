@@ -22,7 +22,7 @@ Note that as network usage increases, hardware requirements may change.
 Clone the Flare repository:
 
 ```sh
-git clone https://github.com/flare-foundation/flare
+git clone https://github.com/flare-foundation/flare.git
 ```
 
 #### Building the Flare Executable
@@ -47,7 +47,7 @@ To connect to the Songbird canary network, run:
   --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.nodeID")"
 ```
 
-You should see some pretty ASCII art and log messages.
+You should see some _fire_ ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
@@ -58,7 +58,7 @@ Please note that you currently need to be whitelisted to connect to beacon node.
 To create a single node local test network, run:
 
 ```sh
-./build/avalanchego --network-id=local \
+./build/flare --network-id=local \
   --staking-enabled=false \
   --snow-sample-size=1 \
   --snow-quorum-size=1
