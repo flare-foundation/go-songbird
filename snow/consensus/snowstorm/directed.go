@@ -151,7 +151,7 @@ func (dg *Directed) Add(tx Tx) error {
 		// Add this tx to list of txs consuming the current UTXO
 		spenders.Add(txID)
 
-		// Because this isn't a pointer, we should re-map the set.
+		// spenders may be nil initially, so we should re-map the set.
 		dg.utxos[inputID] = spenders
 	}
 
@@ -172,8 +172,7 @@ func (dg *Directed) Add(tx Tx) error {
 
 	// If a tx that this tx depends on is rejected, this tx should also be
 	// rejected.
-	dg.registerRejector(dg, tx)
-	return nil
+	return dg.registerRejector(dg, tx)
 }
 
 // Issued implements the Consensus interface
@@ -193,7 +192,9 @@ func (dg *Directed) Issued(tx Tx) bool {
 func (dg *Directed) RecordPoll(votes ids.Bag) (bool, error) {
 	// Increase the vote ID. This is only updated here and is used to reset the
 	// confidence values of transactions lazily.
-	dg.currentVote++
+	// This is also used to track the number of polls required to accept/reject
+	// a transaction.
+	dg.pollNumber++
 
 	// This flag tracks if the Avalanche instance needs to recompute its
 	// frontiers. Frontiers only need to be recalculated if preferences change
@@ -213,7 +214,7 @@ func (dg *Directed) RecordPoll(votes ids.Bag) (bool, error) {
 			continue
 		}
 
-		txNode.RecordSuccessfulPoll(dg.currentVote)
+		txNode.RecordSuccessfulPoll(dg.pollNumber)
 
 		// If the tx should be accepted, then we should defer its acceptance
 		// until its dependencies are decided. If this tx was already marked to
@@ -224,7 +225,9 @@ func (dg *Directed) RecordPoll(votes ids.Bag) (bool, error) {
 			// registered once.
 			txNode.pendingAccept = true
 
-			dg.registerAcceptor(dg, txNode.tx)
+			if err := dg.registerAcceptor(dg, txNode.tx); err != nil {
+				return false, err
+			}
 			if dg.errs.Errored() {
 				return changed, dg.errs.Err
 			}
@@ -239,6 +242,14 @@ func (dg *Directed) RecordPoll(votes ids.Bag) (bool, error) {
 			changed = true
 		}
 	}
+
+	if len(dg.txs) > 0 {
+		if metThreshold.Len() == 0 {
+			dg.Failed()
+		} else {
+			dg.Successful()
+		}
+	}
 	return changed, dg.errs.Err
 }
 
@@ -248,7 +259,7 @@ func (dg *Directed) String() string {
 		nodes = append(nodes, &snowballNode{
 			txID:               txNode.tx.ID(),
 			numSuccessfulPolls: txNode.numSuccessfulPolls,
-			confidence:         txNode.Confidence(dg.currentVote),
+			confidence:         txNode.Confidence(dg.pollNumber),
 		})
 	}
 	return ConsensusString("DG", nodes)

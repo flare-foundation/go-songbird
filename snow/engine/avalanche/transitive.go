@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/network"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/avalanche"
 	"github.com/flare-foundation/flare/snow/consensus/avalanche/poll"
@@ -21,12 +20,6 @@ import (
 	"github.com/flare-foundation/flare/utils/formatting"
 	"github.com/flare-foundation/flare/utils/sampler"
 	"github.com/flare-foundation/flare/utils/wrappers"
-)
-
-const (
-	// TODO define this constant in one place rather than here and in snowman
-	// Max containers size in a MultiPut message
-	maxContainersLen = int(4 * network.DefaultMaxMessageSize / 5)
 )
 
 var _ Engine = &Transitive{}
@@ -107,6 +100,7 @@ func (t *Transitive) finishBootstrapping() error {
 	}
 
 	t.Ctx.Log.Info("bootstrapping finished with %d vertices in the accepted frontier", len(frontier))
+	t.metrics.bootstrapFinished.Set(1)
 	return t.Consensus.Initialize(t.Ctx, t.Params, frontier)
 }
 
@@ -133,7 +127,7 @@ func (t *Transitive) Gossip() error {
 	}
 
 	t.Ctx.Log.Verbo("gossiping %s as accepted to the network", vtxID)
-	t.Sender.Gossip(vtxID, vtx.Bytes())
+	t.Sender.SendGossip(vtxID, vtx.Bytes())
 	return nil
 }
 
@@ -147,7 +141,7 @@ func (t *Transitive) Shutdown() error {
 func (t *Transitive) Get(vdr ids.ShortID, requestID uint32, vtxID ids.ID) error {
 	// If this engine has access to the requested vertex, provide it
 	if vtx, err := t.Manager.GetVtx(vtxID); err == nil {
-		t.Sender.Put(vdr, requestID, vtxID, vtx.Bytes())
+		t.Sender.SendPut(vdr, requestID, vtxID, vtx.Bytes())
 	}
 	return nil
 }
@@ -175,7 +169,7 @@ func (t *Transitive) GetAncestors(vdr ids.ShortID, requestID uint32, vtxID ids.I
 		vtxBytes := vtx.Bytes()
 		// Ensure response size isn't too large. Include wrappers.IntLen because the size of the message
 		// is included with each container, and the size is repr. by an int.
-		if newLen := wrappers.IntLen + ancestorsBytesLen + len(vtxBytes); newLen < maxContainersLen {
+		if newLen := wrappers.IntLen + ancestorsBytesLen + len(vtxBytes); newLen < constants.MaxContainersLen {
 			ancestorsBytes = append(ancestorsBytes, vtxBytes)
 			ancestorsBytesLen = newLen
 		} else { // reached maximum response size
@@ -197,7 +191,7 @@ func (t *Transitive) GetAncestors(vdr ids.ShortID, requestID uint32, vtxID ids.I
 	}
 
 	t.metrics.getAncestorsVtxs.Observe(float64(len(ancestorsBytes)))
-	t.Sender.MultiPut(vdr, requestID, ancestorsBytes)
+	t.Sender.SendMultiPut(vdr, requestID, ancestorsBytes)
 	return nil
 }
 
@@ -344,6 +338,46 @@ func (t *Transitive) QueryFailed(vdr ids.ShortID, requestID uint32) error {
 	return t.Chits(vdr, requestID, nil)
 }
 
+// AppRequest implements the Engine interface
+func (t *Transitive) AppRequest(nodeID ids.ShortID, requestID uint32, deadline time.Time, request []byte) error {
+	if !t.Ctx.IsBootstrapped() {
+		t.Ctx.Log.Debug("dropping AppRequest(%s, %d) due to bootstrapping", nodeID, requestID)
+		return nil
+	}
+	// Notify the VM of this request
+	return t.VM.AppRequest(nodeID, requestID, deadline, request)
+}
+
+// AppResponse implements the Engine interface
+func (t *Transitive) AppResponse(nodeID ids.ShortID, requestID uint32, response []byte) error {
+	if !t.Ctx.IsBootstrapped() {
+		t.Ctx.Log.Debug("dropping AppResponse(%s, %d) due to bootstrapping", nodeID, requestID)
+		return nil
+	}
+	// Notify the VM of a response to its request
+	return t.VM.AppResponse(nodeID, requestID, response)
+}
+
+// AppRequestFailed implements the Engine interface
+func (t *Transitive) AppRequestFailed(nodeID ids.ShortID, requestID uint32) error {
+	if !t.Ctx.IsBootstrapped() {
+		t.Ctx.Log.Debug("dropping AppRequestFailed(%s, %d) due to bootstrapping", nodeID, requestID)
+		return nil
+	}
+	// Notify the VM that a request it made failed
+	return t.VM.AppRequestFailed(nodeID, requestID)
+}
+
+// AppGossip implements the Engine interface
+func (t *Transitive) AppGossip(nodeID ids.ShortID, msg []byte) error {
+	if !t.Ctx.IsBootstrapped() {
+		t.Ctx.Log.Debug("dropping AppGossip(%s) due to bootstrapping", nodeID)
+		return nil
+	}
+	// Notify the VM of this message which has been gossiped to it
+	return t.VM.AppGossip(nodeID, msg)
+}
+
 // Notify implements the Engine interface
 func (t *Transitive) Notify(msg common.Message) error {
 	if !t.Ctx.IsBootstrapped() {
@@ -479,7 +513,11 @@ func (t *Transitive) issue(vtx avalanche.Vertex) error {
 	}
 
 	for _, tx := range txs {
-		for _, dep := range tx.Dependencies() {
+		deps, err := tx.Dependencies()
+		if err != nil {
+			return err
+		}
+		for _, dep := range deps {
 			depID := dep.ID()
 			if !txIDs.Contains(depID) && !t.Consensus.TxIssued(dep) {
 				// This transaction hasn't been issued yet. Add it as a dependency.
@@ -508,7 +546,7 @@ func (t *Transitive) issue(vtx avalanche.Vertex) error {
 	// Track performance statistics
 	t.metrics.numVtxRequests.Set(float64(t.outstandingVtxReqs.Len()))
 	t.metrics.numMissingTxs.Set(float64(t.missingTxs.Len()))
-	t.metrics.numPendingVts.Set(float64(t.pending.Len()))
+	t.metrics.numPendingVts.Set(float64(len(t.pending)))
 	t.metrics.blockerVtxs.Set(float64(t.vtxBlocked.Len()))
 	t.metrics.blockerTxs.Set(float64(t.txBlocked.Len()))
 	return t.errs.Err
@@ -592,7 +630,7 @@ func (t *Transitive) issueRepoll() {
 	// Poll the network
 	t.RequestID++
 	if err == nil && t.polls.Add(t.RequestID, vdrBag) {
-		t.Sender.PullQuery(vdrSet, t.RequestID, vtxID)
+		t.Sender.SendPullQuery(vdrSet, t.RequestID, vtxID)
 	} else if err != nil {
 		t.Ctx.Log.Error("re-query for %s was dropped due to an insufficient number of validators", vtxID)
 	}
@@ -636,11 +674,11 @@ func (t *Transitive) sendRequest(vdr ids.ShortID, vtxID ids.ID) {
 	}
 	t.RequestID++
 	t.outstandingVtxReqs.Add(vdr, t.RequestID, vtxID) // Mark that there is an outstanding request for this vertex
-	t.Sender.Get(vdr, t.RequestID, vtxID)
+	t.Sender.SendGet(vdr, t.RequestID, vtxID)
 	t.metrics.numVtxRequests.Set(float64(t.outstandingVtxReqs.Len())) // Tracks performance statistics
 }
 
-// Health implements the common.Engine interface
+// HealthCheck implements the common.Engine interface
 func (t *Transitive) HealthCheck() (interface{}, error) {
 	var (
 		consensusIntf interface{} = struct{}{}

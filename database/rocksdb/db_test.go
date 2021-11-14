@@ -1,3 +1,4 @@
+//go:build linux && amd64 && rocksdballowed
 // +build linux,amd64,rocksdballowed
 
 // (c) 2019-2020, Ava Labs, Inc. All rights reserved.
@@ -15,7 +16,7 @@ import (
 func TestInterface(t *testing.T) {
 	for _, test := range database.Tests {
 		folder := t.TempDir()
-		db, err := New(folder, logging.NoLog{})
+		db, err := New(folder, nil, logging.NoLog{})
 		if err != nil {
 			t.Fatalf("rocksdb.New(%q, logging.NoLog{}) errored with %s", folder, err)
 		}
@@ -34,7 +35,7 @@ func BenchmarkInterface(b *testing.B) {
 		for _, bench := range database.Benchmarks {
 			folder := b.TempDir()
 
-			db, err := New(folder, logging.NoLog{})
+			db, err := New(folder, nil, logging.NoLog{})
 			if err != nil {
 				b.Fatal(err)
 			}

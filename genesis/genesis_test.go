@@ -232,11 +232,6 @@ func TestGenesis(t *testing.T) {
 			networkID: constants.CostonID,
 			expected:  "fe7832c0baf9c8e350bef2ea06c05958805aabc7f9c5cc6598a414f772819529",
 		},
-		"coston (with custom specified)": {
-			networkID:    constants.CostonID,
-			customConfig: localGenesisConfigJSON, // won't load
-			err:          "cannot override genesis config for standard network coston (7)",
-		},
 		"local": {
 			networkID: constants.LocalID,
 			expected:  "53eeb46de39cabe022f7ac9b100c386cc944c384f7cb1a3372729c6f240dda96",

@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 type Database struct {
 	metrics
 	db    database.Database
-	clock timer.Clock
+	clock mockable.Clock
 }
 
 // New returns a new database with added metrics

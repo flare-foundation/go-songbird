@@ -7,11 +7,13 @@ Node implementation for the [Flare](https://flare.network) network.
 Flare is an incredibly lightweight protocol, so the minimum computer requirements are quite modest.
 Note that as network usage increases, hardware requirements may change.
 
-- Hardware: 2 GHz or faster CPU, 6 GB RAM, >= 200 GB storage.
-- OS: Ubuntu >= 18.04 or Mac OS X >= Catalina.
-- Network: IPv4 or IPv6 network connection, with an open public port.
+- CPU: Equivalent of 8 AWS vCPU
+- RAM: 16 GB
+- Storage: 200 GB
+- OS: Ubuntu 18.04/20.04 or MacOS >= Catalina
+- Network: Reliable IPv4 or IPv6 network connection, with an open public port.
 - Software Dependencies:
-  - [Go](https://golang.org/doc/install) version >= 1.15.5 and set up [`$GOPATH`](https://github.com/golang/go/wiki/SettingGOPATH).
+  - [Go](https://golang.org/doc/install) version >= 1.16.8 and set up [`$GOPATH`](https://github.com/golang/go/wiki/SettingGOPATH).
   - [gcc](https://gcc.gnu.org/)
   - g++
 
@@ -20,8 +22,7 @@ Note that as network usage increases, hardware requirements may change.
 Clone the Flare repository:
 
 ```sh
-git clone https://github.com/flare-foundation/flare.git
-cd flare
+git clone https://github.com/flare-foundation/flare
 ```
 
 #### Building the Flare Executable
@@ -34,41 +35,40 @@ Build Flare using the build script:
 
 The Flare binary, named `flare`, is in the `build` directory.
 
-### Binary Install
-
-Download the [latest build](https://github.com/flare-foundation/flare/releases/latest) for your operating system and architecture.
-
-The Flare binary to be executed is named `flare`.
-
 ## Running Flare
 
 ### Connecting to Songbird
 
-To connect to the Songbird canary network run:
+To connect to the Songbird canary network, run:
 
 ```sh
 ./build/flare --network-id=songbird \
   --bootstrap-ips="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeIP" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.ip")" \
-  --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.nodeID")" \
-
+  --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.nodeID")"
 ```
 
 You should see some pretty ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
-### Creating a local test network
+Please note that you currently need to be whitelisted to connect to beacon node.
 
-To create a single node testnet, run:
+### Launching Flare locally
+
+To create a single node local test network, run:
 
 ```sh
-./build/flare --network-id=local \
+./build/avalanchego --network-id=local \
   --staking-enabled=false \
   --snow-sample-size=1 \
   --snow-quorum-size=1
 ```
 
 This launches a Flare network with one node.
+
+## Generating Code
+
+Flare uses multiple tools to generate efficient and boilerplate code.
 
 ### Running protobuf codegen
 
@@ -106,4 +106,4 @@ For more information, refer to the [GRPC Golang Quick Start Guide](https://grpc.
 
 **We and our community welcome responsible disclosures.**
 
-If you've discovered a security vulnerabilitiy, please report it via our [contarct form](https://flare.network/contact). Valid reports will be eligible for a reward (terms and conditions apply).
+If you've discovered a security vulnerability, please report it via our [contact form](https://flare.network/contact/). Valid reports will be eligible for a reward (terms and conditions apply).

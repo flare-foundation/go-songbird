@@ -1,3 +1,4 @@
+//go:build linux && amd64 && rocksdballowed
 // +build linux,amd64,rocksdballowed
 
 // ^ Only build this file if this computer linux AND it's AMD64 AND rocksdb is allowed
@@ -61,7 +62,8 @@ type Database struct {
 }
 
 // New returns a wrapped RocksDB object.
-func New(file string, log logging.Logger) (database.Database, error) {
+// TODO: use configBytes to config the database options
+func New(file string, configBytes []byte, log logging.Logger) (database.Database, error) {
 	filter := grocksdb.NewBloomFilter(BitsPerKey)
 
 	blockOptions := grocksdb.NewDefaultBlockBasedTableOptions()

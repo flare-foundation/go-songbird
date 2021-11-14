@@ -1,3 +1,6 @@
+// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package indexer
 
 import (
@@ -14,7 +17,7 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/math"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
@@ -26,11 +29,11 @@ const (
 
 var (
 	// Maps to the byte representation of the next accepted index
-	nextAcceptedIndexKey   []byte = []byte{0x00}
-	indexToContainerPrefix []byte = []byte{0x01}
-	containerToIDPrefix    []byte = []byte{0x02}
-	errNoneAccepted               = errors.New("no containers have been accepted")
-	errNumToFetchZero             = fmt.Errorf("numToFetch must be in [1,%d]", MaxFetchedByRange)
+	nextAcceptedIndexKey   = []byte{0x00}
+	indexToContainerPrefix = []byte{0x01}
+	containerToIDPrefix    = []byte{0x02}
+	errNoneAccepted        = errors.New("no containers have been accepted")
+	errNumToFetchZero      = fmt.Errorf("numToFetch must be in [1,%d]", MaxFetchedByRange)
 
 	_ Index = &index{}
 )
@@ -53,7 +56,7 @@ type Index interface {
 // indexer indexes all accepted transactions by the order in which they were accepted
 type index struct {
 	codec codec.Manager
-	clock timer.Clock
+	clock mockable.Clock
 	lock  sync.RWMutex
 	// The index of the next accepted transaction
 	nextAcceptedIndex uint64
@@ -74,7 +77,7 @@ func newIndex(
 	baseDB database.Database,
 	log logging.Logger,
 	codec codec.Manager,
-	clock timer.Clock,
+	clock mockable.Clock,
 ) (Index, error) {
 	vDB := versiondb.New(baseDB)
 	indexToContainer := prefixdb.New(indexToContainerPrefix, vDB)

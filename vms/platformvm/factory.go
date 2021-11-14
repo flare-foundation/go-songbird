@@ -9,6 +9,7 @@ import (
 	"github.com/flare-foundation/flare/chains"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/uptime"
 	"github.com/flare-foundation/flare/snow/validators"
 )
 
@@ -24,6 +25,9 @@ type Factory struct {
 
 	// Node's validator set maps subnetID -> validators of the subnet
 	Validators validators.Manager
+
+	// Provides access to the uptime manager as a thread safe data structure
+	UptimeLockedCalculator uptime.LockedCalculator
 
 	// True if the node is being run with staking enabled
 	StakingEnabled bool
@@ -72,6 +76,9 @@ type Factory struct {
 
 	// Time of the AP3 network upgrade
 	ApricotPhase3Time time.Time
+
+	// Time of the AP4 network upgrade
+	ApricotPhase4Time time.Time
 }
 
 // New returns a new instance of the Platform Chain

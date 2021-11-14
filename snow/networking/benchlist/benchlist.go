@@ -1,3 +1,6 @@
+// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package benchlist
 
 import (
@@ -12,7 +15,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 
 	safemath "github.com/flare-foundation/flare/utils/math"
 )
@@ -89,7 +92,7 @@ type benchlist struct {
 	timer *timer.Timer
 
 	// Tells the time. Can be faked for testing.
-	clock timer.Clock
+	clock mockable.Clock
 
 	// notified when a node is benched or unbenched
 	benchable Benchable

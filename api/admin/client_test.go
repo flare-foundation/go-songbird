@@ -71,12 +71,8 @@ func TestStartCPUProfiler(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
-		success, err := mockClient.StartCPUProfiler()
-		// if there is error as expected, the test passes
-		if err != nil && test.Err != nil {
-			continue
-		}
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		continue
 		if err != nil {
 			t.Fatalf("Unexepcted error: %s", err)
 		}
@@ -90,11 +86,8 @@ func TestStopCPUProfiler(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
-		success, err := mockClient.StopCPUProfiler()
-		// if there is error as expected, the test passes
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
 		if err != nil && test.Err != nil {
-			continue
 		}
 		if err != nil {
 			t.Fatalf("Unexepcted error: %s", err)
@@ -109,7 +102,7 @@ func TestMemoryProfile(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
 		success, err := mockClient.MemoryProfile()
 		// if there is error as expected, the test passes
 		if err != nil && test.Err != nil {
@@ -128,7 +121,7 @@ func TestLockProfile(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
 		success, err := mockClient.LockProfile()
 		// if there is error as expected, the test passes
 		if err != nil && test.Err != nil {
@@ -147,7 +140,7 @@ func TestAlias(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
 		success, err := mockClient.Alias("alias", "alias2")
 		// if there is error as expected, the test passes
 		if err != nil && test.Err != nil {
@@ -166,7 +159,7 @@ func TestAliasChain(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
 		success, err := mockClient.AliasChain("chain", "chain-alias")
 		// if there is error as expected, the test passes
 		if err != nil && test.Err != nil {
@@ -184,7 +177,7 @@ func TestAliasChain(t *testing.T) {
 func TestGetChainAliases(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		expectedReply := []string{"alias1", "alias2"}
-		mockClient := Client{requester: NewMockClient(&GetChainAliasesReply{
+		mockClient := client{requester: NewMockClient(&GetChainAliasesReply{
 			Aliases: expectedReply,
 		}, nil)}
 
@@ -195,7 +188,7 @@ func TestGetChainAliases(t *testing.T) {
 	})
 
 	t.Run("failure", func(t *testing.T) {
-		mockClient := Client{requester: NewMockClient(&GetChainAliasesReply{}, errors.New("some error"))}
+		mockClient := client{requester: NewMockClient(&GetChainAliasesReply{}, errors.New("some error"))}
 
 		_, err := mockClient.GetChainAliases("chain")
 
@@ -207,7 +200,7 @@ func TestStacktrace(t *testing.T) {
 	tests := GetSuccessResponseTests()
 
 	for _, test := range tests {
-		mockClient := Client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
 		success, err := mockClient.Stacktrace()
 		// if there is error as expected, the test passes
 		if err != nil && test.Err != nil {

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
-	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -38,7 +38,7 @@ func TestManagerFire(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
-	manager.RegisterRequest(ids.ShortID{}, ids.ID{}, constants.PullQueryMsg, ids.GenerateTestID(), wg.Done)
+	manager.RegisterRequest(ids.ShortID{}, ids.ID{}, message.PullQuery, ids.GenerateTestID(), wg.Done)
 
 	wg.Wait()
 }
@@ -69,11 +69,11 @@ func TestManagerCancel(t *testing.T) {
 	fired := new(bool)
 
 	id := ids.GenerateTestID()
-	manager.RegisterRequest(ids.ShortID{}, ids.ID{}, constants.PullQueryMsg, id, func() { *fired = true })
+	manager.RegisterRequest(ids.ShortID{}, ids.ID{}, message.PullQuery, id, func() { *fired = true })
 
-	manager.RegisterResponse(ids.ShortID{}, ids.ID{}, id, constants.GetMsg, 1*time.Second)
+	manager.RegisterResponse(ids.ShortID{}, ids.ID{}, id, message.Get, 1*time.Second)
 
-	manager.RegisterRequest(ids.ShortID{}, ids.ID{}, constants.PullQueryMsg, ids.GenerateTestID(), wg.Done)
+	manager.RegisterRequest(ids.ShortID{}, ids.ID{}, message.PullQuery, ids.GenerateTestID(), wg.Done)
 
 	wg.Wait()
 

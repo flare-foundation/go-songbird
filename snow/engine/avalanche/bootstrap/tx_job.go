@@ -17,6 +17,8 @@ import (
 	"github.com/flare-foundation/flare/utils/logging"
 )
 
+var errMissingTxDependenciesOnAccept = errors.New("attempting to accept a transaction with missing dependencies")
+
 type txParser struct {
 	log                     logging.Logger
 	numAccepted, numDropped prometheus.Counter
@@ -45,7 +47,11 @@ type txJob struct {
 func (t *txJob) ID() ids.ID { return t.tx.ID() }
 func (t *txJob) MissingDependencies() (ids.Set, error) {
 	missing := ids.Set{}
-	for _, dep := range t.tx.Dependencies() {
+	deps, err := t.tx.Dependencies()
+	if err != nil {
+		return missing, err
+	}
+	for _, dep := range deps {
 		if dep.Status() != choices.Accepted {
 			missing.Add(dep.ID())
 		}
@@ -55,7 +61,11 @@ func (t *txJob) MissingDependencies() (ids.Set, error) {
 
 // Returns true if this tx job has at least 1 missing dependency
 func (t *txJob) HasMissingDependencies() (bool, error) {
-	for _, dep := range t.tx.Dependencies() {
+	deps, err := t.tx.Dependencies()
+	if err != nil {
+		return false, err
+	}
+	for _, dep := range deps {
 		if dep.Status() != choices.Accepted {
 			return true, nil
 		}
@@ -70,7 +80,7 @@ func (t *txJob) Execute() error {
 	}
 	if hasMissingDeps {
 		t.numDropped.Inc()
-		return errors.New("attempting to accept a transaction with missing dependencies")
+		return errMissingTxDependenciesOnAccept
 	}
 
 	status := t.tx.Status()

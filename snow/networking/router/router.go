@@ -8,9 +8,9 @@ import (
 
 	"github.com/flare-foundation/flare/health"
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
-	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -24,6 +24,7 @@ type Router interface {
 	Initialize(
 		nodeID ids.ShortID,
 		log logging.Logger,
+		msgCreator message.Creator,
 		timeouts *timeout.Manager,
 		gossipFrequency,
 		shutdownTimeout time.Duration,
@@ -41,108 +42,20 @@ type Router interface {
 // ExternalRouter routes messages from the network to the
 // Handler of the consensus engine that the message is intended for
 type ExternalRouter interface {
+	HandleInbound(msg message.InboundMessage)
+
 	RegisterRequest(
-		validatorID ids.ShortID,
+		nodeID ids.ShortID,
 		chainID ids.ID,
 		requestID uint32,
-		msgType constants.MsgType,
-	)
-	GetAcceptedFrontier(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		deadline time.Time,
-		onFinishedHandling func(),
-	)
-	AcceptedFrontier(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		containerIDs []ids.ID,
-		onFinishedHandling func(),
-	)
-	GetAccepted(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		deadline time.Time,
-		containerIDs []ids.ID,
-		onFinishedHandling func(),
-	)
-	Accepted(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		containerIDs []ids.ID,
-		onFinishedHandling func(),
-	)
-	GetAncestors(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		deadline time.Time,
-		containerID ids.ID,
-		onFinishedHandling func(),
-	)
-	MultiPut(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		containers [][]byte,
-		onFinishedHandling func(),
-	)
-	Get(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		deadline time.Time,
-		containerID ids.ID,
-		onFinishedHandling func(),
-	)
-	Put(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		containerID ids.ID,
-		container []byte,
-		onFinishedHandling func(),
-	)
-	PushQuery(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		deadline time.Time,
-		containerID ids.ID,
-		container []byte,
-		onFinishedHandling func(),
-	)
-	PullQuery(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		deadline time.Time,
-		containerID ids.ID,
-		onFinishedHandling func(),
-	)
-	Chits(
-		validatorID ids.ShortID,
-		chainID ids.ID,
-		requestID uint32,
-		votes []ids.ID,
-		onFinishedHandling func(),
+		op message.Op,
 	)
 }
 
 // InternalRouter deals with messages internal to this node
 type InternalRouter interface {
-	GetAcceptedFrontierFailed(validatorID ids.ShortID, chainID ids.ID, requestID uint32)
-	GetAcceptedFailed(validatorID ids.ShortID, chainID ids.ID, requestID uint32)
-	GetFailed(validatorID ids.ShortID, chainID ids.ID, requestID uint32)
-	GetAncestorsFailed(validatorID ids.ShortID, chainID ids.ID, requestID uint32)
-	QueryFailed(validatorID ids.ShortID, chainID ids.ID, requestID uint32)
-
-	Connected(validatorID ids.ShortID)
-	Disconnected(validatorID ids.ShortID)
-
 	benchlist.Benchable
+
+	Connected(nodeID ids.ShortID)
+	Disconnected(nodeID ids.ShortID)
 }

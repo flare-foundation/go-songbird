@@ -1,3 +1,6 @@
+// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package benchlist
 
 import (
@@ -39,6 +42,7 @@ type Manager interface {
 type Config struct {
 	Benchable              Benchable          `json:"-"`
 	Validators             validators.Manager `json:"-"`
+	StakingEnabled         bool               `json:"-"`
 	Threshold              int                `json:"threshold"`
 	MinimumFailingDuration time.Duration      `json:"minimumFailingDuration"`
 	Duration               time.Duration      `json:"duration"`
@@ -107,7 +111,16 @@ func (m *manager) RegisterChain(ctx *snow.Context, namespace string) error {
 		return nil
 	}
 
-	vdrs, ok := m.config.Validators.GetValidators(ctx.SubnetID)
+	var (
+		vdrs validators.Set
+		ok   bool
+	)
+	if m.config.StakingEnabled {
+		vdrs, ok = m.config.Validators.GetValidators(ctx.SubnetID)
+	} else {
+		// If staking is disabled, everyone validates every chain
+		vdrs, ok = m.config.Validators.GetValidators(constants.PrimaryNetworkID)
+	}
 	if !ok {
 		return errUnknownValidators
 	}
@@ -165,4 +178,4 @@ func (noBenchlist) RegisterChain(*snow.Context, string) error { return nil }
 func (noBenchlist) RegisterResponse(ids.ID, ids.ShortID)      {}
 func (noBenchlist) RegisterFailure(ids.ID, ids.ShortID)       {}
 func (noBenchlist) IsBenched(ids.ShortID, ids.ID) bool        { return false }
-func (noBenchlist) GetBenched(ids.ShortID) []ids.ID           { return nil }
+func (noBenchlist) GetBenched(ids.ShortID) []ids.ID           { return []ids.ID{} }
