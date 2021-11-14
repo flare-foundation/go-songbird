@@ -26,82 +26,14 @@ import (
 )
 
 const (
-	defaultEncoding    = formatting.Hex
-	codecVersion       = 0
-	configChainIDAlias = "X"
+	defaultEncoding = formatting.Hex
+	codecVersion    = 0
 )
 
 var (
-	errNoInitiallyStakedFunds = errors.New("initial staked funds cannot be empty")
-	errNoSupply               = errors.New("initial supply must be > 0")
-	errNoStakeDuration        = errors.New("initial stake duration must be > 0")
-	errNoStakers              = errors.New("initial stakers must be > 0")
-	errNoCChainGenesis        = errors.New("C-Chain genesis cannot be empty")
-	errNoTxs                  = errors.New("genesis creates no transactions")
+	errNoCChainGenesis = errors.New("C-Chain genesis cannot be empty")
+	errNoTxs           = errors.New("genesis creates no transactions")
 )
-
-// validateInitialStakedFunds ensures all staked
-// funds have allocations and that all staked
-// funds are unique.
-//
-// This function assumes that NetworkID in *Config has already
-// been checked for correctness.
-func validateInitialStakedFunds(config *Config) error {
-	if len(config.InitialStakedFunds) == 0 {
-		return errNoInitiallyStakedFunds
-	}
-
-	allocationSet := ids.ShortSet{}
-	initialStakedFundsSet := ids.ShortSet{}
-	for _, allocation := range config.Allocations {
-		// It is ok to have duplicates as different
-		// ethAddrs could claim to the same avaxAddr.
-		allocationSet.Add(allocation.AVAXAddr)
-	}
-
-	for _, staker := range config.InitialStakedFunds {
-		if initialStakedFundsSet.Contains(staker) {
-			avaxAddr, err := formatting.FormatAddress(
-				configChainIDAlias,
-				constants.GetHRP(config.NetworkID),
-				staker.Bytes(),
-			)
-			if err != nil {
-				return fmt.Errorf(
-					"unable to format address from %s",
-					staker.String(),
-				)
-			}
-
-			return fmt.Errorf(
-				"address %s is duplicated in initial staked funds",
-				avaxAddr,
-			)
-		}
-		initialStakedFundsSet.Add(staker)
-
-		if !allocationSet.Contains(staker) {
-			avaxAddr, err := formatting.FormatAddress(
-				configChainIDAlias,
-				constants.GetHRP(config.NetworkID),
-				staker.Bytes(),
-			)
-			if err != nil {
-				return fmt.Errorf(
-					"unable to format address from %s",
-					staker.String(),
-				)
-			}
-
-			return fmt.Errorf(
-				"address %s does not have an allocation to stake",
-				avaxAddr,
-			)
-		}
-	}
-
-	return nil
-}
 
 // validateConfig returns an error if the provided
 // *Config is not considered valid.
