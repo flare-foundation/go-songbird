@@ -234,7 +234,7 @@ func TestGenesis(t *testing.T) {
 		},
 		"local": {
 			networkID: constants.LocalID,
-			expected:  "53eeb46de39cabe022f7ac9b100c386cc944c384f7cb1a3372729c6f240dda96",
+			expected:  "4cbed10cd2246f723e9d12157abaddf93844830804095de48023ab62e32ad6eb",
 		},
 		"local (with custom specified)": {
 			networkID:    constants.LocalID,
