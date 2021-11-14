@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/staking"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/staking"
 )
 
 func TestBuild(t *testing.T) {
