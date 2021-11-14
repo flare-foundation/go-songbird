@@ -100,18 +100,8 @@ func (t *Transitive) finishBootstrapping() error {
 
 	// initialize consensus to the last accepted blockID
 	if err := t.Consensus.Initialize(t.Ctx, t.Params, lastAcceptedID, lastAccepted.Height()); err != nil {
-		return errava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
-		ava-labs/avalanchego
+		return err
+	}
 
 	// to maintain the invariant that oracle blocks are issued in the correct
 	// preferences, we need to handle the case that we are bootstrapping into an oracle block

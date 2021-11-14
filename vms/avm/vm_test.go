@@ -276,7 +276,7 @@ func GenesisVMWithArgs(tb testing.TB, additionalFxs []*common.Fx, args *BuildGen
 		TxFee:            testTxFee,
 		CreateAssetTxFee: testTxFee,
 	}}
-	configBytes, err :=o BuildAvmConfigBytes(Config{IndexTransactions: true})
+	configBytes, err := BuildAvmConfigBytes(Config{IndexTransactions: true})
 	if err != nil {
 		tb.Fatal("should not have caused error in creating avm config bytes")
 	}

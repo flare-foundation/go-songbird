@@ -82,11 +82,17 @@ func (p *process) Start() error {
 	case leveldb.Name:
 		dbManager, err = manager.NewLevelDB(p.config.DatabaseConfig.Path, p.config.DatabaseConfig.Config, log, version.CurrentDatabase)
 	case memdb.Name:
+		dbManager = manager.NewMemDB(version.CurrentDatabase)
+	default:
+		err = fmt.Errorf(
+			"db-type was %q but should have been one of {%s, %s, %s}",
+			p.config.DatabaseConfig.Name,
 			leveldb.Name,
 			rocksdb.Name,
 			memdb.Name,
 		)
 	}
+	if err != nil {
 		log.Fatal("couldn't create %q db manager at %s: %s", p.config.DatabaseConfig.Name, p.config.DatabaseConfig.Path, err)
 		logFactory.Close()
 		return err

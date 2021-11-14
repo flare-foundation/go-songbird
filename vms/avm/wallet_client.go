@@ -15,7 +15,35 @@ import (
 	"github.com/flare-foundation/flare/utils/rpc"
 )
 
-type WalletClient struct {
+// Interface compliance
+var _ WalletClient = &client{}
+
+// interface of an AVM wallet client for interacting with avm managed wallet on [chain]
+type WalletClient interface {
+	// IssueTx issues a transaction to a node and returns the TxID
+	IssueTx(tx []byte) (ids.ID, error)
+	// Send [amount] of [assetID] to address [to]
+	Send(
+		user api.UserPass,
+		from []string,
+		changeAddr string,
+		amount uint64,
+		assetID,
+		to,
+		memo string,
+	) (ids.ID, error)
+	// SendMultiple sends a transaction from [user] funding all [outputs]
+	SendMultiple(
+		user api.UserPass,
+		from []string,
+		changeAddr string,
+		outputs []SendOutput,
+		memo string,
+	) (ids.ID, error)
+}
+
+// implementation of an AVM wallet client for interacting with avm managed wallet on [chain]
+type walletClient struct {
 	requester rpc.EndpointRequester
 }
 

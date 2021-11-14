@@ -11,6 +11,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/constants"
 )
 
 var errUnknownValidators = errors.New("unknown validator set for provided chain")

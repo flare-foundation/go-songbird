@@ -18,10 +18,11 @@ import (
 	"github.com/flare-foundation/flare/database/versiondb"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/uptime"
+	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/vms/components/avax"
-	"github.com/flare-foundation/flare/vms/platformvm/uptime"
 
 	safemath "github.com/flare-foundation/flare/utils/math"
 )

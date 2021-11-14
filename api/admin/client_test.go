@@ -72,7 +72,11 @@ func TestStartCPUProfiler(t *testing.T) {
 
 	for _, test := range tests {
 		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
-		continue
+		success, err := mockClient.StartCPUProfiler()
+		// if there is error as expected, the test passes
+		if err != nil && test.Err != nil {
+			continue
+		}
 		if err != nil {
 			t.Fatalf("Unexepcted error: %s", err)
 		}
@@ -87,7 +91,10 @@ func TestStopCPUProfiler(t *testing.T) {
 
 	for _, test := range tests {
 		mockClient := client{requester: NewMockClient(api.SuccessResponse{Success: test.Success}, test.Err)}
+		success, err := mockClient.StopCPUProfiler()
+		// if there is error as expected, the test passes
 		if err != nil && test.Err != nil {
+			continue
 		}
 		if err != nil {
 			t.Fatalf("Unexepcted error: %s", err)

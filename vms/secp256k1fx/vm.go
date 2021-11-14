@@ -6,7 +6,7 @@ package secp256k1fx
 import (
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
 
 // VM that this Fx must be run by

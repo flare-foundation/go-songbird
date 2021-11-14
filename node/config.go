@@ -19,6 +19,7 @@ import (
 	"github.com/flare-foundation/flare/utils/dynamicip"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/profiler"
+	"github.com/flare-foundation/flare/utils/timer"
 )
 
 type IPCConfig struct {

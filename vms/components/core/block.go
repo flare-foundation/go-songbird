@@ -5,6 +5,7 @@ package core
 
 import (
 	"errors"
+	"time"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"

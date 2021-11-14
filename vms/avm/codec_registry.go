@@ -11,7 +11,7 @@ import (
 	"github.com/flare-foundation/flare/codec/linearcodec"
 	"github.com/flare-foundation/flare/codec/reflectcodec"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )

@@ -581,12 +581,7 @@ func (service *Service) GetSubnets(_ *http.Request, args *GetSubnetsArgs, respon
 		}
 		owner, ok := subnet.Owner.(*secp256k1fx.OutputOwners)
 		if !ok {
-			return erava - labs/avalanchego
-			ava - labs/avalanchego
-			ava - labs/avalanchego
-			ava - labs/avalanchego
-			ava - labs/avalanchego
-			ava - labs/avalanchegoUnknownOwners
+			return errUnknownOwners
 		}
 
 		controlAddrs := make([]string, len(owner.Addrs))

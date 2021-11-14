@@ -15,6 +15,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 
 	safemath "github.com/flare-foundation/flare/utils/math"

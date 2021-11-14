@@ -11,7 +11,21 @@ import (
 	"github.com/flare-foundation/flare/utils/rpc"
 )
 
-type Client struct {
+// Interface compliance
+var _ Client = &client{}
+
+// Client interface for interacting with the IPCS endpoint
+type Client interface {
+	// PublishBlockchain requests the node to begin publishing consensus and decision events
+	PublishBlockchain(chainID string) (*PublishBlockchainReply, error)
+	// UnpublishBlockchain requests the node to stop publishing consensus and decision events
+	UnpublishBlockchain(chainID string) (bool, error)
+	// GetPublishedBlockchains requests the node to get blockchains being published
+	GetPublishedBlockchains() ([]ids.ID, error)
+}
+
+// Client implementation for interacting with the IPCS endpoint
+type client struct {
 	requester rpc.EndpointRequester
 }
 
