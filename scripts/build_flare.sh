@@ -41,8 +41,8 @@ source "$FLARE_PATH"/scripts/constants.sh
 # Build with rocksdb allowed only if the environment variable ROCKSDBALLOWED is set
 if [ -z ${ROCKSDBALLOWED+x} ]; then
     echo "Building Flare..."
-    go build -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/app/"*.go
+    go build -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/main/"*.go
 else
     echo "Building Flare with RocksDB enabled..."
-    go build -tags rocksdballowed -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/app/"*.go
+    go build -tags rocksdballowed -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/main/"*.go
 fi
