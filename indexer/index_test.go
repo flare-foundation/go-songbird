@@ -1,3 +1,6 @@
+// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package indexer
 
 import (
@@ -11,7 +14,7 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +29,7 @@ func TestIndex(t *testing.T) {
 	db := versiondb.New(baseDB)
 	ctx := snow.DefaultContextTest()
 
-	indexIntf, err := newIndex(db, logging.NoLog{}, codec, timer.Clock{})
+	indexIntf, err := newIndex(db, logging.NoLog{}, codec, mockable.Clock{})
 	assert.NoError(err)
 	idx := indexIntf.(*index)
 
@@ -80,7 +83,7 @@ func TestIndex(t *testing.T) {
 	assert.NoError(db.Commit())
 	assert.NoError(idx.Close())
 	db = versiondb.New(baseDB)
-	indexIntf, err = newIndex(db, logging.NoLog{}, codec, timer.Clock{})
+	indexIntf, err = newIndex(db, logging.NoLog{}, codec, mockable.Clock{})
 	assert.NoError(err)
 	idx = indexIntf.(*index)
 
@@ -115,7 +118,7 @@ func TestIndexGetContainerByRangeMaxPageSize(t *testing.T) {
 	assert.NoError(err)
 	db := memdb.New()
 	ctx := snow.DefaultContextTest()
-	indexIntf, err := newIndex(db, logging.NoLog{}, codec, timer.Clock{})
+	indexIntf, err := newIndex(db, logging.NoLog{}, codec, mockable.Clock{})
 	assert.NoError(err)
 	idx := indexIntf.(*index)
 
@@ -157,7 +160,7 @@ func TestDontIndexSameContainerTwice(t *testing.T) {
 	assert.NoError(err)
 	db := memdb.New()
 	ctx := snow.DefaultContextTest()
-	idx, err := newIndex(db, logging.NoLog{}, codec, timer.Clock{})
+	idx, err := newIndex(db, logging.NoLog{}, codec, mockable.Clock{})
 	assert.NoError(err)
 
 	// Accept the same container twice

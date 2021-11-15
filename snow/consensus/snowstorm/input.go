@@ -13,11 +13,13 @@ import (
 	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
-// InputFactory implements Factory by returning an input struct
-type InputFactory struct{}
+// inputFactory implements Factory by returning an input struct
+// for testing purposes in parity with "DirectedFactory"
+// focus on more frequent conflicts
+type inputFactory struct{}
 
 // New implements Factory
-func (InputFactory) New() Consensus { return &Input{} }
+func (inputFactory) New() Consensus { return &Input{} }
 
 // Input is an implementation of a multi-color, non-transitive, snowball
 // instance
@@ -47,7 +49,7 @@ type inputTx struct {
 	// successful network poll. This timestamp is needed to ensure correctness
 	// in the case that a tx was rejected when it was preferred in a conflict
 	// set and there was a tie for the second highest numSuccessfulPolls.
-	lastVote int
+	lastVote uint64
 
 	// tx is the actual transaction this node represents
 	tx Tx
@@ -179,8 +181,7 @@ func (ig *Input) Add(tx Tx) error {
 
 	// If a tx that this tx depends on is rejected, this tx should also be
 	// rejected.
-	ig.registerRejector(ig, tx)
-	return nil
+	return ig.registerRejector(ig, tx)
 }
 
 // Issued implements the ConflictGraph interface
@@ -200,7 +201,9 @@ func (ig *Input) Issued(tx Tx) bool {
 func (ig *Input) RecordPoll(votes ids.Bag) (bool, error) {
 	// Increase the vote ID. This is only updated here and is used to reset the
 	// confidence values of transactions lazily.
-	ig.currentVote++
+	// This is also used to track the number of polls required to accept/reject
+	// a transaction.
+	ig.pollNumber++
 
 	// This flag tracks if the Avalanche instance needs to recompute its
 	// frontiers. Frontiers only need to be recalculated if preferences change
@@ -221,7 +224,7 @@ func (ig *Input) RecordPoll(votes ids.Bag) (bool, error) {
 		}
 
 		txNode.numSuccessfulPolls++
-		txNode.lastVote = ig.currentVote
+		txNode.lastVote = ig.pollNumber
 
 		// This tx is preferred if it is preferred in all of its conflict sets
 		preferred := true
@@ -237,10 +240,10 @@ func (ig *Input) RecordPoll(votes ids.Bag) (bool, error) {
 			// should have been reset during the last poll. So, we reset it now.
 			// Additionally, if a different tx was voted for in the last poll,
 			// the confidence should also be reset.
-			if utxo.lastVote+1 != ig.currentVote || txID != utxo.color {
+			if utxo.lastVote+1 != ig.pollNumber || txID != utxo.color {
 				utxo.confidence = 0
 			}
-			utxo.lastVote = ig.currentVote
+			utxo.lastVote = ig.pollNumber
 
 			// Update the Snowflake counter and preference.
 			utxo.color = txID
@@ -299,7 +302,9 @@ func (ig *Input) RecordPoll(votes ids.Bag) (bool, error) {
 			// registered once.
 			txNode.pendingAccept = true
 
-			ig.registerAcceptor(ig, txNode.tx)
+			if err := ig.registerAcceptor(ig, txNode.tx); err != nil {
+				return false, err
+			}
 			if ig.errs.Errored() {
 				return changed, ig.errs.Err
 			}
@@ -308,6 +313,14 @@ func (ig *Input) RecordPoll(votes ids.Bag) (bool, error) {
 		if txNode.tx.Status() == choices.Accepted {
 			// By accepting a tx, the state of this instance has changed.
 			changed = true
+		}
+	}
+
+	if len(ig.txs) > 0 {
+		if metThreshold.Len() == 0 {
+			ig.Failed()
+		} else {
+			ig.Successful()
 		}
 	}
 	return changed, ig.errs.Err
@@ -321,7 +334,7 @@ func (ig *Input) String() string {
 		confidence := ig.params.BetaRogue
 		for _, inputID := range tx.tx.InputIDs() {
 			input := ig.utxos[inputID]
-			if input.lastVote != ig.currentVote || txID != input.color {
+			if input.lastVote != ig.pollNumber || txID != input.color {
 				confidence = 0
 				break
 			}
@@ -418,7 +431,7 @@ func (ig *Input) removeConflict(txID ids.ID, inputIDs []ids.ID) {
 		// preferred.
 		preference := ids.ID{}
 		numSuccessfulPolls := -1
-		lastVote := 0
+		var lastVote uint64
 
 		// Find the new Snowball preference
 		for spender := range utxo.spenders {

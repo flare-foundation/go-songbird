@@ -4,6 +4,8 @@
 package validators
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/flare-foundation/flare/ids"
@@ -11,6 +13,8 @@ import (
 
 // Manager holds the validator set of each subnet
 type Manager interface {
+	fmt.Stringer
+
 	// Set a subnet's validator set
 	Set(ids.ID, Set) error
 
@@ -30,6 +34,10 @@ type Manager interface {
 	// RevealValidator ensures the named validator is not hidden from future
 	// samplings
 	RevealValidator(ids.ShortID) error
+
+	// Contains returns true if there is a validator with the specified ID
+	// currently in the set.
+	Contains(ids.ID, ids.ShortID) bool
 }
 
 // NewManager returns a new, empty manager
@@ -134,4 +142,43 @@ func (m *manager) RevealValidator(vdrID ids.ShortID) error {
 		}
 	}
 	return nil
+}
+
+// Contains implements the Manager interface.
+func (m *manager) Contains(subnetID ids.ID, vdrID ids.ShortID) bool {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	vdrs, ok := m.subnetToVdrs[subnetID]
+	if ok {
+		return vdrs.Contains(vdrID)
+	}
+	return false
+}
+
+func (m *manager) String() string {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	subnets := make([]ids.ID, 0, len(m.subnetToVdrs))
+	for subnetID := range m.subnetToVdrs {
+		subnets = append(subnets, subnetID)
+	}
+	ids.SortIDs(subnets)
+
+	sb := strings.Builder{}
+
+	sb.WriteString(fmt.Sprintf("Validator Manager: (Size = %d)",
+		len(subnets),
+	))
+	for _, subnetID := range subnets {
+		vdrs := m.subnetToVdrs[subnetID]
+		sb.WriteString(fmt.Sprintf(
+			"\n    Subnet[%s]: %s",
+			subnetID,
+			vdrs.PrefixedString("    "),
+		))
+	}
+
+	return sb.String()
 }

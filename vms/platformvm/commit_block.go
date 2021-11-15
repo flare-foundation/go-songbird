@@ -19,6 +19,19 @@ var (
 // be a proposal block) being enacted.
 type CommitBlock struct {
 	DoubleDecisionBlock `serialize:"true"`
+
+	wasPreferred bool
+}
+
+func (c *CommitBlock) Accept() error {
+	if c.vm.bootstrapped {
+		if c.wasPreferred {
+			c.vm.metrics.numVotesWon.Inc()
+		} else {
+			c.vm.metrics.numVotesLost.Inc()
+		}
+	}
+	return c.DoubleDecisionBlock.Accept()
 }
 
 // Verify this block performs a valid state transition.
@@ -53,6 +66,7 @@ func (c *CommitBlock) Verify() error {
 	}
 
 	c.onAcceptState, c.onAcceptFunc = parent.onCommit()
+	c.timestamp = c.onAcceptState.GetTimestamp()
 
 	c.vm.currentBlocks[blkID] = c
 	parent.addChild(c)
@@ -60,8 +74,9 @@ func (c *CommitBlock) Verify() error {
 }
 
 // newCommitBlock returns a new *Commit block where the block's parent, a
-// proposal block, has ID [parentID].
-func (vm *VM) newCommitBlock(parentID ids.ID, height uint64) (*CommitBlock, error) {
+// proposal block, has ID [parentID]. Additionally the block will track if it
+// was originally preferred or not for metrics.
+func (vm *VM) newCommitBlock(parentID ids.ID, height uint64, wasPreferred bool) (*CommitBlock, error) {
 	commit := &CommitBlock{
 		DoubleDecisionBlock: DoubleDecisionBlock{
 			CommonDecisionBlock: CommonDecisionBlock{
@@ -71,12 +86,13 @@ func (vm *VM) newCommitBlock(parentID ids.ID, height uint64) (*CommitBlock, erro
 				},
 			},
 		},
+		wasPreferred: wasPreferred,
 	}
 
 	// We serialize this block as a Block so that it can be deserialized into a
 	// Block
 	blk := Block(commit)
-	bytes, err := Codec.Marshal(codecVersion, &blk)
+	bytes, err := Codec.Marshal(CodecVersion, &blk)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal commit block: %w", err)
 	}

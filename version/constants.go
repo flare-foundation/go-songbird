@@ -4,22 +4,22 @@
 package version
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
+// These are globals that describe network upgrades and node versions
 var (
-	String                       string // Printed when CLI arg --version is used
-	GitCommit                    string // Set in the build script (i.e. at compile time)
-	Current                      = NewDefaultVersion(1, 5, 2)
+	Current                      = NewDefaultVersion(1, 6, 5)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 4, 5)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 6, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 1, 1, 0)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 1, 0, 0)
 	VersionParser                = NewDefaultApplicationParser()
+
+	MinUptimeVersion = NewDefaultApplication(constants.PlatformName, 1, 6, 5)
 
 	CurrentDatabase = DatabaseVersion1_4_5
 	PrevDatabase    = DatabaseVersion1_0_0
@@ -28,31 +28,23 @@ var (
 	DatabaseVersion1_0_0 = NewDefaultVersion(1, 0, 0)
 
 	ApricotPhase0Times       = map[uint32]time.Time{}
-	ApricotPhase0DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
+	ApricotPhase0DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase1Times       = map[uint32]time.Time{}
-	ApricotPhase1DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
+	ApricotPhase1DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase2Times       = map[uint32]time.Time{}
-	ApricotPhase2DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
+	ApricotPhase2DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase3Times       = map[uint32]time.Time{}
-	ApricotPhase3DefaultTime = time.Date(2021, time.January, 0, 0, 0, 0, 0, time.UTC)
-)
+	ApricotPhase3DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-func init() {
-	format := "%s [database=%s"
-	args := []interface{}{
-		CurrentApp,
-		CurrentDatabase,
-	}
-	if GitCommit != "" {
-		format += ", commit=%s"
-		args = append(args, GitCommit)
-	}
-	format += "]\n"
-	String = fmt.Sprintf(format, args...)
-}
+	ApricotPhase4Times       = map[uint32]time.Time{}
+	ApricotPhase4DefaultTime = time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
+	ApricotPhase4DefaultMinPChainHeight uint64
+)
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase0Times[networkID]; exists {
@@ -82,11 +74,25 @@ func GetApricotPhase3Time(networkID uint32) time.Time {
 	return ApricotPhase3DefaultTime
 }
 
+func GetApricotPhase4Time(networkID uint32) time.Time {
+	if upgradeTime, exists := ApricotPhase4Times[networkID]; exists {
+		return upgradeTime
+	}
+	return ApricotPhase4DefaultTime
+}
+
+func GetApricotPhase4MinPChainHeight(networkID uint32) uint64 {
+	if minHeight, exists := ApricotPhase4MinPChainHeight[networkID]; exists {
+		return minHeight
+	}
+	return ApricotPhase4DefaultMinPChainHeight
+}
+
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetApricotPhase3Time(networkID),
+		GetApricotPhase4Time(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
 		GetApricotPhase0Time(networkID),

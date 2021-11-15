@@ -30,6 +30,11 @@ const (
 	codecVersion    = 0
 )
 
+var (
+	errNoCChainGenesis = errors.New("C-Chain genesis cannot be empty")
+	errNoTxs           = errors.New("genesis creates no transactions")
+)
+
 // validateConfig returns an error if the provided
 // *Config is not considered valid.
 func validateConfig(networkID uint32, config *Config) error {
@@ -60,7 +65,7 @@ func validateConfig(networkID uint32, config *Config) error {
 	}
 
 	if len(config.CChainGenesis) == 0 {
-		return errors.New("C-Chain genesis cannot be empty")
+		return errNoCChainGenesis
 	}
 
 	return nil
@@ -250,7 +255,7 @@ func AVAXAssetID(avmGenesisBytes []byte) (ids.ID, error) {
 	}
 
 	if len(genesis.Txs) == 0 {
-		return ids.ID{}, errors.New("genesis creates no transactions")
+		return ids.ID{}, errNoTxs
 	}
 	genesisTx := genesis.Txs[0]
 

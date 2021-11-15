@@ -43,6 +43,6 @@ if [ -z ${ROCKSDBALLOWED+x} ]; then
     echo "Building Flare..."
     go build -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/app/"*.go
 else
-    echo "Building Flare with rocksdb enabled..."
+    echo "Building Flare with RocksDB enabled..."
     go build -tags rocksdballowed -ldflags "-X github.com/flare-foundation/flare/version.GitCommit=$git_commit $static_ld_flags" -o "$flare_path" "$FLARE_PATH/app/"*.go
 fi

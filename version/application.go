@@ -79,7 +79,7 @@ func (v *application) Compatible(o Application) error {
 	// version. This should be removed once we reject Avalanche versions.
 	if o.App() == "flare" &&
 		o.Major() == 0 &&
-		o.Minor() == 2 {
+		o.Minor() == 3 {
 		return nil
 	}
 	switch {
@@ -98,7 +98,7 @@ func (v *application) Before(o Application) bool {
 	// version. This should be removed once we reject Avalanche versions.
 	if o.App() == "flare" &&
 		o.Major() == 0 &&
-		o.Minor() == 2 {
+		o.Minor() == 3 {
 		return true
 	}
 	if v.App() != o.App() {

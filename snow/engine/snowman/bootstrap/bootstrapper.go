@@ -17,8 +17,6 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/queue"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
-	"github.com/flare-foundation/flare/utils/formatting"
 )
 
 // Parameters for delaying bootstrapping to avoid potential CPU burns
@@ -139,7 +137,8 @@ func (b *Bootstrapper) ForceAccepted(acceptedContainerIDs []ids.ID) error {
 	// we iterate over every container that must be traversed.
 	pendingContainerIDs = append(pendingContainerIDs, acceptedContainerIDs...)
 	toProcess := make([]snowman.Block, 0, len(acceptedContainerIDs))
-	b.Ctx.Log.Debug("Starting bootstrapping with %d pending blocks and %d from the accepted frontier", len(pendingContainerIDs), len(acceptedContainerIDs))
+	b.Ctx.Log.Debug("Starting bootstrapping with %d pending blocks and %d from the accepted frontier",
+		len(pendingContainerIDs), len(acceptedContainerIDs))
 	for _, blkID := range pendingContainerIDs {
 		b.startingAcceptedFrontier.Add(blkID)
 		if blk, err := b.VM.GetBlock(blkID); err == nil {
@@ -161,7 +160,7 @@ func (b *Bootstrapper) ForceAccepted(acceptedContainerIDs []ids.ID) error {
 
 	// Process received blocks
 	for _, blk := range toProcess {
-		if err := b.process(blk); err != nil {
+		if err := b.process(blk, nil); err != nil {
 			return err
 		}
 	}
@@ -195,7 +194,7 @@ func (b *Bootstrapper) fetch(blkID ids.ID) error {
 	b.RequestID++
 
 	b.OutstandingRequests.Add(validatorID, b.RequestID, blkID)
-	b.Sender.GetAncestors(validatorID, b.RequestID, blkID) // request block and ancestors
+	b.Sender.SendGetAncestors(validatorID, b.RequestID, blkID) // request block and ancestors
 	return nil
 }
 
@@ -219,24 +218,29 @@ func (b *Bootstrapper) MultiPut(vdr ids.ShortID, requestID uint32, blks [][]byte
 		return nil
 	}
 
-	wantedBlk, err := b.VM.ParseBlock(blks[0]) // the block we requested
-	if err != nil {
-		b.Ctx.Log.Debug("Failed to parse requested block %s: %s", wantedBlkID, err)
+	blocks, err := block.BatchedParseBlock(b.VM, blks)
+	if err != nil { // the provided blocks couldn't be parsed
+		b.Ctx.Log.Debug("failed to parse blocks in MultiPut from %s with ID %d", vdr, requestID)
 		return b.fetch(wantedBlkID)
-	} else if actualID := wantedBlk.ID(); actualID != wantedBlkID {
+	}
+
+	if len(blocks) == 0 {
+		b.Ctx.Log.Debug("parsing blocks returned an empty set of blocks from %s with ID %d", vdr, requestID)
+		return b.fetch(wantedBlkID)
+	}
+
+	requestedBlock := blocks[0]
+	if actualID := requestedBlock.ID(); actualID != wantedBlkID {
 		b.Ctx.Log.Debug("expected the first block to be the requested block, %s, but is %s",
-			wantedBlk, actualID)
+			wantedBlkID, actualID)
 		return b.fetch(wantedBlkID)
 	}
 
-	for _, blkBytes := range blks[1:] {
-		if _, err := b.VM.ParseBlock(blkBytes); err != nil { // persists the block
-			b.Ctx.Log.Debug("Failed to parse block: %s", err)
-			b.Ctx.Log.Verbo("block: %s", formatting.DumpBytes{Bytes: blkBytes})
-		}
+	blockSet := make(map[ids.ID]snowman.Block, len(blocks))
+	for _, block := range blocks[1:] {
+		blockSet[block.ID()] = block
 	}
-
-	return b.process(wantedBlk)
+	return b.process(requestedBlock, blockSet)
 }
 
 // GetAncestorsFailed is called when a GetAncestors message we sent fails
@@ -264,7 +268,7 @@ func (b *Bootstrapper) Timeout() error {
 }
 
 // process a block
-func (b *Bootstrapper) process(blk snowman.Block) error {
+func (b *Bootstrapper) process(blk snowman.Block, processingBlocks map[ids.ID]snowman.Block) error {
 	status := blk.Status()
 	blkID := blk.ID()
 	blkHeight := blk.Height()
@@ -292,11 +296,19 @@ func (b *Bootstrapper) process(blk snowman.Block) error {
 
 		// Traverse to the next block regardless of if the block is pushed
 		blkID = blk.Parent()
-		blk, err = b.VM.GetBlock(blkID)
-		if err != nil {
-			status = choices.Unknown
-		} else {
+		processingBlock, ok := processingBlocks[blkID]
+		// first check processing blocks
+		if ok {
+			blk = processingBlock
 			status = blk.Status()
+		} else {
+			// if not available in processing blocks, get block
+			blk, err = b.VM.GetBlock(blkID)
+			if err != nil {
+				status = choices.Unknown
+			} else {
+				status = blk.Status()
+			}
 		}
 
 		if !pushed {
@@ -406,21 +418,19 @@ func (b *Bootstrapper) finish() error {
 }
 
 // Connected implements the Engine interface.
-func (b *Bootstrapper) Connected(validatorID ids.ShortID) error {
-	if connector, ok := b.VM.(validators.Connector); ok {
-		if err := connector.Connected(validatorID); err != nil {
-			return err
-		}
+func (b *Bootstrapper) Connected(nodeID ids.ShortID) error {
+	if err := b.VM.Connected(nodeID); err != nil {
+		return err
 	}
-	return b.Bootstrapper.Connected(validatorID)
+
+	return b.Bootstrapper.Connected(nodeID)
 }
 
 // Disconnected implements the Engine interface.
-func (b *Bootstrapper) Disconnected(validatorID ids.ShortID) error {
-	if connector, ok := b.VM.(validators.Connector); ok {
-		if err := connector.Disconnected(validatorID); err != nil {
-			return err
-		}
+func (b *Bootstrapper) Disconnected(nodeID ids.ShortID) error {
+	if err := b.VM.Disconnected(nodeID); err != nil {
+		return err
 	}
-	return b.Bootstrapper.Disconnected(validatorID)
+
+	return b.Bootstrapper.Disconnected(nodeID)
 }

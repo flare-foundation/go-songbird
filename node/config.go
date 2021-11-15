@@ -19,6 +19,7 @@ import (
 	"github.com/flare-foundation/flare/utils/dynamicip"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/profiler"
+	"github.com/flare-foundation/flare/utils/timer"
 )
 
 type IPCConfig struct {
@@ -60,26 +61,6 @@ type APIConfig struct {
 	KeystoreAPIEnabled bool `json:"keystoreAPIEnabled"`
 	MetricsAPIEnabled  bool `json:"metricsAPIEnabled"`
 	HealthAPIEnabled   bool `json:"healthAPIEnabled"`
-}
-
-type PeerListGossipConfig struct {
-	PeerListSize       uint32        `json:"peerListSize"`
-	PeerListGossipSize uint32        `json:"peerListGossipSize"`
-	PeerListGossipFreq time.Duration `json:"peerListGossipFreq"`
-}
-
-type ConsensusGossipConfig struct {
-	// Gossip a container in the accepted frontier every [ConsensusGossipFrequency]
-	ConsensusGossipFrequency time.Duration `json:"consensusGossipFreq"`
-	// Number of peers to gossip to when gossiping accepted frontier
-	ConsensusGossipAcceptedFrontierSize uint `json:"consensusGossipAcceptedFrontierSize"`
-	// Number of peers to gossip each accepted container to
-	ConsensusGossipOnAcceptSize uint `json:"consensusGossipOnAcceptSize"`
-}
-
-type GossipConfig struct {
-	PeerListGossipConfig
-	ConsensusGossipConfig
 }
 
 type IPConfig struct {
@@ -134,12 +115,14 @@ type DatabaseConfig struct {
 
 	// Name of the database type to use
 	Name string `json:"name"`
+
+	// Path to config file
+	Config []byte `json:"-"`
 }
 
 // Config contains all of the configurations of an Avalanche node.
 type Config struct {
 	HTTPConfig          `json:"httpConfig"`
-	GossipConfig        `json:"gossipConfig"`
 	IPConfig            `json:"ipConfig"`
 	StakingConfig       `json:"stakingConfig"`
 	genesis.TxFeeConfig `json:"txFeeConfig"`
@@ -166,6 +149,8 @@ type Config struct {
 	// Network configuration
 	NetworkConfig network.Config `json:"networkConfig"`
 
+	AdaptiveTimeoutConfig timer.AdaptiveTimeoutConfig `json:"adaptiveTimeoutConfig"`
+
 	// Benchlist Configuration
 	BenchlistConfig benchlist.Config `json:"benchlistConfig"`
 
@@ -188,9 +173,14 @@ type Config struct {
 	ConsensusRouter          router.Router       `json:"-"`
 	RouterHealthConfig       router.HealthConfig `json:"routerHealthConfig"`
 	ConsensusShutdownTimeout time.Duration       `json:"consensusShutdownTimeout"`
+	// Gossip a container in the accepted frontier every [ConsensusGossipFrequency]
+	ConsensusGossipFrequency time.Duration `json:"consensusGossipFreq"`
 
 	// Subnet Whitelist
 	WhitelistedSubnets ids.Set `json:"whitelistedSubnets"`
+
+	// SubnetConfigs
+	SubnetConfigs map[ids.ID]chains.SubnetConfig `json:"subnetConfigs"`
 
 	// ChainConfigs
 	ChainConfigs map[string]chains.ChainConfig `json:"-"`

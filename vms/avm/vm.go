@@ -28,6 +28,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/components/index"
@@ -69,7 +70,7 @@ type VM struct {
 	ctx *snow.Context
 
 	// Used to check local time
-	clock timer.Clock
+	clock mockable.Clock
 
 	genesisCodec codec.Manager
 	codec        codec.Manager
@@ -133,6 +134,7 @@ func (vm *VM) Initialize(
 	configBytes []byte,
 	toEngine chan<- common.Message,
 	fxs []*common.Fx,
+	_ common.AppSender,
 ) error {
 	avmConfig := Config{}
 	if len(configBytes) > 0 {
@@ -147,7 +149,7 @@ func (vm *VM) Initialize(
 		return err
 	}
 	vm.AddressManager = avax.NewAddressManager(ctx)
-	vm.Aliaser.Initialize()
+	vm.Aliaser = ids.NewAliaser()
 
 	db := dbManager.Current().Database
 	vm.ctx = ctx
@@ -491,7 +493,7 @@ func (vm *VM) FlushTxs() {
 		select {
 		case vm.toEngine <- common.PendingTxs:
 		default:
-			vm.ctx.Log.Warn("Delaying issuance of transactions due to contention")
+			vm.ctx.Log.Debug("dropping message to engine due to contention")
 			vm.timer.SetTimeoutIn(vm.batchTimeout)
 		}
 	}
@@ -1153,4 +1155,24 @@ func (vm *VM) lookupAssetID(asset string) (ids.ID, error) {
 		return assetID, nil
 	}
 	return ids.ID{}, fmt.Errorf("asset '%s' not found", asset)
+}
+
+// This VM doesn't (currently) have any app-specific messages
+func (vm *VM) AppRequest(nodeID ids.ShortID, requestID uint32, deadline time.Time, request []byte) error {
+	return nil
+}
+
+// This VM doesn't (currently) have any app-specific messages
+func (vm *VM) AppResponse(nodeID ids.ShortID, requestID uint32, response []byte) error {
+	return nil
+}
+
+// This VM doesn't (currently) have any app-specific messages
+func (vm *VM) AppRequestFailed(nodeID ids.ShortID, requestID uint32) error {
+	return nil
+}
+
+// This VM doesn't (currently) have any app-specific messages
+func (vm *VM) AppGossip(nodeID ids.ShortID, msg []byte) error {
+	return nil
 }

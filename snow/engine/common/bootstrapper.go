@@ -93,7 +93,7 @@ func (b *Bootstrapper) GetAcceptedFrontier(validatorID ids.ShortID, requestID ui
 	if err != nil {
 		return err
 	}
-	b.Sender.AcceptedFrontier(validatorID, requestID, acceptedFrontier)
+	b.Sender.SendAcceptedFrontier(validatorID, requestID, acceptedFrontier)
 	return nil
 }
 
@@ -181,7 +181,7 @@ func (b *Bootstrapper) AcceptedFrontier(validatorID ids.ShortID, requestID uint3
 
 // GetAccepted implements the Engine interface.
 func (b *Bootstrapper) GetAccepted(validatorID ids.ShortID, requestID uint32, containerIDs []ids.ID) error {
-	b.Sender.Accepted(validatorID, requestID, b.Bootstrapable.FilterAccepted(containerIDs))
+	b.Sender.SendAccepted(validatorID, requestID, b.Bootstrapable.FilterAccepted(containerIDs))
 	return nil
 }
 
@@ -278,11 +278,11 @@ func (b *Bootstrapper) Accepted(validatorID ids.ShortID, requestID uint32, conta
 }
 
 // Connected implements the Engine interface.
-func (b *Bootstrapper) Connected(validatorID ids.ShortID) error {
+func (b *Bootstrapper) Connected(nodeID ids.ShortID) error {
 	if b.started {
 		return nil
 	}
-	weight, ok := b.Beacons.GetWeight(validatorID)
+	weight, ok := b.Beacons.GetWeight(nodeID)
 	if !ok {
 		return nil
 	}
@@ -298,8 +298,8 @@ func (b *Bootstrapper) Connected(validatorID ids.ShortID) error {
 }
 
 // Disconnected implements the Engine interface.
-func (b *Bootstrapper) Disconnected(validatorID ids.ShortID) error {
-	if weight, ok := b.Beacons.GetWeight(validatorID); ok {
+func (b *Bootstrapper) Disconnected(nodeID ids.ShortID) error {
+	if weight, ok := b.Beacons.GetWeight(nodeID); ok {
 		// TODO: Account for weight changes in a more robust manner.
 
 		// Sub64 should rarely error since only validators that have added their
@@ -322,7 +322,7 @@ func (b *Bootstrapper) RestartBootstrap(reset bool) error {
 	}
 
 	if b.bootstrapAttempts > 0 && b.bootstrapAttempts%b.RetryBootstrapWarnFrequency == 0 {
-		b.Ctx.Log.Warn("continuing to attempt to bootstrap after %d failed attempts. Is this node connected to the internet?",
+		b.Ctx.Log.Debug("continuing to attempt to bootstrap after %d failed attempts. Is this node connected to the internet?",
 			b.bootstrapAttempts)
 	}
 
@@ -387,7 +387,7 @@ func (b *Bootstrapper) sendGetAcceptedFrontiers() {
 	}
 
 	if vdrs.Len() > 0 {
-		b.Sender.GetAcceptedFrontier(vdrs, b.RequestID)
+		b.Sender.SendGetAcceptedFrontier(vdrs, b.RequestID)
 	}
 }
 
@@ -408,6 +408,6 @@ func (b *Bootstrapper) sendGetAccepted() {
 			vdrs.Len(),
 			b.pendingSendAccepted.Len(),
 		)
-		b.Sender.GetAccepted(vdrs, b.RequestID, b.acceptedFrontier)
+		b.Sender.SendGetAccepted(vdrs, b.RequestID, b.acceptedFrontier)
 	}
 }

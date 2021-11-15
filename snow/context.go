@@ -4,18 +4,20 @@
 package snow
 
 import (
+	"crypto"
+	"crypto/x509"
 	"sync"
 	"time"
-
-	stdatomic "sync/atomic"
 
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/api/keystore"
 	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
 
 type EventDispatcher interface {
@@ -25,11 +27,6 @@ type EventDispatcher interface {
 	// Accept must be called before [containerID] is committed to the VM as accepted.
 	Accept(ctx *Context, containerID ids.ID, container []byte) error
 	Reject(ctx *Context, containerID ids.ID, container []byte) error
-}
-
-type AliasLookup interface {
-	Lookup(alias string) (ids.ID, error)
-	PrimaryAlias(id ids.ID) (string, error)
 }
 
 type SubnetLookup interface {
@@ -62,7 +59,7 @@ type Context struct {
 	Lock                sync.RWMutex
 	Keystore            keystore.BlockchainKeystore
 	SharedMemory        atomic.SharedMemory
-	BCLookup            AliasLookup
+	BCLookup            ids.AliaserReader
 	SNLookup            SubnetLookup
 	Namespace           string
 	Metrics             prometheus.Registerer
@@ -70,20 +67,52 @@ type Context struct {
 	// Epoch management
 	EpochFirstTransition time.Time
 	EpochDuration        time.Duration
-	Clock                timer.Clock
+	Clock                mockable.Clock
 
-	// Non-zero iff this chain bootstrapped. Should only be accessed atomically.
-	bootstrapped uint32
+	// Non-zero iff this chain bootstrapped.
+	bootstrapped utils.AtomicBool
+
+	// Non-zero iff this chain is executing transactions.
+	executing utils.AtomicBool
+
+	// Indicates this chain is available to only validators.
+	validatorOnly utils.AtomicBool
+
+	// snowman++ attributes
+	ValidatorState    validators.State  // interface for P-Chain validators
+	StakingLeafSigner crypto.Signer     // block signer
+	StakingCertLeaf   *x509.Certificate // block certificate
 }
 
 // IsBootstrapped returns true iff this chain is done bootstrapping
 func (ctx *Context) IsBootstrapped() bool {
-	return stdatomic.LoadUint32(&ctx.bootstrapped) > 0
+	return ctx.bootstrapped.GetValue()
 }
 
 // Bootstrapped marks this chain as done bootstrapping
 func (ctx *Context) Bootstrapped() {
-	stdatomic.StoreUint32(&ctx.bootstrapped, 1)
+	ctx.bootstrapped.SetValue(true)
+}
+
+// IsExecuting returns true iff this chain is still executing transactions.
+func (ctx *Context) IsExecuting() bool {
+	return ctx.executing.GetValue()
+}
+
+// Executing marks this chain as executing or not.
+// Set to "true" if there's an ongoing transaction.
+func (ctx *Context) Executing(b bool) {
+	ctx.executing.SetValue(b)
+}
+
+// IsValidatorOnly returns true iff this chain is available only to validators
+func (ctx *Context) IsValidatorOnly() bool {
+	return ctx.validatorOnly.GetValue()
+}
+
+// SetValidatorOnly  marks this chain as available only to validators
+func (ctx *Context) SetValidatorOnly() {
+	ctx.validatorOnly.SetValue(true)
 }
 
 // Epoch this context thinks it's in based on the wall clock time.
@@ -99,8 +128,6 @@ func (ctx *Context) Epoch() uint32 {
 }
 
 func DefaultContextTest() *Context {
-	aliaser := &ids.Aliaser{}
-	aliaser.Initialize()
 	return &Context{
 		NetworkID:           0,
 		SubnetID:            ids.Empty,
@@ -109,7 +136,7 @@ func DefaultContextTest() *Context {
 		Log:                 logging.NoLog{},
 		DecisionDispatcher:  emptyEventDispatcher{},
 		ConsensusDispatcher: emptyEventDispatcher{},
-		BCLookup:            aliaser,
+		BCLookup:            ids.NewAliaser(),
 		Namespace:           "",
 		Metrics:             prometheus.NewRegistry(),
 	}

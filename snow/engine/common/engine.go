@@ -4,6 +4,8 @@
 package common
 
 import (
+	"time"
+
 	"github.com/flare-foundation/flare/health"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
@@ -128,9 +130,63 @@ type AcceptedHandler interface {
 	GetAcceptedFailed(validatorID ids.ShortID, requestID uint32) error
 }
 
+type AppHandler interface {
+	// Notify this engine of a request for data from [nodeID].
+	// This node should send an AppResponse to [nodeID] in response to
+	// this message using the same request ID and before the deadline.
+	// The VM may choose to not send a response to this request.
+	// The meaning of [request], and what should be sent in response to it,
+	// is application (VM) defined.
+	// It is not guaranteed that [request] is well-formed/valid.
+	// The VM must do this validation.
+	// A non-nil return value causes this engine to shutdown.
+	AppRequest(nodeID ids.ShortID, requestID uint32, deadline time.Time, request []byte) error
+
+	// Notify this engine that an AppRequest message it sent to
+	// [nodeID] with request ID [requestID] failed.
+	// This may be because the request timed out or because the message
+	// couldn't be sent to [nodeID].
+	// It is guaranteed that:
+	// * This engine sent a request to [nodeID] with ID [requestID].
+	// * AppRequestFailed([nodeID], [requestID]) has not already been called.
+	// * AppResponse([nodeID], [requestID]) has not already been called.
+	// A non-nil return value causes this engine to shutdown.
+	AppRequestFailed(nodeID ids.ShortID, requestID uint32) error
+
+	// Notify this engine of a response to the AppRequest message it sent
+	// to [nodeID] with request ID [requestID].
+	// The meaning of [response] is application (VM) defined.
+	// It is guaranteed that:
+	// * This engine sent a request to [nodeID] with ID [requestID].
+	// * AppRequestFailed([nodeID], [requestID]) has not already been called.
+	// * AppResponse([nodeID], [requestID]) has not already been called.
+	// It is not guaranteed that [response] contains the expected response,
+	// or that [response] is well-formed/valid.
+	// The VM must perform the validation of [response].
+	// If [response] is invalid or not the expected response, the VM chooses how to react.
+	// For example, the VM may send another AppRequest, or it may give up
+	// trying to get the requested information.
+	// A non-nil return value causes this engine to shutdown.
+	// Therefore, receipt of an unexpected or invalid [response]
+	// should not cause this method to return a non-nil error!
+	AppResponse(nodeID ids.ShortID, requestID uint32, response []byte) error
+
+	// Notify this engine of a gossip message from [nodeID].
+	// This message is not expected in response to any event, and it does
+	// not need to be responded to.
+	// The meaning of [msg] is application (VM) defined, and the VM defines
+	// how to react to this message.
+	// A node may gossip the same message multiple times. That is,
+	// AppGossip([nodeID], [msg]) may be called multiple times.
+	// A non-nil return value causes this engine to shutdown.
+	AppGossip(nodeID ids.ShortID, msg []byte) error
+}
+
 // FetchHandler defines how a consensus engine reacts to retrieval messages from
 // other validators. Functions only return fatal errors if they occur.
 type FetchHandler interface {
+	AppHandler
+
 	// Notify this engine of a request for a container.
 	//
 	// This function can be called by any validator. It is not safe to assume
