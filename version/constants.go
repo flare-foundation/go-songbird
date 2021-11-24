@@ -43,7 +43,7 @@ var (
 	ApricotPhase4DefaultTime = time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
-	ApricotPhase4DefaultMinPChainHeight uint64
+	ApricotPhase4DefaultMinPChainHeight = uint64(0)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {

@@ -1093,7 +1093,7 @@ func (n *Node) Initialize(
 	if err = n.initNetworking(); err != nil { // Set up all networking
 		return fmt.Errorf("problem initializing networking: %w", err)
 	}
-	if err = n.initEventDispatcher(); err != nil { // Set up the event dipatcher
+	if err = n.initEventDispatcher(); err != nil { // Set up the event dispatcher
 		return fmt.Errorf("problem initializing event dispatcher: %w", err)
 	}
 
