@@ -196,7 +196,7 @@ type manager struct {
 	// Value: The chain
 	chains map[ids.ID]*router.Handler
 
-	// snowman++ related interface to allow validators retrival
+	// snowman++ related interface to allow validators retrieval
 	validatorState validators.State
 }
 
