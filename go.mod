@@ -1,9 +1,5 @@
 module github.com/flare-foundation/flare
 
-// Changes to the minimum golang version must also be replicated in
-// scripts/build_flare.sh
-// README.md
-// go.mod (here, only major.minor can be specified)
 go 1.16
 
 require (
