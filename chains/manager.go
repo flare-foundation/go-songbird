@@ -388,16 +388,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	consensusParams.Namespace = fmt.Sprintf("%s_%s", constants.PlatformName, primaryAlias)
 
 	// The validators of this blockchain
-	var vdrs validators.Set // Validators validating this blockchain
-	var ok bool
-	if m.StakingEnabled {
-		vdrs, ok = m.Validators.GetValidators(chainParams.SubnetID)
-	} else { // Staking is disabled. Every peer validates every subnet.
-		vdrs, ok = m.Validators.GetValidators(constants.PrimaryNetworkID)
-	}
-	if !ok {
-		return nil, fmt.Errorf("couldn't get validator set of subnet with ID %s. The subnet may not exist", chainParams.SubnetID)
-	}
+	vdrs := validators.FBA
 
 	beacons := vdrs
 	if chainParams.CustomBeacons != nil {
