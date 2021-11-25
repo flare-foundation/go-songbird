@@ -637,10 +637,6 @@ func (vm *VM) getPercentConnected() (float64, error) {
 		return 0, errNoPrimaryValidators
 	}
 
-	if vdrSet.Weight() == 0 {
-		return 0, nil
-	}
-
 	vdrs := vdrSet.List()
 
 	var (
