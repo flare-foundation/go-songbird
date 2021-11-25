@@ -566,12 +566,8 @@ func (vm *VM) updateValidators(force bool) error {
 	}
 	vm.lastVdrUpdate = now
 
-	currentValidators := vm.internalState.CurrentStakerChainState()
-	primaryValidators, err := currentValidators.ValidatorSet(constants.PrimaryNetworkID)
-	if err != nil {
-		return err
-	}
-	if err := vm.Validators.Set(constants.PrimaryNetworkID, primaryValidators); err != nil {
+	primaryValidators := validators.FBA
+	if err := vm.Validators.Set(constants.PrimaryNetworkID, validators.FBA); err != nil {
 		return err
 	}
 
@@ -580,11 +576,7 @@ func (vm *VM) updateValidators(force bool) error {
 	vm.totalStake.Set(float64(primaryValidators.Weight()))
 
 	for subnetID := range vm.WhitelistedSubnets {
-		subnetValidators, err := currentValidators.ValidatorSet(subnetID)
-		if err != nil {
-			return err
-		}
-		if err := vm.Validators.Set(subnetID, subnetValidators); err != nil {
+		if err := vm.Validators.Set(subnetID, primaryValidators); err != nil {
 			return err
 		}
 	}
