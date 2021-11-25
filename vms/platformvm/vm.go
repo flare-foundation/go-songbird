@@ -566,13 +566,25 @@ func (vm *VM) updateValidators(force bool) error {
 	}
 	vm.lastVdrUpdate = now
 
-	if err := vm.Validators.Set(constants.PrimaryNetworkID, fbaValidators); err != nil {
+	currentValidators := vm.internalState.CurrentStakerChainState()
+	primaryValidators, err := currentValidators.ValidatorSet(constants.PrimaryNetworkID)
+	if err != nil {
 		return err
 	}
-	vm.totalStake.Set(float64(fbaValidators.Weight()))
+	if err := vm.Validators.Set(constants.PrimaryNetworkID, primaryValidators); err != nil {
+		return err
+	}
+
+	weight, _ := primaryValidators.GetWeight(vm.ctx.NodeID)
+	vm.localStake.Set(float64(weight))
+	vm.totalStake.Set(float64(primaryValidators.Weight()))
 
 	for subnetID := range vm.WhitelistedSubnets {
-		if err := vm.Validators.Set(subnetID, fbaValidators); err != nil {
+		subnetValidators, err := currentValidators.ValidatorSet(subnetID)
+		if err != nil {
+			return err
+		}
+		if err := vm.Validators.Set(subnetID, subnetValidators); err != nil {
 			return err
 		}
 	}
