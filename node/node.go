@@ -574,8 +574,6 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 	// If any of these chains die, the node shuts down
 	criticalChains := ids.Set{}
 	criticalChains.Add(
-		constants.PlatformChainID,
-		xChainID,
 		cChainID,
 	)
 
