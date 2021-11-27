@@ -234,7 +234,7 @@ func TestGenesis(t *testing.T) {
 		},
 		"local": {
 			networkID: constants.LocalID,
-			expected:  "4cbed10cd2246f723e9d12157abaddf93844830804095de48023ab62e32ad6eb",
+			expected:  "ea56695f55b9e13939645bd57b314247a851e9082b843a4568b4872fa351f348",
 		},
 		"local (with custom specified)": {
 			networkID:    constants.LocalID,
@@ -339,7 +339,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "RrcDUXThuRvFXgALVGQqsTLdCnyqzGLRMsB5ttJspk4B7rkxJ",
+					expectedID: "2Ytp7NiJQBsLP1qSCuiNEjaxkapuELS3WQBrNEiiGGsQHheUo3",
 				},
 			},
 		},
