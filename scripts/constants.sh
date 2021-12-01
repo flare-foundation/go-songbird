@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-#
+
 # Use lower_case variables in the scripts and UPPER_CASE variables for override
 # Use the constants.sh for env overrides
 # Use the versions.sh to specify versions
-#
 
 FLARE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd ) # Directory above this script
 

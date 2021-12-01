@@ -1,0 +1,84 @@
+{
+    "validators": [
+        {
+            "nodeID": "NodeID-3M9KVT6ixi4gVMisbm5TnPXYXgFN5LHuv",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-Cn9P5wgg7d9RNLqm4dFLCUV2diCxpkj7f",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-QCt9AxMPt5nn445CQGoA3yktqkChnKmPY",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-9bWz6J61B8WbQtzeSyA1jsXosyVbuUJd1",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-DLMnewsEwtSH8Qk7p9RGzUVyZAaZVMKsk",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-7meEpyjmGbL577th58dm4nvvtVZiJusFp",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-JeYnnrUkuArAAe2Sjo47Z3X5yfeF7cw43",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-Fdwp9Wtjh5rxzuTCF9z4zrSM31y7ZzBQS",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-JdEBRLS98PansyFKQUzFKqk4xqrVZ41nC",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-NnX4fajAmyvpL9RLfheNdc47FKKDuQW8i",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-AzdF8JNU468uwZYGquHt7bhDrsggZpK67",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-FqeGcnLAXbDTthd382aP9uyu1i47paRRh",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-B9HuZ5hDkRodyRRsiMEHWgMmmMF7xSKbj",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-Jx3E1F7mfkseZmqnFgDUFV3eusMxVdT6Z",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-FnvWuwvJGezs4uaBLujkfeM8U3gmAUY3Z",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-LhVs6hzHjBcEkzA1Eu8Qxb9nEQAk1Qbgf",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-9SqDo3MxpvEDN4bE4rLTyM7HkkKAw4h96",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-4tStYRTi3KDxFmv1YHTZAQxbzeyMA7z52",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-8XnMh17zo6pB8Pa2zptRBi9TbbMZgij2t",
+            "weight": 50000
+        },
+        {
+            "nodeID": "NodeID-PEDdah7g7Efiii1xw8ex2dH58oMfByzjb",
+            "weight": 50000
+        }
+    ]
+}
