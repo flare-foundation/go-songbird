@@ -40,7 +40,9 @@ var (
 			"istanbulBlock": 0,
 			"muirGlacierBlock": 0,
 			"apricotPhase1BlockTimestamp": 0,
-			"apricotPhase2BlockTimestamp": 0
+			"apricotPhase2BlockTimestamp": 0,
+			"apricotPhase3BlockTimestamp": 0,
+			"apricotPhase4BlockTimestamp": 0
 		},
 		"nonce": "0x0",
 		"timestamp": "0x0",
