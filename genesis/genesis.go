@@ -54,15 +54,16 @@ func validateConfig(networkID uint32, config *Config) error {
 		)
 	}
 
-	offsetTimeRequired := config.InitialStakeDurationOffset * uint64(len(config.InitialStakers)-1)
-	if offsetTimeRequired > config.InitialStakeDuration {
-		return fmt.Errorf(
-			"initial stake duration is %d but need at least %d with offset of %d",
-			config.InitialStakeDuration,
-			offsetTimeRequired,
-			config.InitialStakeDurationOffset,
-		)
-	}
+	// TODO: Fix this validation for selection of FBA set.
+	// offsetTimeRequired := config.InitialStakeDurationOffset * uint64(len(config.InitialStakers)-1)
+	// if offsetTimeRequired > config.InitialStakeDuration {
+	// 	return fmt.Errorf(
+	// 		"initial stake duration is %d but need at least %d with offset of %d",
+	// 		config.InitialStakeDuration,
+	// 		offsetTimeRequired,
+	// 		config.InitialStakeDurationOffset,
+	// 	)
+	// }
 
 	if len(config.CChainGenesis) == 0 {
 		return errNoCChainGenesis

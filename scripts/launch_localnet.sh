@@ -7,7 +7,7 @@ export FBA_VALs=./scripts/configs/local/fba_validators.json
 
 printf "Launching node 1 at 127.0.0.1:9650\n"
 export WEB3_API=enabled
-./build/flare \
+./build/flare --network-id=local \
     --public-ip=127.0.0.1 \
     --http-port=9650 \
     --staking-port=9651 \
@@ -24,7 +24,7 @@ sleep 3
 
 printf "Launching node 2 at 127.0.0.1:9660\n"
 export WEB3_API=enabled
-./build/flare \
+./build/flare --network-id=local \
     --public-ip=127.0.0.1 \
     --http-port=9660 \
     --staking-port=9661 \
@@ -41,7 +41,7 @@ sleep 3
 
 printf "Launching node 3 at 127.0.0.1:9670\n"
 export WEB3_API=enabled
-./build/flare \
+./build/flare --network-id=local \
     --public-ip=127.0.0.1 \
     --http-port=9670 \
     --staking-port=9671 \
@@ -58,7 +58,7 @@ sleep 3
 
 printf "Launching node 4 at 127.0.0.1:9680\n"
 export WEB3_API=enabled
-./build/flare \
+./build/flare --network-id=local \
     --public-ip=127.0.0.1 \
     --http-port=9680 \
     --staking-port=9681 \
@@ -75,7 +75,7 @@ sleep 3
 
 printf "Launching node 5 at 127.0.0.1:9690\n"
 export WEB3_API=enabled
-./build/flare \
+./build/flare --network-id=local \
     --public-ip=127.0.0.1 \
     --http-port=9690 \
     --staking-port=9691 \
