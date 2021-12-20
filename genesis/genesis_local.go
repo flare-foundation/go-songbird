@@ -26,7 +26,7 @@ var (
 	// network.
 	localCChainGenesis = `{
 		"config": {
-			"chainId": 20210406,
+			"chainId": 4294967295,
 			"homesteadBlock": 0,
 			"daoForkBlock": 0,
 			"daoForkSupport": true,

@@ -7,7 +7,7 @@
 
 # Set up the versions to be used
 # Don't export them as their used in the context of other calls
-coreth_version=${CORETH_VERSION:-'438c75fa5bfb0f7a21d0deecb0922905ef3b6e7a'}
+coreth_version=${CORETH_VERSION:-'51759a790da94e83025369b2b4fbf651654123f5'}
 
 # Changes to the minimum golang version must also be replicated in
 # README.md
