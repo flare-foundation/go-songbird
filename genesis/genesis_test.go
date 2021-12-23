@@ -212,7 +212,7 @@ func TestGenesis(t *testing.T) {
 		},
 		"coston": {
 			networkID: constants.CostonID,
-			expected:  "ecbcb5e3ce88d1bc3db10bb255acf7079f4b746b8bd09851e15c3a9ef5f7eabe",
+			expected:  "3db0d1b4f7b84402237be571667ff22e760bc0ed1a57e41e44cc86246bf94317",
 		},
 		"local": {
 			networkID: constants.LocalID,
@@ -321,7 +321,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "2ndykEwY2y8A3cjb67LK8rXBqp5DSCZLMc5bSm3WMFwW2SqdjU",
+					expectedID: "TWbLQ1bXwJCy4c2jCiBGXBz5RDsHygfBXwUeuk6gn7pz3vdx7",
 				},
 			},
 		},

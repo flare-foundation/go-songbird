@@ -37,13 +37,18 @@ var (
 	ApricotPhase2DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase3Times = map[uint32]time.Time{
-		constants.LocalID: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)}
-	ApricotPhase3DefaultTime = time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC)
+		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+	}
+	ApricotPhase3DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase4Times = map[uint32]time.Time{
-		constants.LocalID: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
-	ApricotPhase4DefaultTime = time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC)
+	ApricotPhase4DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
