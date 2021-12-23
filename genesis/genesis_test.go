@@ -73,24 +73,6 @@ func TestValidateConfig(t *testing.T) {
 			}(),
 			err: "start time cannot be in the future",
 		},
-		"invalid initial stake duration": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakeDuration = 0
-				return &thisConfig
-			}(),
-			err: "initial stake duration is 0 but need at least 21600 with offset of 5400",
-		},
-		"invalid stake offset": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakeDurationOffset = 100000000
-				return &thisConfig
-			}(),
-			err: "initial stake duration is 31536000 but need at least 400000000 with offset of 100000000",
-		},
 		"empty C-Chain genesis": {
 			networkID: 12345,
 			config: func() *Config {
@@ -217,7 +199,7 @@ func TestGenesis(t *testing.T) {
 	}{
 		"flare": {
 			networkID: constants.FlareID,
-			expected:  "cb197d98f75c9c04935961d411511af5e19161051c03e5a12c3fd6b71f39ede1",
+			expected:  "21deece2c88ac4cf7b9ebb265054946c7938fa447d472be97dc7579871555010",
 		},
 		"songbird": {
 			networkID: constants.SongbirdID,
@@ -230,11 +212,11 @@ func TestGenesis(t *testing.T) {
 		},
 		"coston": {
 			networkID: constants.CostonID,
-			expected:  "fe7832c0baf9c8e350bef2ea06c05958805aabc7f9c5cc6598a414f772819529",
+			expected:  "3db0d1b4f7b84402237be571667ff22e760bc0ed1a57e41e44cc86246bf94317",
 		},
 		"local": {
 			networkID: constants.LocalID,
-			expected:  "ea56695f55b9e13939645bd57b314247a851e9082b843a4568b4872fa351f348",
+			expected:  "047a9119121fedfd296c4f684974fa1d4bdb91b94675e7b57db266a309afab8c",
 		},
 		"local (with custom specified)": {
 			networkID:    constants.LocalID,
@@ -313,7 +295,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "2iB9avCQeuXNLse4wTA85W4jevQnWTY2QHp3DVoJ4PCSMXa8nP",
+					expectedID: "6ZZhw9q1giWQrdCpJqpa3dx8y5kidGvTwk1eZohPuZsYFdkr1",
 				},
 			},
 		},
@@ -331,6 +313,19 @@ func TestVMGenesis(t *testing.T) {
 			},
 		},
 		{
+			networkID: constants.CostonID,
+			vmTest: []vmTest{
+				{
+					vmID:       avm.ID,
+					expectedID: "8S5vg8ycMqULMMq2CzrRh3qqbFWjs6a35H8UwNAaS83v9Ynxa",
+				},
+				{
+					vmID:       evm.ID,
+					expectedID: "TWbLQ1bXwJCy4c2jCiBGXBz5RDsHygfBXwUeuk6gn7pz3vdx7",
+				},
+			},
+		},
+		{
 			networkID: constants.LocalID,
 			vmTest: []vmTest{
 				{
@@ -339,7 +334,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "2Ytp7NiJQBsLP1qSCuiNEjaxkapuELS3WQBrNEiiGGsQHheUo3",
+					expectedID: "86fvHfcmB1PrLA4AH4ZikG1nbct7NfmUKSg1HmZg5EQLkJtdz",
 				},
 			},
 		},
