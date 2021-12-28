@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package network
@@ -9,13 +9,14 @@ import (
 	"net"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/assert"
 )
 
 type TestMsg struct {

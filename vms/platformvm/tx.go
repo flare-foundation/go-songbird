@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
@@ -53,8 +54,14 @@ type UnsignedDecisionTx interface {
 	// Execute this transaction with the provided state.
 	Execute(vm *VM, vs VersionedState, stx *Tx) (
 		onAcceptFunc func() error,
-		err TxError,
+		err error,
 	)
+
+	// To maintain consistency with the Atomic txs
+	InputUTXOs() ids.Set
+
+	// AtomicOperations provides the requests to be written to shared memory.
+	AtomicOperations() (ids.ID, *atomic.Requests, error)
 }
 
 // UnsignedProposalTx is an unsigned operation that can be proposed
@@ -65,25 +72,20 @@ type UnsignedProposalTx interface {
 	Execute(vm *VM, state MutableState, stx *Tx) (
 		onCommitState VersionedState,
 		onAbortState VersionedState,
-		onCommitFunc func() error,
-		onAbortFunc func() error,
-		err TxError,
+		err error,
 	)
 	InitiallyPrefersCommit(vm *VM) bool
 }
 
 // UnsignedAtomicTx is an unsigned operation that can be atomically accepted
 type UnsignedAtomicTx interface {
-	UnsignedTx
-
-	// UTXOs this tx consumes
-	InputUTXOs() ids.Set
+	UnsignedDecisionTx
 
 	// Execute this transaction with the provided state.
-	Execute(vm *VM, parentState MutableState, stx *Tx) (VersionedState, TxError)
+	AtomicExecute(vm *VM, parentState MutableState, stx *Tx) (VersionedState, error)
 
 	// Accept this transaction with the additionally provided state transitions.
-	Accept(ctx *snow.Context, batch database.Batch) error
+	AtomicAccept(ctx *snow.Context, batch database.Batch) error
 }
 
 // Tx is a signed transaction

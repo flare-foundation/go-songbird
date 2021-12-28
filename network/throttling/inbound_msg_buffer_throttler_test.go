@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package throttling
@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 // Test inboundMsgBufferThrottler

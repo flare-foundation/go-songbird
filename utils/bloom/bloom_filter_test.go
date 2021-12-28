@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package bloom
@@ -6,8 +6,9 @@ package bloom
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/utils/units"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 func TestNew(t *testing.T) {

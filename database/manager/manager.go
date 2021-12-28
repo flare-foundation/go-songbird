@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package manager
@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/corruptabledb"
 	"github.com/flare-foundation/flare/database/leveldb"
 	"github.com/flare-foundation/flare/database/memdb"
 	"github.com/flare-foundation/flare/database/meterdb"
@@ -130,10 +131,12 @@ func new(
 		return nil, fmt.Errorf("couldn't create db at %s: %w", currentDBPath, err)
 	}
 
+	wrappedDB := corruptabledb.New(currentDB)
+
 	manager := &manager{
 		databases: []*VersionedDatabase{
 			{
-				Database: currentDB,
+				Database: wrappedDB,
 				Version:  currentVersion,
 			},
 		},
@@ -177,8 +180,10 @@ func new(
 			return fmt.Errorf("couldn't create db at %s: %w", path, err)
 		}
 
+		wrappedDB := corruptabledb.New(db)
+
 		manager.databases = append(manager.databases, &VersionedDatabase{
-			Database: db,
+			Database: wrappedDB,
 			Version:  version,
 		})
 

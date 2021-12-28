@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package appsender
@@ -6,10 +6,11 @@ package appsender
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/appsender/appsenderproto"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ appsenderproto.AppSenderServer = &Server{}

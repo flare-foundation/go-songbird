@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package uptime
@@ -21,10 +21,6 @@ var (
 		{
 			name:    "continuous",
 			factory: ContinuousFactory{},
-		},
-		{
-			name:    "interval",
-			factory: IntervalFactory{},
 		},
 	}
 
@@ -131,14 +127,14 @@ func StandardUsageTest(t *testing.T, factory Factory) {
 		t.Fatalf("Wrong uptime value. Expected %f got %f", .625, uptime)
 	}
 
-	currentTime = currentTime.Add((maxSkippedIntervals + 2) * halflife)
+	currentTime = currentTime.Add(34 * halflife)
 	if uptime := m.Read(currentTime); math.Abs(uptime-1) > epsilon {
 		t.Fatalf("Wrong uptime value. Expected %d got %f", 1, uptime)
 	}
 
 	m.Stop(currentTime)
 
-	currentTime = currentTime.Add((maxSkippedIntervals + 2) * halflife)
+	currentTime = currentTime.Add(34 * halflife)
 	if uptime := m.Read(currentTime); math.Abs(uptime-0) > epsilon {
 		t.Fatalf("Wrong uptime value. Expected %d got %f", 0, uptime)
 	}

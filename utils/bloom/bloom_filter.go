@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package bloom
@@ -7,9 +7,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/spaolacci/murmur3"
-
 	streakKnife "github.com/holiman/bloomfilter/v2"
+	"github.com/spaolacci/murmur3"
 )
 
 var errMaxBytes = errors.New("too large")

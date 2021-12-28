@@ -4,6 +4,11 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# Changes to the minimum golang version must also be replicated in
+# README.md
+# go.mod
+go_version_minimum="1.16.8"
+
 go_version() {
     go version | sed -nE -e 's/[^0-9.]+([0-9.]+).+/\1/p'
 }
@@ -20,18 +25,17 @@ version_lt() {
     fi
 }
 
+if version_lt "$(go_version)" "$go_version_minimum"; then
+    echo "Flare requires Go >= $go_version_minimum, Go $(go_version) found." >&2
+    exit 1
+fi
+
 # Avalanchego root folder
 FLARE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd )
 # Load the versions
 source "$FLARE_PATH"/scripts/versions.sh
 # Load the constants
 source "$FLARE_PATH"/scripts/constants.sh
-
-if version_lt "$(go_version)" "$go_version_minimum"; then
-    echo "Flare requires Go >= $go_version_minimum, Go $(go_version) found." >&2
-    exit 1
-fi
-
 
 # Build with rocksdb allowed only if the environment variable ROCKSDBALLOWED is set
 if [ -z ${ROCKSDBALLOWED+x} ]; then

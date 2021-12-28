@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package poll
@@ -6,9 +6,8 @@ package poll
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/logging"

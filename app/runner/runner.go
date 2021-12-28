@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package runner
@@ -11,10 +11,9 @@ import (
 	"github.com/hashicorp/go-plugin"
 
 	"github.com/flare-foundation/flare/app"
+	appplugin "github.com/flare-foundation/flare/app/plugin"
 	"github.com/flare-foundation/flare/app/process"
 	"github.com/flare-foundation/flare/node"
-
-	appplugin "github.com/flare-foundation/flare/app/plugin"
 )
 
 // Run an AvalancheGo node.

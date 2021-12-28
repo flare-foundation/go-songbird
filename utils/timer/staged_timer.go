@@ -1,9 +1,11 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package timer
 
-import "time"
+import (
+	"time"
+)
 
 // NewStagedTimer returns a timer that will execute [f]
 // when a timeout occurs and execute an additional timeout after

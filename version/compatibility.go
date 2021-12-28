@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
@@ -43,7 +43,7 @@ type compatibility struct {
 
 	minCompatible     Application
 	minCompatibleTime time.Time
-	prevMinCompatable Application
+	prevMinCompatible Application
 
 	minUnmaskable     Application
 	minUnmaskableTime time.Time
@@ -57,7 +57,7 @@ func NewCompatibility(
 	version Application,
 	minCompatible Application,
 	minCompatibleTime time.Time,
-	prevMinCompatable Application,
+	prevMinCompatible Application,
 	minUnmaskable Application,
 	minUnmaskableTime time.Time,
 	prevMinUnmaskable Application,
@@ -66,7 +66,7 @@ func NewCompatibility(
 		version:           version,
 		minCompatible:     minCompatible,
 		minCompatibleTime: minCompatibleTime,
-		prevMinCompatable: prevMinCompatable,
+		prevMinCompatible: prevMinCompatible,
 		minUnmaskable:     minUnmaskable,
 		minUnmaskableTime: minUnmaskableTime,
 		prevMinUnmaskable: prevMinUnmaskable,
@@ -92,7 +92,7 @@ func (c *compatibility) Compatible(peer Application) error {
 	}
 
 	// The minCompatible check isn't being enforced yet.
-	if !peer.Before(c.prevMinCompatable) {
+	if !peer.Before(c.prevMinCompatible) {
 		// The peer is at least the previous minimum compatible version.
 		return nil
 	}

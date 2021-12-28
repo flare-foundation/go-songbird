@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/units"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateSubnetTxAP3FeeChange(t *testing.T) {

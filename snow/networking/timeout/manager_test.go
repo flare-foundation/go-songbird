@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package timeout
@@ -8,11 +8,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/utils/timer"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 func TestManagerFire(t *testing.T) {

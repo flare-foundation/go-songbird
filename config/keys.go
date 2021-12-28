@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package config
@@ -6,8 +6,11 @@ package config
 // #nosec G101
 const (
 	ConfigFileKey                               = "config-file"
+	ConfigContentKey                            = "config-file-content"
+	ConfigContentTypeKey                        = "config-file-content-type"
 	VersionKey                                  = "version"
 	GenesisConfigFileKey                        = "genesis"
+	GenesisConfigContentKey                     = "genesis-content"
 	NetworkNameKey                              = "network-id"
 	TxFeeKey                                    = "tx-fee"
 	CreateAssetTxFeeKey                         = "create-asset-tx-fee"
@@ -26,6 +29,7 @@ const (
 	DBTypeKey                                   = "db-type"
 	DBPathKey                                   = "db-dir"
 	DBConfigFileKey                             = "db-config-file"
+	DBConfigContentKey                          = "db-config-file-content"
 	PublicIPKey                                 = "public-ip"
 	DynamicUpdateDurationKey                    = "dynamic-update-duration"
 	DynamicPublicIPResolverKey                  = "dynamic-public-ip"
@@ -38,9 +42,14 @@ const (
 	HTTPPortKey                                 = "http-port"
 	HTTPSEnabledKey                             = "http-tls-enabled"
 	HTTPSKeyFileKey                             = "http-tls-key-file"
+	HTTPSKeyContentKey                          = "http-tls-key-file-content"
 	HTTPSCertFileKey                            = "http-tls-cert-file"
+	HTTPSCertContentKey                         = "http-tls-cert-file-content"
 	HTTPAllowedOrigins                          = "http-allowed-origins"
+	HTTPShutdownTimeoutKey                      = "http-shutdown-timeout"
+	HTTPShutdownWaitKey                         = "http-shutdown-wait"
 	APIAuthRequiredKey                          = "api-auth-required"
+	APIAuthPasswordKey                          = "api-auth-password"
 	APIAuthPasswordFileKey                      = "api-auth-password-file"
 	BootstrapIPsKey                             = "bootstrap-ips"
 	BootstrapIDsKey                             = "bootstrap-ids"
@@ -48,7 +57,9 @@ const (
 	StakingEnabledKey                           = "staking-enabled"
 	StakingEphemeralCertEnabledKey              = "staking-ephemeral-cert-enabled"
 	StakingKeyPathKey                           = "staking-tls-key-file"
+	StakingKeyContentKey                        = "staking-tls-key-file-content"
 	StakingCertPathKey                          = "staking-tls-cert-file"
+	StakingCertContentKey                       = "staking-tls-cert-file-content"
 	StakingDisabledWeightKey                    = "staking-disabled-weight"
 	NetworkInitialTimeoutKey                    = "network-initial-timeout"
 	NetworkMinimumTimeoutKey                    = "network-minimum-timeout"
@@ -94,8 +105,6 @@ const (
 	SnowOptimalProcessingKey                    = "snow-optimal-processing"
 	SnowMaxProcessingKey                        = "snow-max-processing"
 	SnowMaxTimeProcessingKey                    = "snow-max-time-processing"
-	SnowEpochFirstTransitionKey                 = "snow-epoch-first-transition"
-	SnowEpochDurationKey                        = "snow-epoch-duration"
 	WhitelistedSubnetsKey                       = "whitelisted-subnets"
 	AdminAPIEnabledKey                          = "api-admin-enabled"
 	InfoAPIEnabledKey                           = "api-info-enabled"
@@ -128,7 +137,9 @@ const (
 	BootstrapMultiputMaxContainersSentKey       = "bootstrap-multiput-max-containers-sent"
 	BootstrapMultiputMaxContainersReceivedKey   = "bootstrap-multiput-max-containers-received"
 	ChainConfigDirKey                           = "chain-config-dir"
+	ChainConfigContentKey                       = "chain-config-content"
 	SubnetConfigDirKey                          = "subnet-config-dir"
+	SubnetConfigContentKey                      = "subnet-config-content"
 	ProfileDirKey                               = "profile-dir"
 	ProfileContinuousEnabledKey                 = "profile-continuous-enabled"
 	ProfileContinuousFreqKey                    = "profile-continuous-freq"
@@ -142,5 +153,7 @@ const (
 	OutboundThrottlerAtLargeAllocSizeKey        = "throttler-outbound-at-large-alloc-size"
 	OutboundThrottlerVdrAllocSizeKey            = "throttler-outbound-validator-alloc-size"
 	OutboundThrottlerNodeMaxAtLargeBytesKey     = "throttler-outbound-node-max-at-large-bytes"
+	UptimeMetricFreqKey                         = "uptime-metric-freq"
 	VMAliasesFileKey                            = "vm-aliases-file"
+	VMAliasesContentKey                         = "vm-aliases-file-content"
 )

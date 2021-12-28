@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package snowstorm
@@ -6,11 +6,8 @@ package snowstorm
 import (
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/flare-foundation/flare/utils/sampler"
-
 	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 func TestConflictGraphEquality(t *testing.T) {
@@ -21,7 +18,6 @@ func TestConflictGraphEquality(t *testing.T) {
 	maxInputConflicts := 2
 	numNodes := 100
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     20,
 		Alpha:                 11,
 		BetaVirtuous:          20,

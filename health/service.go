@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package health
@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/logging"
+	health "github.com/AppsFlyer/go-sundheit"
 	"github.com/prometheus/client_golang/prometheus"
 
-	health "github.com/AppsFlyer/go-sundheit"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 var _ Service = &service{}
@@ -53,7 +53,7 @@ type service struct {
 	checkFreq time.Duration
 }
 
-// RegisterCheckFn adds a check that calls [checkFn] to evaluate health
+// RegisterCheck adds a check that calls [checkFn] to evaluate health
 func (s *service) RegisterCheck(name string, checkFn Check) error {
 	check := &check{
 		name:    name,

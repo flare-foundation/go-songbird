@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/flare-foundation/flare/ids"
-
 	"github.com/flare-foundation/flare/vms/components/avax"
 )
 

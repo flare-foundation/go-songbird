@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package benchlist
@@ -15,10 +15,9 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/logging"
+	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
-
-	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 // If a peer consistently does not respond to queries, it will
@@ -137,7 +136,6 @@ func NewBenchlist(
 	minimumFailingDuration,
 	duration time.Duration,
 	maxPortion float64,
-	namespace string,
 	registerer prometheus.Registerer,
 ) (Benchlist, error) {
 	if maxPortion < 0 || maxPortion >= 1 {
@@ -157,7 +155,7 @@ func NewBenchlist(
 	}
 	benchlist.timer = timer.NewTimer(benchlist.update)
 	go benchlist.timer.Dispatch()
-	return benchlist, benchlist.metrics.Initialize(registerer, namespace)
+	return benchlist, benchlist.metrics.Initialize(registerer)
 }
 
 // Update removes benched validators whose time on the bench is over

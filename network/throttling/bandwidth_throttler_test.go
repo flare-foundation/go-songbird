@@ -1,13 +1,17 @@
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package throttling
 
 import (
 	"sync"
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 func TestBandwidthThrottler(t *testing.T) {

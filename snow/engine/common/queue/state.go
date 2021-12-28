@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package queue
@@ -6,13 +6,14 @@ package queue
 import (
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/cache/metercacher"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/linkeddb"
 	"github.com/flare-foundation/flare/database/prefixdb"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (

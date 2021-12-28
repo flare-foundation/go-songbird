@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package avm
@@ -10,11 +10,10 @@ import (
 
 	"github.com/flare-foundation/flare/api"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/vms/components/avax"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
-
 	"github.com/flare-foundation/flare/utils/formatting"
 	safemath "github.com/flare-foundation/flare/utils/math"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 type WalletService struct {
