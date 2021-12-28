@@ -308,20 +308,6 @@ func (vm *VM) Bootstrapped() error {
 		return err
 	}
 
-	primaryValidatorSet, exist := vm.Validators.GetValidators(constants.PrimaryNetworkID)
-	if !exist {
-		return errNoPrimaryValidators
-	}
-	primaryValidators := primaryValidatorSet.List()
-
-	validatorIDs := make([]ids.ShortID, len(primaryValidators))
-	for i, vdr := range primaryValidators {
-		validatorIDs[i] = vdr.ID()
-	}
-
-	if err := vm.uptimeManager.StartTracking(validatorIDs); err != nil {
-		return err
-	}
 	return vm.internalState.Commit()
 }
 

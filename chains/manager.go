@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/api/keystore"
 	"github.com/flare-foundation/flare/api/metrics"
@@ -44,7 +46,6 @@ import (
 	"github.com/flare-foundation/flare/vms"
 	"github.com/flare-foundation/flare/vms/metervm"
 	"github.com/flare-foundation/flare/vms/proposervm"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -194,7 +195,7 @@ type manager struct {
 	// Value: The chain
 	chains map[ids.ID]*router.Handler
 
-	// snowman++ related interface to allow validators retrival
+	// snowman++ related interface to allow validators retrieval
 	validatorState validators.State
 }
 

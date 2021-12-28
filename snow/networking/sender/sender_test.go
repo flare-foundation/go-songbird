@@ -26,7 +26,7 @@ import (
 )
 
 func TestSenderContext(t *testing.T) {
-	context := snow.DefaultContextTest()
+	context := snow.DefaultConsensusContextTest()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)

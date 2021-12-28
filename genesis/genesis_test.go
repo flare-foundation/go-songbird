@@ -57,69 +57,6 @@ func TestValidateConfig(t *testing.T) {
 			}(),
 			err: "start time cannot be in the future",
 		},
-		"no initial supply": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.Allocations = []Allocation{}
-				return &thisConfig
-			}(),
-			err: "initial supply must be > 0",
-		},
-		"no initial stakers": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakers = []Staker{}
-				return &thisConfig
-			}(),
-			err: "initial stakers must be > 0",
-		},
-		"invalid initial stake duration": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakeDuration = 0
-				return &thisConfig
-			}(),
-			err: "initial stake duration must be > 0",
-		},
-		"invalid stake offset": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakeDurationOffset = 100000000
-				return &thisConfig
-			}(),
-			err: "initial stake duration is 31536000 but need at least 400000000 with offset of 100000000",
-		},
-		"empty initial staked funds": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakedFunds = []ids.ShortID(nil)
-				return &thisConfig
-			}(),
-			err: "initial staked funds cannot be empty",
-		},
-		"duplicate initial staked funds": {
-			networkID: 12345,
-			config: func() *Config {
-				thisConfig := LocalConfig
-				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, thisConfig.InitialStakedFunds[0])
-				return &thisConfig
-			}(),
-			err: "duplicated in initial staked funds",
-		},
-		"initial staked funds not in allocations": {
-			networkID: 5,
-			config: func() *Config {
-				thisConfig := SongbirdConfig
-				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, LocalConfig.InitialStakedFunds[0])
-				return &thisConfig
-			}(),
-			err: "does not have an allocation to stake",
-		},
 		"empty C-Chain genesis": {
 			networkID: 12345,
 			config: func() *Config {
@@ -244,20 +181,25 @@ func TestGenesisFromFile(t *testing.T) {
 		err             string
 		expected        string
 	}{
-		"mainnet": {
+		"flare": {
 			networkID:    constants.FlareID,
 			customConfig: customGenesisConfigJSON,
-			err:          "cannot override genesis config for standard network mainnet (1)",
+			err:          "cannot override genesis config for standard network flare (1)",
 		},
-		"fuji": {
+		"songbird": {
 			networkID:    constants.SongbirdID,
 			customConfig: customGenesisConfigJSON,
-			err:          "cannot override genesis config for standard network fuji (5)",
+			err:          "cannot override genesis config for standard network songbird (5)",
 		},
-		"fuji (with custom specified)": {
+		"coston": {
+			networkID:    constants.CostonID,
+			customConfig: customGenesisConfigJSON,
+			err:          "cannot override genesis config for standard network coston (7)",
+		},
+		"songbird (with custom specified)": {
 			networkID:    constants.SongbirdID,
 			customConfig: localGenesisConfigJSON, // won't load
-			err:          "cannot override genesis config for standard network fuji (5)",
+			err:          "cannot override genesis config for standard network songbird (5)",
 		},
 		"local": {
 			networkID:    constants.LocalID,
@@ -331,13 +273,17 @@ func TestGenesisFromFlag(t *testing.T) {
 		err          string
 		expected     string
 	}{
-		"mainnet": {
+		"flare": {
 			networkID: constants.FlareID,
-			err:       "cannot override genesis config for standard network mainnet (1)",
+			err:       "cannot override genesis config for standard network flare (1)",
 		},
-		"fuji": {
+		"songbird": {
 			networkID: constants.SongbirdID,
-			err:       "cannot override genesis config for standard network fuji (5)",
+			err:       "cannot override genesis config for standard network songbird (5)",
+		},
+		"coston": {
+			networkID: constants.SongbirdID,
+			err:       "cannot override genesis config for standard network coston (7)",
 		},
 		"local": {
 			networkID: constants.LocalID,
@@ -453,6 +399,19 @@ func TestVMGenesis(t *testing.T) {
 			},
 		},
 		{
+			networkID: constants.CostonID,
+			vmTest: []vmTest{
+				{
+					vmID:       avm.ID,
+					expectedID: "2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm",
+				},
+				{
+					vmID:       evm.ID,
+					expectedID: "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp",
+				},
+			},
+		},
+		{
 			networkID: constants.LocalID,
 			vmTest: []vmTest{
 				{
@@ -506,6 +465,10 @@ func TestAVAXAssetID(t *testing.T) {
 		},
 		{
 			networkID:  constants.SongbirdID,
+			expectedID: "U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK",
+		},
+		{
+			networkID:  constants.CostonID,
 			expectedID: "U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK",
 		},
 		{

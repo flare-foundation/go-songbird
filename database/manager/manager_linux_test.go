@@ -8,10 +8,10 @@
 package manager
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"path/filepath"
 
 	"github.com/flare-foundation/flare/database/rocksdb"
 	"github.com/flare-foundation/flare/utils/logging"
