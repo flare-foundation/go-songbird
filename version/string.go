@@ -1,9 +1,11 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var (
 	// String is displayed when CLI arg --version is used

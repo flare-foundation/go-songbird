@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/rpc/v2"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/chains"
@@ -24,18 +25,18 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/uptime"
 	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
+	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/utils/units"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-
-	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 const (
@@ -117,7 +118,7 @@ type VM struct {
 	codecRegistry codec.Registry
 
 	// Bootstrapped remembers if this chain has finished bootstrapping or not
-	bootstrapped bool
+	bootstrapped utils.AtomicBool
 
 	// Contains the IDs of transactions recently dropped because they failed
 	// verification. These txs may be re-issued and put into accepted blocks, so
@@ -135,8 +136,6 @@ type VM struct {
 	// Key: block ID
 	// Value: the block
 	currentBlocks map[ids.ID]Block
-
-	lastVdrUpdate time.Time
 }
 
 // Initialize this blockchain.
@@ -153,8 +152,13 @@ func (vm *VM) Initialize(
 ) error {
 	ctx.Log.Verbo("initializing platform chain")
 
+	registerer := prometheus.NewRegistry()
+	if err := ctx.Metrics.Register(registerer); err != nil {
+		return err
+	}
+
 	// Initialize metrics as soon as possible
-	if err := vm.metrics.Initialize(ctx.Namespace, ctx.Metrics); err != nil {
+	if err := vm.metrics.Initialize("", registerer); err != nil {
 		return err
 	}
 
@@ -179,7 +183,7 @@ func (vm *VM) Initialize(
 	vm.validatorSetCaches = make(map[ids.ID]cache.Cacher)
 	vm.currentBlocks = make(map[ids.ID]Block)
 
-	if err := vm.blockBuilder.Initialize(vm); err != nil {
+	if err := vm.blockBuilder.Initialize(vm, registerer); err != nil {
 		return fmt.Errorf(
 			"failed to initialize the block builder: %w",
 			err,
@@ -187,7 +191,7 @@ func (vm *VM) Initialize(
 	}
 	vm.network = newNetwork(vm.ApricotPhase4Time, appSender, vm)
 
-	is, err := NewMeteredInternalState(vm, vm.dbManager.Current().Database, genesisBytes, ctx.Namespace, ctx.Metrics)
+	is, err := NewMeteredInternalState(vm, vm.dbManager.Current().Database, genesisBytes, registerer)
 	if err != nil {
 		return err
 	}
@@ -195,9 +199,9 @@ func (vm *VM) Initialize(
 
 	// Initialize the utility to track validator uptimes
 	vm.uptimeManager = uptime.NewManager(is)
-	vm.UptimeLockedCalculator.SetCalculator(ctx, vm.uptimeManager)
+	vm.UptimeLockedCalculator.SetCalculator(&vm.bootstrapped, &ctx.Lock, vm.uptimeManager)
 
-	if err := vm.updateValidators(true); err != nil {
+	if err := vm.updateValidators(); err != nil {
 		return fmt.Errorf(
 			"failed to initialize validator sets: %w",
 			err,
@@ -289,26 +293,35 @@ func (vm *VM) createChain(tx *Tx) error {
 
 // Bootstrapping marks this VM as bootstrapping
 func (vm *VM) Bootstrapping() error {
-	vm.bootstrapped = false
+	vm.bootstrapped.SetValue(false)
 	return vm.fx.Bootstrapping()
 }
 
 // Bootstrapped marks this VM as bootstrapped
 func (vm *VM) Bootstrapped() error {
-	if vm.bootstrapped {
+	if vm.bootstrapped.GetValue() {
 		return nil
 	}
-	vm.bootstrapped = true
+	vm.bootstrapped.SetValue(true)
 
-	errs := wrappers.Errs{}
-	errs.Add(
-		vm.updateValidators(false),
-		vm.fx.Bootstrapped(),
-	)
-	if errs.Errored() {
-		return errs.Err
+	if err := vm.fx.Bootstrapped(); err != nil {
+		return err
 	}
 
+	primaryValidatorSet, exist := vm.Validators.GetValidators(constants.PrimaryNetworkID)
+	if !exist {
+		return errNoPrimaryValidators
+	}
+	primaryValidators := primaryValidatorSet.List()
+
+	validatorIDs := make([]ids.ShortID, len(primaryValidators))
+	for i, vdr := range primaryValidators {
+		validatorIDs[i] = vdr.ID()
+	}
+
+	if err := vm.uptimeManager.StartTracking(validatorIDs); err != nil {
+		return err
+	}
 	return vm.internalState.Commit()
 }
 
@@ -320,7 +333,7 @@ func (vm *VM) Shutdown() error {
 
 	vm.blockBuilder.Shutdown()
 
-	if vm.bootstrapped {
+	if vm.bootstrapped.GetValue() {
 		primaryValidatorSet, exist := vm.Validators.GetValidators(constants.PrimaryNetworkID)
 		if !exist {
 			return errNoPrimaryValidators
@@ -559,24 +572,18 @@ func (vm *VM) GetCurrentHeight() (uint64, error) {
 	return lastAccepted.Height(), nil
 }
 
-func (vm *VM) updateValidators(force bool) error {
-	now := vm.clock.Time()
-	if !force && !vm.bootstrapped && now.Sub(vm.lastVdrUpdate) < 5*time.Second {
-		return nil
-	}
-	vm.lastVdrUpdate = now
-
-	primaryValidators := validators.FBA
-	if err := vm.Validators.Set(constants.PrimaryNetworkID, validators.FBA); err != nil {
+func (vm *VM) updateValidators() error {
+	localValidators := validators.FBA
+	if err := vm.Validators.Set(constants.PrimaryNetworkID, localValidators); err != nil {
 		return err
 	}
 
-	weight, _ := primaryValidators.GetWeight(vm.ctx.NodeID)
+	weight, _ := localValidators.GetWeight(vm.ctx.NodeID)
 	vm.localStake.Set(float64(weight))
-	vm.totalStake.Set(float64(primaryValidators.Weight()))
+	vm.totalStake.Set(float64(localValidators.Weight()))
 
 	for subnetID := range vm.WhitelistedSubnets {
-		if err := vm.Validators.Set(subnetID, primaryValidators); err != nil {
+		if err := vm.Validators.Set(subnetID, localValidators); err != nil {
 			return err
 		}
 	}

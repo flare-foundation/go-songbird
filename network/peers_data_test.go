@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package network
@@ -6,10 +6,11 @@ package network
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPeersData(t *testing.T) {
@@ -74,7 +75,7 @@ func TestPeersData(t *testing.T) {
 	assert.True(t, &peer2 == retrievedPeer2)
 	assert.True(t, data.size() == 1)
 
-	// retrieval by inbound index is handled
+	// retrival by inbound index is handled
 	peer3 := peer{
 		nodeID: ids.ShortID{0x03},
 	}
@@ -89,7 +90,7 @@ func TestPeersData(t *testing.T) {
 	assert.True(t, ok)
 	assert.True(t, &peer3 == thirdPeer)
 
-	// retrieval by outbound index is handled
+	// retrival by outbound index is handled
 	outOfIndexPeer, ok := data.getByIdx(data.size())
 	assert.False(t, ok)
 	assert.True(t, outOfIndexPeer == nil)

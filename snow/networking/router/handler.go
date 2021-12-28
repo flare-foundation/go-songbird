@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package router
@@ -7,8 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-
-	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
@@ -27,7 +25,7 @@ var errDuplicatedContainerID = errors.New("inbound message contains duplicated c
 // Handler passes incoming messages from the network to the consensus engine.
 // (Actually, it receives the incoming messages from a ChainRouter, but same difference.)
 type Handler struct {
-	ctx *snow.Context
+	ctx *snow.ConsensusContext
 	// Useful for faking time in tests
 	clock   mockable.Clock
 	mc      message.Creator
@@ -59,11 +57,9 @@ func (h *Handler) Initialize(
 	engine common.Engine,
 	validators validators.Set,
 	msgFromVMChan <-chan common.Message,
-	metricsNamespace string,
-	metricsRegisterer prometheus.Registerer,
 ) error {
 	h.ctx = engine.Context()
-	if err := h.metrics.Initialize(metricsNamespace, metricsRegisterer); err != nil {
+	if err := h.metrics.Initialize("handler", h.ctx.Registerer); err != nil {
 		return fmt.Errorf("initializing handler metrics errored with: %s", err)
 	}
 	h.mc = mc
@@ -73,14 +69,14 @@ func (h *Handler) Initialize(
 	h.validators = validators
 	var lock sync.Mutex
 	h.unprocessedMsgsCond = sync.NewCond(&lock)
-	h.cpuTracker = tracker.NewCPUTracker(uptime.IntervalFactory{}, defaultCPUInterval)
+	h.cpuTracker = tracker.NewCPUTracker(uptime.ContinuousFactory{}, defaultCPUInterval)
 	var err error
-	h.unprocessedMsgs, err = newUnprocessedMsgs(h.ctx.Log, h.validators, h.cpuTracker, metricsNamespace, metricsRegisterer)
+	h.unprocessedMsgs, err = newUnprocessedMsgs(h.ctx.Log, h.validators, h.cpuTracker, "handler", h.ctx.Registerer)
 	return err
 }
 
 // Context of this Handler
-func (h *Handler) Context() *snow.Context { return h.engine.Context() }
+func (h *Handler) Context() *snow.ConsensusContext { return h.engine.Context() }
 
 // Engine returns the engine this handler dispatches to
 func (h *Handler) Engine() common.Engine { return h.engine }
@@ -235,7 +231,7 @@ func (h *Handler) handleConsensusMsg(msg message.InboundMessage) error {
 		if err != nil {
 			h.ctx.Log.Debug("Malformed message %s from (%s, %s, %d) dropped. Error: %s",
 				msg.Op(), nodeID, h.engine.Context().ChainID, reqID, err)
-			return nil
+			return h.engine.GetAcceptedFrontierFailed(nodeID, reqID)
 		}
 		return h.engine.AcceptedFrontier(nodeID, reqID, containerIDs)
 
@@ -259,7 +255,7 @@ func (h *Handler) handleConsensusMsg(msg message.InboundMessage) error {
 		if err != nil {
 			h.ctx.Log.Debug("Malformed message %s from (%s, %s, %d) dropped. Error: %s",
 				msg.Op(), nodeID, h.engine.Context().ChainID, reqID, err)
-			return nil
+			return h.engine.GetAcceptedFailed(nodeID, reqID)
 		}
 		return h.engine.Accepted(nodeID, reqID, containerIDs)
 
@@ -336,7 +332,7 @@ func (h *Handler) handleConsensusMsg(msg message.InboundMessage) error {
 		if err != nil {
 			h.ctx.Log.Debug("Malformed message %s from (%s, %s, %d) dropped. Error: %s",
 				msg.Op(), nodeID, h.engine.Context().ChainID, reqID, err)
-			return nil
+			return h.engine.QueryFailed(nodeID, reqID)
 		}
 		return h.engine.Chits(nodeID, reqID, votes)
 
@@ -366,7 +362,7 @@ func (h *Handler) handleConsensusMsg(msg message.InboundMessage) error {
 		if !ok {
 			h.ctx.Log.Debug("Malformed message %s from (%s, %s, %d) dropped. Error: could not parse AppBytes",
 				msg.Op(), nodeID, h.engine.Context().ChainID, reqID)
-			return nil
+			return h.engine.AppRequestFailed(nodeID, reqID)
 		}
 		return h.engine.AppResponse(nodeID, reqID, appBytes)
 

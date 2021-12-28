@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -13,11 +13,10 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
+	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/components/verify"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-
-	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 var (
@@ -120,7 +119,7 @@ func (tx *UnsignedAddValidatorTx) SyntacticVerify(ctx *snow.Context) error {
 
 // Attempts to verify this transaction with the provided state.
 func (tx *UnsignedAddValidatorTx) SemanticVerify(vm *VM, parentState MutableState, stx *Tx) error {
-	_, _, _, _, err := tx.Execute(vm, parentState, stx)
+	_, _, err := tx.Execute(vm, parentState, stx)
 	// We ignore [errFutureStakeTime] here because an advanceTimeTx will be
 	// issued before this transaction is issued.
 	if errors.Is(err, errFutureStakeTime) {
@@ -137,30 +136,28 @@ func (tx *UnsignedAddValidatorTx) Execute(
 ) (
 	VersionedState,
 	VersionedState,
-	func() error,
-	func() error,
-	TxError,
+	error,
 ) {
 	// Verify the tx is well-formed
 	if err := tx.SyntacticVerify(vm.ctx); err != nil {
-		return nil, nil, nil, nil, permError{err}
+		return nil, nil, err
 	}
 
 	switch {
 	case tx.Validator.Wght < vm.MinValidatorStake: // Ensure validator is staking at least the minimum amount
-		return nil, nil, nil, nil, permError{errWeightTooSmall}
+		return nil, nil, errWeightTooSmall
 	case tx.Validator.Wght > vm.MaxValidatorStake: // Ensure validator isn't staking too much
-		return nil, nil, nil, nil, permError{errWeightTooLarge}
+		return nil, nil, errWeightTooLarge
 	case tx.Shares < vm.MinDelegationFee:
-		return nil, nil, nil, nil, permError{errInsufficientDelegationFee}
+		return nil, nil, errInsufficientDelegationFee
 	}
 
 	duration := tx.Validator.Duration()
 	switch {
 	case duration < vm.MinStakeDuration: // Ensure staking length is not too short
-		return nil, nil, nil, nil, permError{errStakeTooShort}
+		return nil, nil, errStakeTooShort
 	case duration > vm.MaxStakeDuration: // Ensure staking length is not too long
-		return nil, nil, nil, nil, permError{errStakeTooLong}
+		return nil, nil, errStakeTooLong
 	}
 
 	currentStakers := parentState.CurrentStakerChainState()
@@ -170,72 +167,53 @@ func (tx *UnsignedAddValidatorTx) Execute(
 	copy(outs, tx.Outs)
 	copy(outs[len(tx.Outs):], tx.Stake)
 
-	if vm.bootstrapped {
+	if vm.bootstrapped.GetValue() {
 		currentTimestamp := parentState.GetTimestamp()
 		// Ensure the proposed validator starts after the current time
 		startTime := tx.StartTime()
 		if !currentTimestamp.Before(startTime) {
-			return nil, nil, nil, nil, permError{
-				fmt.Errorf(
-					"validator's start time (%s) at or before current timestamp (%s)",
-					startTime,
-					currentTimestamp,
-				),
-			}
+			return nil, nil, fmt.Errorf(
+				"validator's start time (%s) at or before current timestamp (%s)",
+				startTime,
+				currentTimestamp,
+			)
 		}
 
 		// Ensure this validator isn't currently a validator.
 		_, err := currentStakers.GetValidator(tx.Validator.NodeID)
 		if err == nil {
-			return nil, nil, nil, nil, permError{
-				fmt.Errorf(
-					"%s is already a primary network validator",
-					tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
-				),
-			}
+			return nil, nil, fmt.Errorf(
+				"%s is already a primary network validator",
+				tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
+			)
 		}
 		if err != database.ErrNotFound {
-			return nil, nil, nil, nil, tempError{
-				fmt.Errorf(
-					"failed to find whether %s is a validator: %w",
-					tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
-					err,
-				),
-			}
+			return nil, nil, fmt.Errorf(
+				"failed to find whether %s is a validator: %w",
+				tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
+				err,
+			)
 		}
 
 		// Ensure this validator isn't about to become a validator.
 		_, err = pendingStakers.GetValidatorTx(tx.Validator.NodeID)
 		if err == nil {
-			return nil, nil, nil, nil, permError{
-				fmt.Errorf(
-					"%s is about to become a primary network validator",
-					tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
-				),
-			}
+			return nil, nil, fmt.Errorf(
+				"%s is about to become a primary network validator",
+				tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
+			)
 		}
 		if err != database.ErrNotFound {
-			return nil, nil, nil, nil, tempError{
-				fmt.Errorf(
-					"failed to find whether %s is about to become a validator: %w",
-					tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
-					err,
-				),
-			}
+			return nil, nil, fmt.Errorf(
+				"failed to find whether %s is about to become a validator: %w",
+				tx.Validator.NodeID.PrefixedString(constants.NodeIDPrefix),
+				err,
+			)
 		}
 
 		// Verify the flowcheck
 		if err := vm.semanticVerifySpend(parentState, tx, tx.Ins, outs, stx.Creds, vm.AddStakerTxFee, vm.ctx.AVAXAssetID); err != nil {
-			switch err.(type) {
-			case permError:
-				return nil, nil, nil, nil, permError{
-					fmt.Errorf("failed semanticVerifySpend: %w", err),
-				}
-			default:
-				return nil, nil, nil, nil, tempError{
-					fmt.Errorf("failed semanticVerifySpend: %w", err),
-				}
-			}
+			return nil, nil, fmt.Errorf("failed semanticVerifySpend: %w", err)
 		}
 
 		// Make sure the tx doesn't start too far in the future. This is done
@@ -243,7 +221,7 @@ func (tx *UnsignedAddValidatorTx) Execute(
 		// error.
 		maxStartTime := currentTimestamp.Add(maxFutureStartTime)
 		if startTime.After(maxStartTime) {
-			return nil, nil, nil, nil, permError{errFutureStakeTime}
+			return nil, nil, errFutureStakeTime
 		}
 	}
 
@@ -264,7 +242,7 @@ func (tx *UnsignedAddValidatorTx) Execute(
 	// Produce the UTXOS
 	produceOutputs(onAbortState, txID, vm.ctx.AVAXAssetID, outs)
 
-	return onCommitState, onAbortState, nil, nil, nil
+	return onCommitState, onAbortState, nil
 }
 
 // InitiallyPrefersCommit returns true if the proposed validators start time is

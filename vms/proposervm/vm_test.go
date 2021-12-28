@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package proposervm
@@ -25,9 +25,8 @@ import (
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/version"
-	"github.com/flare-foundation/flare/vms/proposervm/proposer"
-
 	statelessblock "github.com/flare-foundation/flare/vms/proposervm/block"
+	"github.com/flare-foundation/flare/vms/proposervm/proposer"
 )
 
 var (
@@ -119,7 +118,6 @@ func initTestProposerVM(
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
 	ctx.ValidatorState = valState
-	ctx.Bootstrapped()
 
 	dummyDBManager := manager.NewMemDB(version.DefaultVersion1_0_0)
 	// make sure that DBs are compressed correctly
@@ -130,6 +128,10 @@ func initTestProposerVM(
 
 	// Initialize shouldn't be called again
 	coreVM.InitializeF = nil
+
+	if err := proVM.Bootstrapped(); err != nil {
+		t.Fatal(err)
+	}
 
 	if err := proVM.SetPreference(coreGenBlk.IDV); err != nil {
 		t.Fatal(err)
@@ -274,6 +276,10 @@ func TestProposerBlocksAreBuiltOnPreferredProBlock(t *testing.T) {
 		t.Fatal("proBlk1 and proBlk2 should be different for this test")
 	}
 
+	if err := proBlk2.Verify(); err != nil {
+		t.Fatal(err)
+	}
+
 	// ...and set one as preferred
 	var prefcoreBlk *snowman.TestBlock
 	coreVM.SetPreferenceF = func(prefID ids.ID) error {
@@ -366,6 +372,10 @@ func TestCoreBlocksMustBeBuiltOnPreferredCoreBlock(t *testing.T) {
 	}
 	if proBlk1.ID() == proBlk2.ID() {
 		t.Fatal("proBlk1 and proBlk2 should be different for this test")
+	}
+
+	if err := proBlk2.Verify(); err != nil {
+		t.Fatal(err)
 	}
 
 	// ...and set one as preferred
@@ -540,22 +550,6 @@ func TestTwoProBlocksWrappingSameCoreBlockCanBeParsed(t *testing.T) {
 	}
 	if parsedBlk2.ID() != proBlk2.ID() {
 		t.Fatal("error in parsing block")
-	}
-
-	rtrvdProBlk1, err := proVM.GetBlock(proBlk1.ID())
-	if err != nil {
-		t.Fatal("Could not retrieve proBlk1")
-	}
-	if rtrvdProBlk1.ID() != proBlk1.ID() {
-		t.Fatal("blocks do not match following cache whiping")
-	}
-
-	rtrvdProBlk2, err := proVM.GetBlock(proBlk2.ID())
-	if err != nil {
-		t.Fatal("Could not retrieve proBlk1")
-	}
-	if rtrvdProBlk2.ID() != proBlk2.ID() {
-		t.Fatal("blocks do not match following cache whiping")
 	}
 }
 
@@ -856,7 +850,6 @@ func TestExpiredBuildBlock(t *testing.T) {
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
 	ctx.ValidatorState = valState
-	ctx.Bootstrapped()
 
 	dbManager := manager.NewMemDB(version.DefaultVersion1_0_0)
 	toEngine := make(chan common.Message, 1)
@@ -883,6 +876,10 @@ func TestExpiredBuildBlock(t *testing.T) {
 
 	// Initialize shouldn't be called again
 	coreVM.InitializeF = nil
+
+	if err := proVM.Bootstrapped(); err != nil {
+		t.Fatal(err)
+	}
 
 	if err := proVM.SetPreference(coreGenBlk.IDV); err != nil {
 		t.Fatal(err)
@@ -1149,7 +1146,6 @@ func TestInnerVMRollback(t *testing.T) {
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
 	ctx.ValidatorState = valState
-	ctx.Bootstrapped()
 
 	coreVM.InitializeF = func(
 		*snow.Context,
@@ -1170,6 +1166,10 @@ func TestInnerVMRollback(t *testing.T) {
 
 	if err := proVM.Initialize(ctx, dbManager, nil, nil, nil, nil, nil, nil); err != nil {
 		t.Fatalf("failed to initialize proposerVM with %s", err)
+	}
+
+	if err := proVM.Bootstrapped(); err != nil {
+		t.Fatal(err)
 	}
 
 	if err := proVM.SetPreference(coreGenBlk.IDV); err != nil {

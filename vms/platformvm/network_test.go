@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/vms/avm"
 	"github.com/flare-foundation/flare/vms/platformvm/message"
-	"github.com/stretchr/testify/assert"
 )
 
 func getValidTx(vm *VM, t *testing.T) *Tx {

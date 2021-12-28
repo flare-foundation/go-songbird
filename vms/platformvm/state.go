@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -8,9 +8,8 @@ import (
 	"fmt"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/vms/components/avax"
-
 	safemath "github.com/flare-foundation/flare/utils/math"
+	"github.com/flare-foundation/flare/vms/components/avax"
 )
 
 // getPaginatedUTXOs returns UTXOs such that at least one of the addresses in

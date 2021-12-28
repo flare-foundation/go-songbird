@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package avm
@@ -12,9 +12,8 @@ import (
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/rpc"
-
 	cjson "github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/utils/rpc"
 )
 
 // Interface compliance

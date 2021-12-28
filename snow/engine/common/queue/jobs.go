@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package queue
@@ -6,13 +6,14 @@ package queue
 import (
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/versiondb"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -88,7 +89,7 @@ func (j *Jobs) Push(job Job) (bool, error) {
 	return true, nil
 }
 
-func (j *Jobs) ExecuteAll(ctx *snow.Context, halter common.Haltable, restarted bool, events ...snow.EventDispatcher) (int, error) {
+func (j *Jobs) ExecuteAll(ctx *snow.ConsensusContext, halter common.Haltable, restarted bool, events ...snow.EventDispatcher) (int, error) {
 	ctx.Executing(true)
 	defer ctx.Executing(false)
 

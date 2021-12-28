@@ -1,5 +1,9 @@
 module github.com/flare-foundation/flare
 
+// Changes to the minimum golang version must also be replicated in
+// scripts/build_flare.sh
+// README.md
+// go.mod (here, only major.minor can be specified)
 go 1.16
 
 require (
@@ -30,6 +34,7 @@ require (
 	github.com/mr-tron/base58 v1.2.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
 	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_model v0.2.0
 	github.com/rs/cors v1.7.0
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/spf13/cast v1.3.1 // indirect

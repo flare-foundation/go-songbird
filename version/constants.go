@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
@@ -11,15 +11,13 @@ import (
 
 // These are globals that describe network upgrades and node versions
 var (
-	Current                      = NewDefaultVersion(1, 6, 5)
+	Current                      = NewDefaultVersion(1, 7, 2)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 6, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 7, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 6, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 1, 1, 0)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 1, 0, 0)
 	VersionParser                = NewDefaultApplicationParser()
-
-	MinUptimeVersion = NewDefaultApplication(constants.PlatformName, 1, 6, 5)
 
 	CurrentDatabase = DatabaseVersion1_4_5
 	PrevDatabase    = DatabaseVersion1_0_0
@@ -49,6 +47,13 @@ var (
 		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 	ApricotPhase4DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	ApricotPhase5Times = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+	}
+	ApricotPhase5DefaultTime = time.Date(2000, time.December, 5, 5, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
@@ -96,11 +101,18 @@ func GetApricotPhase4MinPChainHeight(networkID uint32) uint64 {
 	return ApricotPhase4DefaultMinPChainHeight
 }
 
+func GetApricotPhase5Time(networkID uint32) time.Time {
+	if upgradeTime, exists := ApricotPhase5Times[networkID]; exists {
+		return upgradeTime
+	}
+	return ApricotPhase5DefaultTime
+}
+
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetApricotPhase4Time(networkID),
+		GetApricotPhase5Time(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
 		GetApricotPhase0Time(networkID),

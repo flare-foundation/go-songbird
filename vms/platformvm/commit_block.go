@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -24,7 +24,7 @@ type CommitBlock struct {
 }
 
 func (c *CommitBlock) Accept() error {
-	if c.vm.bootstrapped {
+	if c.vm.bootstrapped.GetValue() {
 		if c.wasPreferred {
 			c.vm.metrics.numVotesWon.Inc()
 		} else {
@@ -43,10 +43,6 @@ func (c *CommitBlock) Verify() error {
 	blkID := c.ID()
 
 	if err := c.DoubleDecisionBlock.Verify(); err != nil {
-		c.vm.ctx.Log.Trace("rejecting block %s due to a failed verification: %s", blkID, err)
-		if err := c.Reject(); err != nil {
-			c.vm.ctx.Log.Error("failed to reject commit block %s due to %s", blkID, err)
-		}
 		return err
 	}
 
@@ -58,14 +54,10 @@ func (c *CommitBlock) Verify() error {
 	// The parent of a Commit block should always be a proposal
 	parent, ok := parentIntf.(*ProposalBlock)
 	if !ok {
-		c.vm.ctx.Log.Trace("rejecting block %s due to an incorrect parent type", blkID)
-		if err := c.Reject(); err != nil {
-			c.vm.ctx.Log.Error("failed to reject commit block %s due to %s", blkID, err)
-		}
 		return errInvalidBlockType
 	}
 
-	c.onAcceptState, c.onAcceptFunc = parent.onCommit()
+	c.onAcceptState = parent.onCommitState
 	c.timestamp = c.onAcceptState.GetTimestamp()
 
 	c.vm.currentBlocks[blkID] = c

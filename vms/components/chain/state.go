@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package chain
@@ -6,13 +6,14 @@ package chain
 import (
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/cache/metercacher"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // State implements an efficient caching layer used to wrap a VM
@@ -132,11 +133,10 @@ func NewState(config *Config) *State {
 
 func NewMeteredState(
 	registerer prometheus.Registerer,
-	namespace string,
 	config *Config,
 ) (*State, error) {
 	decidedCache, err := metercacher.New(
-		fmt.Sprintf("%s_decided_cache", namespace),
+		"decided_cache",
 		registerer,
 		&cache.LRU{Size: config.DecidedCacheSize},
 	)
@@ -144,7 +144,7 @@ func NewMeteredState(
 		return nil, err
 	}
 	missingCache, err := metercacher.New(
-		fmt.Sprintf("%s_missing_cache", namespace),
+		"missing_cache",
 		registerer,
 		&cache.LRU{Size: config.MissingCacheSize},
 	)
@@ -152,7 +152,7 @@ func NewMeteredState(
 		return nil, err
 	}
 	unverifiedCache, err := metercacher.New(
-		fmt.Sprintf("%s_unverified_cache", namespace),
+		"unverified_cache",
 		registerer,
 		&cache.LRU{Size: config.UnverifiedCacheSize},
 	)
@@ -160,7 +160,7 @@ func NewMeteredState(
 		return nil, err
 	}
 	bytesToIDCache, err := metercacher.New(
-		fmt.Sprintf("%s_bytes_to_id_cache", namespace),
+		"bytes_to_id_cache",
 		registerer,
 		&cache.LRU{Size: config.BytesToIDCacheSize},
 	)

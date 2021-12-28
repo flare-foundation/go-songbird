@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package nftfx
@@ -7,11 +7,10 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/flare-foundation/flare/vms/types"
-
 	"github.com/flare-foundation/flare/utils/units"
 	"github.com/flare-foundation/flare/vms/components/verify"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/vms/types"
 )
 
 const (

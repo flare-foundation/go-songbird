@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package tracker
@@ -13,7 +13,7 @@ import (
 
 func TestCPUTracker(t *testing.T) {
 	halflife := time.Second
-	cpuTracker := NewCPUTracker(uptime.IntervalFactory{}, halflife)
+	cpuTracker := NewCPUTracker(uptime.ContinuousFactory{}, halflife)
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2}
 

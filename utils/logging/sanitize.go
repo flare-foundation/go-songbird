@@ -1,9 +1,11 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package logging
 
-import "strings"
+import (
+	"strings"
+)
 
 func Sanitize(s string) string {
 	return strings.ReplaceAll(s, "\n", "\\n")

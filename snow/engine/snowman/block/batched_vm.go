@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package block
@@ -19,7 +19,7 @@ type BatchedChainVM interface {
 		blkID ids.ID, // first requested block
 		maxBlocksNum int, // max number of blocks to be retrieved
 		maxBlocksSize int, // max cumulated byte size of retrieved blocks
-		maxBlocksRetrivalTime time.Duration, // max duration of retrieval operation
+		maxBlocksRetrivalTime time.Duration, // max duration of retrival operation
 	) ([][]byte, error)
 
 	BatchedParseBlock(blks [][]byte) ([]snowman.Block, error)
@@ -30,7 +30,7 @@ func GetAncestors(
 	blkID ids.ID, // first requested block
 	maxBlocksNum int, // max number of blocks to be retrieved
 	maxBlocksSize int, // max cumulated byte size of retrieved blocks
-	maxBlocksRetrivalTime time.Duration, // max duration of retrieval operation
+	maxBlocksRetrivalTime time.Duration, // max duration of retrival operation
 ) ([][]byte, error) {
 	// Try and batch GetBlock requests
 	if vm, ok := vm.(BatchedChainVM); ok {

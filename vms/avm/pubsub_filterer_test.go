@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package avm
@@ -7,12 +7,12 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/flare-foundation/flare/pubsub"
-	"github.com/flare-foundation/flare/vms/components/avax"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/pubsub"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 type mockFilter struct {

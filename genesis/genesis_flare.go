@@ -175821,7 +175821,7 @@ var (
 			CreateBlockchainTxFee: 1 * units.Avax,
 		},
 		StakingConfig: StakingConfig{
-			UptimeRequirement:  .6, // 60%
+			UptimeRequirement:  .8, // 80%
 			MinValidatorStake:  2 * units.KiloAvax,
 			MaxValidatorStake:  3 * units.MegaAvax,
 			MinDelegatorStake:  25 * units.Avax,
@@ -175829,10 +175829,6 @@ var (
 			MinStakeDuration:   2 * 7 * 24 * time.Hour,
 			MaxStakeDuration:   365 * 24 * time.Hour,
 			StakeMintingPeriod: 365 * 24 * time.Hour,
-		},
-		EpochConfig: EpochConfig{
-			EpochFirstTransition: time.Unix(1607626800, 0),
-			EpochDuration:        6 * time.Hour,
 		},
 	}
 )

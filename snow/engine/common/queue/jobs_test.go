@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package queue
@@ -7,13 +7,14 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/memdb"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/assert"
 )
 
 // Test that creating a new queue can be created and that it is initially empty.
@@ -96,7 +97,7 @@ func TestPushAndExecute(t *testing.T) {
 		return job, nil
 	}
 
-	count, err := jobs.ExecuteAll(snow.DefaultContextTest(), &common.Halter{}, false)
+	count, err := jobs.ExecuteAll(snow.DefaultConsensusContextTest(), &common.Halter{}, false)
 	assert.NoError(err)
 	assert.Equal(1, count)
 
@@ -189,7 +190,7 @@ func TestRemoveDependency(t *testing.T) {
 		}
 	}
 
-	count, err := jobs.ExecuteAll(snow.DefaultContextTest(), &common.Halter{}, false)
+	count, err := jobs.ExecuteAll(snow.DefaultConsensusContextTest(), &common.Halter{}, false)
 	assert.NoError(err)
 	assert.Equal(2, count)
 	assert.True(executed0)
@@ -415,7 +416,7 @@ func TestHandleJobWithMissingDependencyOnRunnableStack(t *testing.T) {
 		}
 	}
 
-	_, err = jobs.ExecuteAll(snow.DefaultContextTest(), &common.Halter{}, false)
+	_, err = jobs.ExecuteAll(snow.DefaultConsensusContextTest(), &common.Halter{}, false)
 	// Assert that the database closed error on job1 causes ExecuteAll
 	// to fail in the middle of execution.
 	assert.Error(err)
@@ -448,7 +449,7 @@ func TestHandleJobWithMissingDependencyOnRunnableStack(t *testing.T) {
 	assert.NoError(err)
 	assert.True(hasNext)
 
-	count, err := jobs.ExecuteAll(snow.DefaultContextTest(), &common.Halter{}, false)
+	count, err := jobs.ExecuteAll(snow.DefaultConsensusContextTest(), &common.Halter{}, false)
 	assert.NoError(err)
 	assert.Equal(2, count)
 	assert.True(executed1)

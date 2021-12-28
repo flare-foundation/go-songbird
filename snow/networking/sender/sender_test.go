@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package sender
@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
@@ -40,8 +39,6 @@ func TestSenderContext(t *testing.T) {
 		externalSender,
 		&router.ChainRouter{},
 		&timeout.Manager{},
-		"",
-		metrics,
 		2,
 		2,
 		2,
@@ -82,18 +79,18 @@ func TestTimeout(t *testing.T) {
 	err = chainRouter.Initialize(ids.ShortEmpty, logging.NoLog{}, mc, &tm, time.Hour, time.Second, ids.Set{}, nil, router.HealthConfig{}, "", prometheus.NewRegistry())
 	assert.NoError(t, err)
 
-	context := snow.DefaultContextTest()
+	context := snow.DefaultConsensusContextTest()
 	externalSender := &ExternalSenderTest{TB: t}
 	externalSender.Default(false)
 	sender := Sender{}
-	err = sender.Initialize(context, mc, externalSender, &chainRouter, &tm, "", metrics, 2, 2, 2)
+	err = sender.Initialize(context, mc, externalSender, &chainRouter, &tm, 2, 2, 2)
 	assert.NoError(t, err)
 
 	engine := common.EngineTest{T: t}
 	engine.Default(true)
 	engine.CantConnected = false
 
-	engine.ContextF = snow.DefaultContextTest
+	engine.ContextF = snow.DefaultConsensusContextTest
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)
@@ -111,8 +108,6 @@ func TestTimeout(t *testing.T) {
 		&engine,
 		vdrs,
 		nil,
-		"",
-		prometheus.NewRegistry(),
 	)
 	assert.NoError(t, err)
 
@@ -164,19 +159,19 @@ func TestReliableMessages(t *testing.T) {
 		ids.Set{}, nil, router.HealthConfig{}, "", prometheus.NewRegistry())
 	assert.NoError(t, err)
 
-	context := snow.DefaultContextTest()
+	context := snow.DefaultConsensusContextTest()
 
 	externalSender := &ExternalSenderTest{TB: t}
 	externalSender.Default(false)
 	sender := Sender{}
-	err = sender.Initialize(context, mc, externalSender, &chainRouter, &tm, "", metrics, 2, 2, 2)
+	err = sender.Initialize(context, mc, externalSender, &chainRouter, &tm, 2, 2, 2)
 	assert.NoError(t, err)
 
 	engine := common.EngineTest{T: t}
 	engine.Default(true)
 	engine.CantConnected = false
 
-	engine.ContextF = snow.DefaultContextTest
+	engine.ContextF = snow.DefaultConsensusContextTest
 	engine.GossipF = func() error { return nil }
 
 	queriesToSend := 1000
@@ -196,8 +191,6 @@ func TestReliableMessages(t *testing.T) {
 		&engine,
 		vdrs,
 		nil,
-		"",
-		prometheus.NewRegistry(),
 	)
 	assert.NoError(t, err)
 
@@ -257,18 +250,18 @@ func TestReliableMessagesToMyself(t *testing.T) {
 	err = chainRouter.Initialize(ids.ShortEmpty, logging.NoLog{}, mc, &tm, time.Hour, time.Second, ids.Set{}, nil, router.HealthConfig{}, "", prometheus.NewRegistry())
 	assert.NoError(t, err)
 
-	context := snow.DefaultContextTest()
+	context := snow.DefaultConsensusContextTest()
 
 	sender := Sender{}
 	externalSender := &ExternalSenderTest{TB: t}
 	externalSender.Default(false)
-	err = sender.Initialize(context, mc, externalSender, &chainRouter, &tm, "", metrics, 2, 2, 2)
+	err = sender.Initialize(context, mc, externalSender, &chainRouter, &tm, 2, 2, 2)
 	assert.NoError(t, err)
 
 	engine := common.EngineTest{T: t}
 	engine.Default(false)
 
-	engine.ContextF = snow.DefaultContextTest
+	engine.ContextF = snow.DefaultConsensusContextTest
 	engine.GossipF = func() error { return nil }
 	engine.CantPullQuery = false
 
@@ -289,8 +282,6 @@ func TestReliableMessagesToMyself(t *testing.T) {
 		&engine,
 		vdrs,
 		nil,
-		"",
-		prometheus.NewRegistry(),
 	)
 	assert.NoError(t, err)
 

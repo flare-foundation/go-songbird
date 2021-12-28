@@ -1,14 +1,12 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package rpcchainvm
 
 import (
-	"golang.org/x/net/context"
-
-	"google.golang.org/grpc"
-
 	"github.com/hashicorp/go-plugin"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/vmproto"
@@ -16,7 +14,7 @@ import (
 
 // Handshake is a common handshake that is shared by plugin and host.
 var Handshake = plugin.HandshakeConfig{
-	ProtocolVersion:  8,
+	ProtocolVersion:  9,
 	MagicCookieKey:   "VM_PLUGIN",
 	MagicCookieValue: "dynamic",
 }

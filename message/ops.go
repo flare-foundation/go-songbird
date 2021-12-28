@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package message
@@ -14,11 +14,9 @@ const (
 	GetVersion Op = iota
 	_
 	GetPeerList
-	// TODO: NetworkUpgrade/Rename this to Pong
-	UptimePong
-	Ping
-	// TODO: NetworkUpgrade/delete this in favor of UptimePong
 	Pong
+	Ping
+	_
 	// Bootstrapping:
 	GetAcceptedFrontier
 	AcceptedFrontier
@@ -63,7 +61,6 @@ var (
 		PeerList,
 		Ping,
 		Pong,
-		UptimePong,
 	}
 
 	// List of all consensus request message types
@@ -154,8 +151,7 @@ var (
 		GetPeerList: {},
 		PeerList:    {SignedPeers},
 		Ping:        {},
-		Pong:        {},
-		UptimePong:  {Uptime},
+		Pong:        {Uptime},
 		// Bootstrapping:
 		GetAcceptedFrontier: {ChainID, RequestID, Deadline},
 		AcceptedFrontier:    {ChainID, RequestID, ContainerIDs},
@@ -199,8 +195,6 @@ func (op Op) String() string {
 		return "ping"
 	case Pong:
 		return "pong"
-	case UptimePong:
-		return "uptime_pong"
 	case GetAcceptedFrontier:
 		return "get_accepted_frontier"
 	case AcceptedFrontier:

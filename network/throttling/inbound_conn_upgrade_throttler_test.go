@@ -1,21 +1,25 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package throttling
 
 import (
+	"net"
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
-const (
-	host1 = "127.0.0.1"
-	host2 = "127.0.0.2"
-	host3 = "127.0.0.3"
-	host4 = "127.0.0.4"
+var (
+	host1     = utils.IPDesc{IP: net.IPv4(1, 2, 3, 4), Port: 9651}
+	host2     = utils.IPDesc{IP: net.IPv4(1, 2, 3, 5), Port: 9653}
+	host3     = utils.IPDesc{IP: net.IPv4(1, 2, 3, 6), Port: 9655}
+	host4     = utils.IPDesc{IP: net.IPv4(1, 2, 3, 7), Port: 9657}
+	localhost = utils.IPDesc{IP: net.IPv4(127, 0, 0, 1), Port: 9657}
 )
 
 func TestNoInboundConnUpgradeThrottler(t *testing.T) {
@@ -75,6 +79,13 @@ func TestInboundConnUpgradeThrottler(t *testing.T) {
 	assert.False(throttlerIntf.ShouldUpgrade(host1))
 	assert.False(throttlerIntf.ShouldUpgrade(host2))
 	assert.False(throttlerIntf.ShouldUpgrade(host3))
+
+	// Local host should never be rate-limited
+	assert.True(throttlerIntf.ShouldUpgrade(localhost))
+	assert.True(throttlerIntf.ShouldUpgrade(localhost))
+	assert.True(throttlerIntf.ShouldUpgrade(localhost))
+	assert.True(throttlerIntf.ShouldUpgrade(localhost))
+	assert.True(throttlerIntf.ShouldUpgrade(localhost))
 
 	// Make sure [throttler.done] isn't closed
 	throttler := throttlerIntf.(*inboundConnUpgradeThrottler)

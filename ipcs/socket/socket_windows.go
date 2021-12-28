@@ -1,7 +1,7 @@
 //go:build windows
 // +build windows
 
-// (c) 2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package socket
@@ -10,6 +10,7 @@ import (
 	"net"
 
 	"github.com/Microsoft/go-winio"
+
 	"github.com/flare-foundation/flare/utils/constants"
 )
 

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package snowstorm
@@ -12,15 +12,13 @@ import (
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/utils/wrappers"
-
 	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 type testFunc func(*testing.T, Factory)
@@ -115,62 +113,62 @@ func getTestName(i interface{}) string {
 
 func MetricsTest(t *testing.T, factory Factory) {
 	{
+		ctx := snow.DefaultConsensusContextTest()
 		params := sbcon.Parameters{
-			Metrics:           prometheus.NewRegistry(),
 			K:                 2,
 			Alpha:             2,
 			BetaVirtuous:      1,
 			BetaRogue:         2,
 			ConcurrentRepolls: 1,
 		}
-		err := params.Metrics.Register(prometheus.NewCounter(prometheus.CounterOpts{
+		err := ctx.Registerer.Register(prometheus.NewCounter(prometheus.CounterOpts{
 			Name: "tx_processing",
 		}))
 		if err != nil {
 			t.Fatal(err)
 		}
 		graph := factory.New()
-		if err := graph.Initialize(snow.DefaultContextTest(), params); err == nil {
+		if err := graph.Initialize(ctx, params); err == nil {
 			t.Fatalf("should have errored due to a duplicated metric")
 		}
 	}
 	{
+		ctx := snow.DefaultConsensusContextTest()
 		params := sbcon.Parameters{
-			Metrics:           prometheus.NewRegistry(),
 			K:                 2,
 			Alpha:             2,
 			BetaVirtuous:      1,
 			BetaRogue:         2,
 			ConcurrentRepolls: 1,
 		}
-		err := params.Metrics.Register(prometheus.NewCounter(prometheus.CounterOpts{
+		err := ctx.Registerer.Register(prometheus.NewCounter(prometheus.CounterOpts{
 			Name: "tx_accepted",
 		}))
 		if err != nil {
 			t.Fatal(err)
 		}
 		graph := factory.New()
-		if err := graph.Initialize(snow.DefaultContextTest(), params); err == nil {
+		if err := graph.Initialize(ctx, params); err == nil {
 			t.Fatalf("should have errored due to a duplicated metric")
 		}
 	}
 	{
+		ctx := snow.DefaultConsensusContextTest()
 		params := sbcon.Parameters{
-			Metrics:           prometheus.NewRegistry(),
 			K:                 2,
 			Alpha:             2,
 			BetaVirtuous:      1,
 			BetaRogue:         2,
 			ConcurrentRepolls: 1,
 		}
-		err := params.Metrics.Register(prometheus.NewCounter(prometheus.CounterOpts{
+		err := ctx.Registerer.Register(prometheus.NewCounter(prometheus.CounterOpts{
 			Name: "tx_rejected",
 		}))
 		if err != nil {
 			t.Fatal(err)
 		}
 		graph := factory.New()
-		if err := graph.Initialize(snow.DefaultContextTest(), params); err == nil {
+		if err := graph.Initialize(ctx, params); err == nil {
 			t.Fatalf("should have errored due to a duplicated metric")
 		}
 	}
@@ -180,7 +178,6 @@ func ParamsTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -190,7 +187,7 @@ func ParamsTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,7 +207,6 @@ func IssuedTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -220,7 +216,7 @@ func IssuedTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +240,6 @@ func LeftoverInputTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -254,7 +249,7 @@ func LeftoverInputTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -301,7 +296,6 @@ func LowerConfidenceTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -311,7 +305,7 @@ func LowerConfidenceTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -360,7 +354,6 @@ func MiddleConfidenceTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -370,7 +363,7 @@ func MiddleConfidenceTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -424,7 +417,6 @@ func IndependentTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          2,
@@ -434,7 +426,7 @@ func IndependentTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -489,7 +481,6 @@ func VirtuousTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -499,7 +490,7 @@ func VirtuousTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -535,7 +526,6 @@ func IsVirtuousTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -545,7 +535,7 @@ func IsVirtuousTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	if err := graph.Initialize(snow.DefaultContextTest(), params); err != nil {
+	if err := graph.Initialize(snow.DefaultConsensusContextTest(), params); err != nil {
 		t.Fatal(err)
 	}
 
@@ -591,7 +581,6 @@ func QuiesceTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -601,7 +590,7 @@ func QuiesceTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -632,7 +621,6 @@ func AcceptingDependencyTest(t *testing.T, factory Factory) {
 	purple.InputIDsV = append(purple.InputIDsV, ids.Empty.Prefix(8))
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -642,7 +630,7 @@ func AcceptingDependencyTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	if err := graph.Initialize(snow.DefaultContextTest(), params); err != nil {
+	if err := graph.Initialize(snow.DefaultConsensusContextTest(), params); err != nil {
 		t.Fatal(err)
 	}
 
@@ -774,7 +762,6 @@ func AcceptingSlowDependencyTest(t *testing.T, factory Factory) {
 	}
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -784,7 +771,7 @@ func AcceptingSlowDependencyTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -921,7 +908,6 @@ func RejectingDependencyTest(t *testing.T, factory Factory) {
 	purple.InputIDsV = append(purple.InputIDsV, ids.Empty.Prefix(8))
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -931,7 +917,7 @@ func RejectingDependencyTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1023,7 +1009,6 @@ func VacuouslyAcceptedTest(t *testing.T, factory Factory) {
 	}}
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1033,7 +1018,7 @@ func VacuouslyAcceptedTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1051,7 +1036,6 @@ func ConflictsTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1061,7 +1045,7 @@ func ConflictsTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1103,7 +1087,6 @@ func VirtuousDependsOnRogueTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1113,7 +1096,7 @@ func VirtuousDependsOnRogueTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1178,7 +1161,6 @@ func ErrorOnVacuouslyAcceptedTest(t *testing.T, factory Factory) {
 	}}
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1188,7 +1170,7 @@ func ErrorOnVacuouslyAcceptedTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1209,7 +1191,6 @@ func ErrorOnAcceptedTest(t *testing.T, factory Factory) {
 	purple.InputIDsV = append(purple.InputIDsV, ids.Empty.Prefix(4))
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1219,7 +1200,7 @@ func ErrorOnAcceptedTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1254,7 +1235,6 @@ func ErrorOnRejectingLowerConfidenceConflictTest(t *testing.T, factory Factory) 
 	pink.InputIDsV = append(pink.InputIDsV, X)
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1264,7 +1244,7 @@ func ErrorOnRejectingLowerConfidenceConflictTest(t *testing.T, factory Factory) 
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1301,7 +1281,6 @@ func ErrorOnRejectingHigherConfidenceConflictTest(t *testing.T, factory Factory)
 	pink.InputIDsV = append(pink.InputIDsV, X)
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1311,7 +1290,7 @@ func ErrorOnRejectingHigherConfidenceConflictTest(t *testing.T, factory Factory)
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1333,7 +1312,6 @@ func UTXOCleanupTest(t *testing.T, factory Factory) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     1,
 		Alpha:                 1,
 		BetaVirtuous:          1,
@@ -1343,7 +1321,7 @@ func UTXOCleanupTest(t *testing.T, factory Factory) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	assert.NoError(t, err)
 
 	err = graph.Add(Red)
@@ -1381,7 +1359,6 @@ func StringTest(t *testing.T, factory Factory, prefix string) {
 	graph := factory.New()
 
 	params := sbcon.Parameters{
-		Metrics:               prometheus.NewRegistry(),
 		K:                     2,
 		Alpha:                 2,
 		BetaVirtuous:          1,
@@ -1391,7 +1368,7 @@ func StringTest(t *testing.T, factory Factory, prefix string) {
 		MaxOutstandingItems:   1,
 		MaxItemProcessingTime: 1,
 	}
-	err := graph.Initialize(snow.DefaultContextTest(), params)
+	err := graph.Initialize(snow.DefaultConsensusContextTest(), params)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,7 +2,7 @@
 // +build linux,amd64,rocksdballowed
 
 // ^ Only build this file if this computer runs Linux AND is AMD64 AND rocksdb is allowed
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package manager
@@ -10,12 +10,12 @@ package manager
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"path/filepath"
 
 	"github.com/flare-foundation/flare/database/rocksdb"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/version"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewSingleRocksDB(t *testing.T) {

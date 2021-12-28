@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package message
@@ -35,9 +35,7 @@ type OutboundMsgBuilder interface {
 
 	Ping() (OutboundMessage, error)
 
-	Pong() (OutboundMessage, error)
-
-	UptimePong(uptimePercentage uint8) (OutboundMessage, error)
+	Pong(uptimePercentage uint8) (OutboundMessage, error)
 
 	GetAcceptedFrontier(
 		chainID ids.ID,
@@ -208,21 +206,13 @@ func (b *outMsgBuilder) Ping() (OutboundMessage, error) {
 	)
 }
 
-func (b *outMsgBuilder) Pong() (OutboundMessage, error) {
+func (b *outMsgBuilder) Pong(uptimePercentage uint8) (OutboundMessage, error) {
 	return b.c.Pack(
 		Pong,
-		nil,
-		Pong.Compressable(), // Pong messages can't be compressed
-	)
-}
-
-func (b *outMsgBuilder) UptimePong(uptimePercentage uint8) (OutboundMessage, error) {
-	return b.c.Pack(
-		UptimePong,
 		map[Field]interface{}{
 			Uptime: uptimePercentage,
 		},
-		UptimePong.Compressable(), // UptimePong messages can't be compressed
+		Pong.Compressable(), // Pong messages can't be compressed
 	)
 }
 

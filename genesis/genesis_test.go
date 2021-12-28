@@ -1,9 +1,11 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package genesis
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -18,24 +20,6 @@ import (
 	"github.com/flare-foundation/flare/vms/evm"
 	"github.com/flare-foundation/flare/vms/platformvm"
 )
-
-func TestAliases(t *testing.T) {
-	assert := assert.New(t)
-
-	genesisBytes, _, err := Genesis(constants.LocalID, "")
-	assert.NoError(err)
-
-	generalAliases, _, err := Aliases(genesisBytes)
-	assert.NoError(err)
-
-	if _, exists := generalAliases["vm/"+platformvm.ID.String()]; !exists {
-		assert.Fail("Should have a custom alias from the vm")
-	} else if _, exists := generalAliases["vm/"+avm.ID.String()]; !exists {
-		assert.Fail("Should have a custom alias from the vm")
-	} else if _, exists := generalAliases["vm/"+evm.ID.String()]; !exists {
-		assert.Fail("Should have a custom alias from the vm")
-	}
-}
 
 func TestValidateConfig(t *testing.T) {
 	tests := map[string]struct {
@@ -72,6 +56,69 @@ func TestValidateConfig(t *testing.T) {
 				return &thisConfig
 			}(),
 			err: "start time cannot be in the future",
+		},
+		"no initial supply": {
+			networkID: 12345,
+			config: func() *Config {
+				thisConfig := LocalConfig
+				thisConfig.Allocations = []Allocation{}
+				return &thisConfig
+			}(),
+			err: "initial supply must be > 0",
+		},
+		"no initial stakers": {
+			networkID: 12345,
+			config: func() *Config {
+				thisConfig := LocalConfig
+				thisConfig.InitialStakers = []Staker{}
+				return &thisConfig
+			}(),
+			err: "initial stakers must be > 0",
+		},
+		"invalid initial stake duration": {
+			networkID: 12345,
+			config: func() *Config {
+				thisConfig := LocalConfig
+				thisConfig.InitialStakeDuration = 0
+				return &thisConfig
+			}(),
+			err: "initial stake duration must be > 0",
+		},
+		"invalid stake offset": {
+			networkID: 12345,
+			config: func() *Config {
+				thisConfig := LocalConfig
+				thisConfig.InitialStakeDurationOffset = 100000000
+				return &thisConfig
+			}(),
+			err: "initial stake duration is 31536000 but need at least 400000000 with offset of 100000000",
+		},
+		"empty initial staked funds": {
+			networkID: 12345,
+			config: func() *Config {
+				thisConfig := LocalConfig
+				thisConfig.InitialStakedFunds = []ids.ShortID(nil)
+				return &thisConfig
+			}(),
+			err: "initial staked funds cannot be empty",
+		},
+		"duplicate initial staked funds": {
+			networkID: 12345,
+			config: func() *Config {
+				thisConfig := LocalConfig
+				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, thisConfig.InitialStakedFunds[0])
+				return &thisConfig
+			}(),
+			err: "duplicated in initial staked funds",
+		},
+		"initial staked funds not in allocations": {
+			networkID: 5,
+			config: func() *Config {
+				thisConfig := SongbirdConfig
+				thisConfig.InitialStakedFunds = append(thisConfig.InitialStakedFunds, LocalConfig.InitialStakedFunds[0])
+				return &thisConfig
+			}(),
+			err: "does not have an allocation to stake",
 		},
 		"empty C-Chain genesis": {
 			networkID: 12345,
@@ -189,7 +236,7 @@ var (
 	}`
 )
 
-func TestGenesis(t *testing.T) {
+func TestGenesisFromFile(t *testing.T) {
 	tests := map[string]struct {
 		networkID       uint32
 		customConfig    string
@@ -197,26 +244,25 @@ func TestGenesis(t *testing.T) {
 		err             string
 		expected        string
 	}{
-		"flare": {
-			networkID: constants.FlareID,
-			expected:  "21deece2c88ac4cf7b9ebb265054946c7938fa447d472be97dc7579871555010",
+		"mainnet": {
+			networkID:    constants.FlareID,
+			customConfig: customGenesisConfigJSON,
+			err:          "cannot override genesis config for standard network mainnet (1)",
 		},
-		"songbird": {
-			networkID: constants.SongbirdID,
-			expected:  "9899b5146aae46dd87fdf6d7d64d7b83d30e78aa3158e3ea200cec6c2c67c68a",
+		"fuji": {
+			networkID:    constants.SongbirdID,
+			customConfig: customGenesisConfigJSON,
+			err:          "cannot override genesis config for standard network fuji (5)",
 		},
-		"songbird (with custom specified)": {
+		"fuji (with custom specified)": {
 			networkID:    constants.SongbirdID,
 			customConfig: localGenesisConfigJSON, // won't load
-			err:          "cannot override genesis config for standard network songbird (5)",
-		},
-		"coston": {
-			networkID: constants.CostonID,
-			expected:  "3db0d1b4f7b84402237be571667ff22e760bc0ed1a57e41e44cc86246bf94317",
+			err:          "cannot override genesis config for standard network fuji (5)",
 		},
 		"local": {
-			networkID: constants.LocalID,
-			expected:  "047a9119121fedfd296c4f684974fa1d4bdb91b94675e7b57db266a309afab8c",
+			networkID:    constants.LocalID,
+			customConfig: customGenesisConfigJSON,
+			err:          "cannot override genesis config for standard network local (12345)",
 		},
 		"local (with custom specified)": {
 			networkID:    constants.LocalID,
@@ -226,7 +272,7 @@ func TestGenesis(t *testing.T) {
 		"custom": {
 			networkID:    9999,
 			customConfig: customGenesisConfigJSON,
-			expected:     "59d54c06efb86a678e4b9883fad6e15bf50dc1a1bf6a151e78c1a195ad971653",
+			expected:     "a1d1838586db85fe94ab1143560c3356df9ba2445794b796bba050be89f4fcb4",
 		},
 		"custom (networkID mismatch)": {
 			networkID:    9999,
@@ -247,8 +293,9 @@ func TestGenesis(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			assert := assert.New(t)
+			// test loading of genesis from file
 
+			assert := assert.New(t)
 			var customFile string
 			if len(test.customConfig) > 0 {
 				customFile = filepath.Join(t.TempDir(), "config.json")
@@ -259,7 +306,100 @@ func TestGenesis(t *testing.T) {
 				customFile = test.missingFilepath
 			}
 
-			genesisBytes, _, err := Genesis(test.networkID, customFile)
+			genesisBytes, _, err := FromFile(test.networkID, customFile)
+			if len(test.err) > 0 {
+				assert.Error(err)
+				assert.Contains(err.Error(), test.err)
+				return
+			}
+			assert.NoError(err)
+
+			genesisHash := fmt.Sprintf("%x", hashing.ComputeHash256(genesisBytes))
+			assert.Equal(test.expected, genesisHash, "genesis hash mismatch")
+
+			genesis := platformvm.Genesis{}
+			_, err = platformvm.GenesisCodec.Unmarshal(genesisBytes, &genesis)
+			assert.NoError(err)
+		})
+	}
+}
+
+func TestGenesisFromFlag(t *testing.T) {
+	tests := map[string]struct {
+		networkID    uint32
+		customConfig string
+		err          string
+		expected     string
+	}{
+		"mainnet": {
+			networkID: constants.FlareID,
+			err:       "cannot override genesis config for standard network mainnet (1)",
+		},
+		"fuji": {
+			networkID: constants.SongbirdID,
+			err:       "cannot override genesis config for standard network fuji (5)",
+		},
+		"local": {
+			networkID: constants.LocalID,
+			err:       "cannot override genesis config for standard network local (12345)",
+		},
+		"local (with custom specified)": {
+			networkID:    constants.LocalID,
+			customConfig: customGenesisConfigJSON,
+			err:          "cannot override genesis config for standard network local (12345)",
+		},
+		"custom": {
+			networkID:    9999,
+			customConfig: customGenesisConfigJSON,
+			expected:     "a1d1838586db85fe94ab1143560c3356df9ba2445794b796bba050be89f4fcb4",
+		},
+		"custom (networkID mismatch)": {
+			networkID:    9999,
+			customConfig: localGenesisConfigJSON,
+			err:          "networkID 9999 specified but genesis config contains networkID 12345",
+		},
+		"custom (invalid format)": {
+			networkID:    9999,
+			customConfig: invalidGenesisConfigJSON,
+			err:          "unable to load genesis content from flag",
+		},
+		"custom (missing content)": {
+			networkID: 9999,
+			err:       "unable to load genesis content from flag",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// test loading of genesis content from flag/env-var
+
+			assert := assert.New(t)
+			var genBytes []byte
+			if len(test.customConfig) == 0 {
+				// try loading a default config
+				var err error
+				switch test.networkID {
+				case constants.FlareID:
+					genBytes, err = json.Marshal(&FlareConfig)
+					assert.NoError(err)
+				case constants.SongbirdID:
+					genBytes, err = json.Marshal(&SongbirdConfig)
+					assert.NoError(err)
+				case constants.CostonID:
+					genBytes, err = json.Marshal(&CostonConfig)
+					assert.NoError(err)
+				case constants.LocalID:
+					genBytes, err = json.Marshal(&LocalConfig)
+					assert.NoError(err)
+				default:
+					genBytes = make([]byte, 0)
+				}
+			} else {
+				genBytes = []byte(test.customConfig)
+			}
+			content := base64.StdEncoding.EncodeToString(genBytes)
+
+			genesisBytes, _, err := FromFlag(test.networkID, content)
 			if len(test.err) > 0 {
 				assert.Error(err)
 				assert.Contains(err.Error(), test.err)
@@ -291,11 +431,11 @@ func TestVMGenesis(t *testing.T) {
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
-					expectedID: "kuZe3hRrShPqeGbHag3ffGVNUTeca2TgFmbDhKgB9gPyCuvaq",
+					expectedID: "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM",
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "6ZZhw9q1giWQrdCpJqpa3dx8y5kidGvTwk1eZohPuZsYFdkr1",
+					expectedID: "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5",
 				},
 			},
 		},
@@ -304,24 +444,11 @@ func TestVMGenesis(t *testing.T) {
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
-					expectedID: "7xKYhEvYuUekwDxozgEiMPufzJ3jJPypKbGE8ny6KL84z4RKB",
+					expectedID: "2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm",
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "erCt5pSo5d4bM8fMrsB2dRM54PGssDAVqRg1jHedQzr6ayLiq",
-				},
-			},
-		},
-		{
-			networkID: constants.CostonID,
-			vmTest: []vmTest{
-				{
-					vmID:       avm.ID,
-					expectedID: "8S5vg8ycMqULMMq2CzrRh3qqbFWjs6a35H8UwNAaS83v9Ynxa",
-				},
-				{
-					vmID:       evm.ID,
-					expectedID: "TWbLQ1bXwJCy4c2jCiBGXBz5RDsHygfBXwUeuk6gn7pz3vdx7",
+					expectedID: "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp",
 				},
 			},
 		},
@@ -330,11 +457,11 @@ func TestVMGenesis(t *testing.T) {
 			vmTest: []vmTest{
 				{
 					vmID:       avm.ID,
-					expectedID: "ALRkp1tuy7ErVkWuEWFLVd657JAULWDDyQkQBkLKVE94jCaNu",
+					expectedID: "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed",
 				},
 				{
 					vmID:       evm.ID,
-					expectedID: "86fvHfcmB1PrLA4AH4ZikG1nbct7NfmUKSg1HmZg5EQLkJtdz",
+					expectedID: "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU",
 				},
 			},
 		},
@@ -349,7 +476,8 @@ func TestVMGenesis(t *testing.T) {
 			t.Run(name, func(t *testing.T) {
 				assert := assert.New(t)
 
-				genesisBytes, _, err := Genesis(test.networkID, "")
+				config := GetConfig(test.networkID)
+				genesisBytes, _, err := FromConfig(config)
 				assert.NoError(err)
 
 				genesisTx, err := VMGenesis(genesisBytes, vmTest.vmID)
@@ -374,15 +502,15 @@ func TestAVAXAssetID(t *testing.T) {
 	}{
 		{
 			networkID:  constants.FlareID,
-			expectedID: "foMCFvzKECiGVJmmkAEHm9Vt43hYjuxreiNX5PfqfecaVsZBT",
+			expectedID: "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z",
 		},
 		{
 			networkID:  constants.SongbirdID,
-			expectedID: "1S3PSi4VsVpD8iK2vdykuajxVeuCV2xhjPSkQ4K88mqWGozMP",
+			expectedID: "U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK",
 		},
 		{
 			networkID:  constants.LocalID,
-			expectedID: "2RULRJVXVpQNAsV3sBpy4G8LWH1LN3z5Adokv5bVtnZmsBQDCX",
+			expectedID: "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe",
 		},
 	}
 
@@ -390,7 +518,8 @@ func TestAVAXAssetID(t *testing.T) {
 		t.Run(constants.NetworkIDToNetworkName[test.networkID], func(t *testing.T) {
 			assert := assert.New(t)
 
-			_, avaxAssetID, err := Genesis(test.networkID, "")
+			config := GetConfig(test.networkID)
+			_, avaxAssetID, err := FromConfig(config)
 			assert.NoError(err)
 
 			assert.Equal(

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package snowstorm
@@ -9,7 +9,6 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/choices"
-
 	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
@@ -70,7 +69,7 @@ type inputUTXO struct {
 }
 
 // Initialize implements the ConflictGraph interface
-func (ig *Input) Initialize(ctx *snow.Context, params sbcon.Parameters) error {
+func (ig *Input) Initialize(ctx *snow.ConsensusContext, params sbcon.Parameters) error {
 	ig.txs = make(map[ids.ID]*inputTx)
 	ig.utxos = make(map[ids.ID]inputUTXO)
 

@@ -1,17 +1,14 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package snowstorm
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/utils/sampler"
-
 	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 type Network struct {
@@ -94,8 +91,7 @@ func (n *Network) Initialize(
 }
 
 func (n *Network) AddNode(cg Consensus) error {
-	n.params.Metrics = prometheus.NewRegistry()
-	if err := cg.Initialize(snow.DefaultContextTest(), n.params); err != nil {
+	if err := cg.Initialize(snow.DefaultConsensusContextTest(), n.params); err != nil {
 		return err
 	}
 
