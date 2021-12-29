@@ -9,8 +9,16 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
+// NOTE: We are doing a three-phase deploy to get rid of legacy Avalanche
+// versioning and to transition to Flare versioning.
+// 1. Roll out upgrade with hard-coded Flare versioning support.
+// 2. Roll out upgrade sending Flare application name and version numbers.
+// 3. Roll out upgrade removing hard-coded Flare versioning support.
+
 // These are globals that describe network upgrades and node versions
 var (
+	// TODO: Change to Flare versions after all nodes on Songbird have hard-coded
+	// Flare versioning support.
 	Current                      = NewDefaultVersion(1, 7, 2)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
 	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 7, 0)

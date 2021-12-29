@@ -76,6 +76,14 @@ func NewCompatibility(
 func (c *compatibility) Version() Application { return c.version }
 
 func (c *compatibility) Compatible(peer Application) error {
+	// NOTE: This hard-coded Flare versioning support ensures that we don't drop
+	// newer nodes which send Flare application name and version numbers.
+	// TODO: Remove when all nodes on Songbird are sending Flare application
+	// name and version numbers.
+	if peer.App() == "flare" {
+		return nil
+	}
+
 	if err := c.version.Compatible(peer); err != nil {
 		return err
 	}
@@ -100,6 +108,14 @@ func (c *compatibility) Compatible(peer Application) error {
 }
 
 func (c *compatibility) Unmaskable(peer Application) error {
+	// NOTE: This hard-coded Flare versioning support ensures that we don't drop
+	// newer nodes which send Flare application name and version numbers.
+	// TODO: Remove when all nodes on Songbird are sending Flare application
+	// name and version numbers.
+	if peer.App() == "flare" {
+		return nil
+	}
+
 	if err := c.Compatible(peer); err != nil {
 		return err
 	}
@@ -124,6 +140,14 @@ func (c *compatibility) Unmaskable(peer Application) error {
 }
 
 func (c *compatibility) WontMask(peer Application) error {
+	// NOTE: This hard-coded Flare versioning support ensures that we don't drop
+	// newer nodes which send Flare application name and version numbers.
+	// TODO: Remove when all nodes on Songbird are sending Flare application
+	// name and version numbers.
+	if peer.App() == "flare" {
+		return nil
+	}
+
 	if err := c.Compatible(peer); err != nil {
 		return err
 	}
