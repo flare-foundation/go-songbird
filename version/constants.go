@@ -22,7 +22,7 @@ var (
 	Current                      = NewDefaultVersion(1, 7, 2)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
 	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 7, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 6, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 1, 1, 0)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 1, 0, 0)
 	VersionParser                = NewDefaultApplicationParser()

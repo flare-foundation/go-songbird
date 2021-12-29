@@ -99,7 +99,6 @@ func (c *compatibility) Compatible(peer Application) error {
 		return errIncompatible
 	}
 
-	// The minCompatible check isn't being enforced yet.
 	if !peer.Before(c.prevMinCompatible) {
 		// The peer is at least the previous minimum compatible version.
 		return nil
@@ -131,7 +130,6 @@ func (c *compatibility) Unmaskable(peer Application) error {
 		return errMaskable
 	}
 
-	// The minCompatible check isn't being enforced yet.
 	if !peer.Before(c.prevMinUnmaskable) {
 		// The peer is at least the previous minimum unmaskable version.
 		return nil
