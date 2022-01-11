@@ -80,7 +80,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 	if err := verifyIsNotOracleBlock(p.innerBlk); err != nil {
 		return err
 	}
-
+p.vm.State.GetLastAccepted() //blockchain.getblockbynumber
 	childPChainHeight := child.PChainHeight()
 	if childPChainHeight < parentPChainHeight {
 		return errPChainHeightNotMonotonic
@@ -119,6 +119,10 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 		childHeight := child.Height()
 		proposerID := child.Proposer()
 		minDelay, err := p.vm.Windower.Delay(childHeight, parentPChainHeight, proposerID)
+		// todo maybe p.vm.Delay(windower, childHeight, parentPChainHeight, proposerID) so that we have access to vm
+		// todo or have p.vm.block.ChainVM in the arguments
+		// todo how to extract blockchain and thereby evm from just vm?
+
 		if err != nil {
 			return err
 		}

@@ -51,12 +51,18 @@ func New(state validators.State, subnetID, chainID ids.ID) Windower {
 }
 
 func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID) (time.Duration, error) {
+	//todo take hash of parent block , remove pChainHeight
+	//todo make separate proto file!
+	// todo blockID
+
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
 
 	// get the validator set by the p-chain height
 	validatorsMap, err := w.state.GetValidatorSet(pChainHeight, w.subnetID)
+	//todo use the newly made Flare api call instead of the above function. (todo Do it just like the Postman call?)
+	//todo use the chainHeight and pass it to create header in the flare call.
 	if err != nil {
 		return 0, err
 	}

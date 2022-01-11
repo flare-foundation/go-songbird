@@ -24,6 +24,7 @@ var Handshake = plugin.HandshakeConfig{
 // PluginMap is the map of plugins we can dispense.
 var PluginMap = map[string]plugin.Plugin{
 	"vm": &Plugin{},
+	"validators": &PluginValidator{},
 }
 
 // Plugin is the implementation of plugin.Plugin so we can serve/consume this.
@@ -46,5 +47,26 @@ func (p *Plugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
 
 // GRPCClient returns a new GRPC client
 func (p *Plugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
+	return NewClient(vmproto.NewVMClient(c), broker), nil
+}
+
+type PluginValidator struct {
+	plugin.NetRPCUnsupportedPlugin
+	// Concrete implementation, written in Go. This is only used for plugins
+	// that are written in Go.
+	vm block.ChainVM
+}
+
+// NewPluginValidator creates a new PluginValidator from the provided VM
+func NewPluginValidator(vm block.ChainVM) *PluginValidator { return &PluginValidator{vm: vm} }
+
+// GRPCServer registers a new GRPC server.
+func (p *PluginValidator) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
+	vmproto.RegisterVMServer(s, NewServer(p.vm, broker))
+	return nil
+}
+
+// GRPCClient returns a new GRPC client
+func (p *PluginValidator) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
 	return NewClient(vmproto.NewVMClient(c), broker), nil
 }
