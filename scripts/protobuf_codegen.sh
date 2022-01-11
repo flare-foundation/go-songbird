@@ -2,7 +2,7 @@
 
 TARGET=$PWD
 
-if [ -n "$1" ]; then 
+if [ -n "$1" ]; then
   TARGET="$1"
 fi
 
