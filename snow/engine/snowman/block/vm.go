@@ -70,3 +70,7 @@ type Parser interface {
 	// bytes.
 	ParseBlock([]byte) (snowman.Block, error)
 }
+
+type Validators interface {
+	GetValidators(ids.ID) (map[ids.ID]float64, error)
+}

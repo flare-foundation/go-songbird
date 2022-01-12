@@ -4,6 +4,7 @@
 package rpcchainvm
 
 import (
+	"github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto"
 	"golang.org/x/net/context"
 
 	"google.golang.org/grpc"
@@ -23,7 +24,7 @@ var Handshake = plugin.HandshakeConfig{
 
 // PluginMap is the map of plugins we can dispense.
 var PluginMap = map[string]plugin.Plugin{
-	"vm": &Plugin{},
+	"vm":         &Plugin{},
 	"validators": &PluginValidator{},
 }
 
@@ -54,19 +55,20 @@ type PluginValidator struct {
 	plugin.NetRPCUnsupportedPlugin
 	// Concrete implementation, written in Go. This is only used for plugins
 	// that are written in Go.
-	vm block.ChainVM
+	vm    block.ChainVM
+	valVM block.Validators // proposervm.ValidatorVM
 }
 
 // NewPluginValidator creates a new PluginValidator from the provided VM
-func NewPluginValidator(vm block.ChainVM) *PluginValidator { return &PluginValidator{vm: vm} }
+func NewPluginValidator(vm block.Validators) *PluginValidator { return &PluginValidator{valVM: vm} }
 
 // GRPCServer registers a new GRPC server.
 func (p *PluginValidator) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-	vmproto.RegisterVMServer(s, NewServer(p.vm, broker))
+	validatorproto.RegisterValidatorsServer(s, NewServer(p.vm, broker)) //todo
 	return nil
 }
 
 // GRPCClient returns a new GRPC client
 func (p *PluginValidator) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-	return NewClient(vmproto.NewVMClient(c), broker), nil
+	return NewValidatorsClient(validatorproto.NewValidatorsClient(c), broker), nil
 }
