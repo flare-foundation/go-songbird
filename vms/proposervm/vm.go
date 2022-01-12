@@ -89,7 +89,9 @@ func (vm *VM) Initialize(
 	prefixDB := prefixdb.New(dbPrefix, rawDB)
 	vm.db = versiondb.New(prefixDB)
 	vm.State = state.New(vm.db)
-	vm.Windower = proposer.New(ctx.ValidatorState, ctx.SubnetID, ctx.ChainID)
+	vm.Windower = proposer.New(ctx.ValidatorState, ctx.SubnetID, ctx.ChainID, &ValidatorVM{
+		VM:vm,
+	})
 	vm.Tree = tree.New()
 
 	scheduler, vmToEngine := scheduler.New(vm.ctx.Log, toEngine)
@@ -163,8 +165,9 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 		return err
 	}
 
+	bID, _ := vm.State.GetLastAccepted()
 	// reset scheduler
-	minDelay, err := vm.Windower.Delay(blk.Height()+1, pChainHeight, vm.ctx.NodeID)
+	minDelay, err := vm.Windower.Delay(blk.Height()+1, pChainHeight, vm.ctx.NodeID, bID)
 	if err != nil {
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that

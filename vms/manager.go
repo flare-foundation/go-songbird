@@ -5,6 +5,7 @@ package vms
 
 import (
 	"fmt"
+	"github.com/flare-foundation/flare/vms/proposervm"
 	"sync"
 
 	"github.com/flare-foundation/flare/api/server"
@@ -102,10 +103,16 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 
 	m.log.Debug("adding static API for vm %q", vmID)
 
-	vm, err := factory.New(nil)
+	vmsInterface, err := factory.New(nil)
 	if err != nil {
 		return err
 	}
+
+	vms := vmsInterface.([]interface{})
+	vm := vms[0]
+	valVMInterface := vms[1]
+	valVM := valVMInterface.(proposervm.ValidatorVM)
+	valVM.Version()
 
 	commonVM, ok := vm.(common.VM)
 	if !ok {

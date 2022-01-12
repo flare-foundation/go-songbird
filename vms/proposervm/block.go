@@ -118,7 +118,8 @@ p.vm.State.GetLastAccepted() //blockchain.getblockbynumber
 
 		childHeight := child.Height()
 		proposerID := child.Proposer()
-		minDelay, err := p.vm.Windower.Delay(childHeight, parentPChainHeight, proposerID)
+		bID, _ := p.vm.State.GetLastAccepted()
+		minDelay, err := p.vm.Windower.Delay(childHeight, parentPChainHeight, proposerID, bID)
 		// todo maybe p.vm.Delay(windower, childHeight, parentPChainHeight, proposerID) so that we have access to vm
 		// todo or have p.vm.block.ChainVM in the arguments
 		// todo how to extract blockchain and thereby evm from just vm?

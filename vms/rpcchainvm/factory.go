@@ -78,7 +78,22 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 		return nil, errWrongVM
 	}
 
-	vm.SetProcess(client)
+	vm.SetProcess(client) // todo do the same for validators
+
 	vm.ctx = ctx
-	return vm, nil
+
+	raw1, err := rpcClient.Dispense("validators")
+	if err != nil {
+		client.Kill()
+		return nil, err
+	}
+	valVM, ok := raw1.(*ValidatorsClient)
+	if !ok {
+		client.Kill()
+		return nil, errWrongVM
+	}
+	valVM.SetProcess(client)
+	valVM.ctx = ctx
+
+	return []interface{}{vm, valVM}, nil
 }

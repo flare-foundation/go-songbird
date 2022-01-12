@@ -4,6 +4,7 @@
 package proposer
 
 import (
+	"github.com/flare-foundation/flare/vms/validatorvm"
 	"sort"
 	"time"
 
@@ -28,6 +29,7 @@ type Windower interface {
 		chainHeight,
 		pChainHeight uint64,
 		validatorID ids.ShortID,
+		hash ids.ID,
 	) (time.Duration, error)
 }
 
@@ -38,23 +40,27 @@ type windower struct {
 	subnetID    ids.ID
 	chainSource uint64
 	sampler     sampler.WeightedWithoutReplacement
+	vmValidator *validatorvm.ValidatorVM
 }
 
-func New(state validators.State, subnetID, chainID ids.ID) Windower {
+func New(state validators.State, subnetID, chainID ids.ID, vmValidator *validatorvm.ValidatorVM) Windower {
 	w := wrappers.Packer{Bytes: chainID[:]}
 	return &windower{
 		state:       state,
 		subnetID:    subnetID,
 		chainSource: w.UnpackLong(),
 		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
+		vmValidator: vmValidator,
 	}
 }
 
-func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID) (time.Duration, error) {
+func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
 	//todo take hash of parent block , remove pChainHeight
 	//todo make separate proto file!
 	// todo blockID
-
+	//bID, _ := w.vmValidator.VM.State.GetLastAccepted() //todo do we really need to use the VM here or can we do without it so that we can get rid of the circular dependency?
+	//(b.ParentID().([]byte))
+	validatorsMapNew, err := w.vmValidator.GetValidators(hash)
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
@@ -80,6 +86,14 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 			return 0, err
 		}
 		weight = newWeight
+	}
+	// New validators from coreth
+	validators = nil
+	for id, u := range validatorsMapNew {
+		validators = append(validators, validatorData{
+			id:        id, //todo figure out why shortID is used
+			weightNew: u,
+		})
 	}
 
 	// canonically sort validators
