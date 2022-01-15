@@ -388,7 +388,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	consensusParams.Namespace = fmt.Sprintf("%s_%s", constants.PlatformName, primaryAlias)
 
 	// The validators of this blockchain
-	var vdrs validators.Set // ValidatorVMInterface validating this blockchain
+	var vdrs validators.Set // Validators validating this blockchain
 	var ok bool
 	if m.StakingEnabled {
 		vdrs, ok = m.Validators.GetValidators(chainParams.SubnetID)
