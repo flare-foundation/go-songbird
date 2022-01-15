@@ -4,6 +4,7 @@
 package proposervm
 
 import (
+	"github.com/flare-foundation/flare/vms/validatorvm"
 	"time"
 
 	"github.com/flare-foundation/flare/database"
@@ -89,8 +90,8 @@ func (vm *VM) Initialize(
 	prefixDB := prefixdb.New(dbPrefix, rawDB)
 	vm.db = versiondb.New(prefixDB)
 	vm.State = state.New(vm.db)
-	vm.Windower = proposer.New(ctx.ValidatorState, ctx.SubnetID, ctx.ChainID, &ValidatorVM{
-		VM:vm,
+	vm.Windower = proposer.New(ctx.ValidatorState, ctx.SubnetID, ctx.ChainID, &validatorvm.ValidatorVM{
+		//VM:vm,
 	})
 	vm.Tree = tree.New()
 

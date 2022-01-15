@@ -56,15 +56,15 @@ type PluginValidator struct {
 	// Concrete implementation, written in Go. This is only used for plugins
 	// that are written in Go.
 	vm    block.ChainVM
-	valVM block.Validators // proposervm.ValidatorVM
+	valVM block.ValidatorVMInterface // proposervm.ValidatorVM
 }
 
 // NewPluginValidator creates a new PluginValidator from the provided VM
-func NewPluginValidator(vm block.Validators) *PluginValidator { return &PluginValidator{valVM: vm} }
+func NewPluginValidator(vm block.ValidatorVMInterface) *PluginValidator { return &PluginValidator{valVM: vm} }
 
 // GRPCServer registers a new GRPC server.
 func (p *PluginValidator) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-	validatorproto.RegisterValidatorsServer(s, NewServer(p.vm, broker)) //todo
+	validatorproto.RegisterValidatorsServer(s, NewValidatorsServer(p.valVM, broker)) //todo
 	return nil
 }
 

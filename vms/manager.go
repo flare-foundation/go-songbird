@@ -5,13 +5,13 @@ package vms
 
 import (
 	"fmt"
-	"github.com/flare-foundation/flare/vms/proposervm"
+	"github.com/flare-foundation/flare/combinedvm"
+	"github.com/flare-foundation/flare/snow/engine/common"
 	"sync"
 
 	"github.com/flare-foundation/flare/api/server"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/logging"
 )
@@ -108,17 +108,34 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 		return err
 	}
 
-	vms := vmsInterface.([]interface{})
-	vm := vms[0]
-	valVMInterface := vms[1]
-	valVM := valVMInterface.(proposervm.ValidatorVM)
-	valVM.Version()
-
-	commonVM, ok := vm.(common.VM)
-	if !ok {
-		return nil
+	var vm interface{}
+	switch vmsInterface.(type) {
+	case combinedvm.CombinedVM:
+		vms := (vmsInterface).(combinedvm.CombinedVM) // todo Put the combinedVM in some outer package to avoid circular dependency
+		vm := vms.Vm
+		vm.Version()
+		valVM := vms.VmVal
+		fmt.Println("Calling GetValidators() in vms/manager")
+		valVM.GetValidators(ids.ID{})
+	default:
+		vm, err = factory.New(nil)
+		if err != nil {
+			return err
+		}
 	}
 
+
+	//vms := (vmsInterface).(combinedvm.CombinedVM) // todo Put the combinedVM in some outer package to avoid circular dependency
+	//vm := vms.Vm
+	//
+	//valVM := vms.VmVal
+	//valVM.GetValidators(ids.ID{})
+
+	//commonVM, ok := vm.(common.VM)
+	//if !ok {
+	//	return nil
+	//}
+	commonVM := vm.(common.VM)
 	version, err := commonVM.Version()
 	if err != nil {
 		m.log.Error("fetching version for %q errored with: %s", vmID, err)

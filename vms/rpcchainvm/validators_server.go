@@ -5,6 +5,8 @@ package rpcchainvm
 
 import (
 	"context"
+	"fmt"
+	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto"
 	"github.com/hashicorp/go-plugin"
 
@@ -19,7 +21,7 @@ var _ validatorproto.ValidatorsServer = &ValidatorsServer{}
 // ValidatorsServer is a VM that is managed over RPC.
 type ValidatorsServer struct {
 	validatorproto.UnimplementedValidatorsServer
-	valVM  block.Validators
+	valVM  block.ValidatorVMInterface
 	broker *plugin.GRPCBroker
 
 	serverCloser grpcutils.ServerCloser
@@ -30,7 +32,7 @@ type ValidatorsServer struct {
 }
 
 // ValidatorsServer returns a vm instance connected to a remote vm instance
-func NewValidatorsServer(valVM block.Validators, broker *plugin.GRPCBroker) *ValidatorsServer {
+func NewValidatorsServer(valVM block.ValidatorVMInterface, broker *plugin.GRPCBroker) *ValidatorsServer {
 	return &ValidatorsServer{
 		valVM:  valVM,
 		broker: broker,
@@ -38,8 +40,22 @@ func NewValidatorsServer(valVM block.Validators, broker *plugin.GRPCBroker) *Val
 }
 
 func (v ValidatorsServer) GetValidators(_ context.Context, req *validatorproto.ValidatorsRequest) (*validatorproto.ValidatorsResponse, error) {
-	validators, err := v.valVM.GetValidators(req.Hash)
+	bytesID, err := ids.ToID(req.Hash)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Calling GetValidators() in validators_server.go")
+
+	validators, err := v.valVM.GetValidators(bytesID)
 	return &validatorproto.ValidatorsResponse{
-		Validators: validators, //todo get the map types consistent, maybe just string for now?
+		Validators: convertMapIDstoMapStringKey(validators), //todo get the map types consistent, maybe just string for now?
 	}, err
+}
+
+func convertMapIDstoMapStringKey(m map[ids.ShortID]float64) map[string]float64 {
+	stringMap := make(map[string]float64)
+	for key, value := range m {
+		stringMap[key.String()] = value
+	}
+	return stringMap
 }

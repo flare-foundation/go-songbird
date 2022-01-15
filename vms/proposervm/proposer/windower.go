@@ -90,6 +90,11 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 	// New validators from coreth
 	validators = nil
 	for id, u := range validatorsMapNew {
+		//longID, err := ids.ToID(id)
+		//shortID, err := ids.ToShortID(id)
+		if err != nil {
+			continue
+		}
 		validators = append(validators, validatorData{
 			id:        id, //todo figure out why shortID is used
 			weightNew: u,

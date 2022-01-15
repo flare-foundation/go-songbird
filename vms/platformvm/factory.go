@@ -4,6 +4,8 @@
 package platformvm
 
 import (
+	"github.com/flare-foundation/flare/combinedvm"
+	"github.com/flare-foundation/flare/vms/validatorvm"
 	"time"
 
 	"github.com/flare-foundation/flare/chains"
@@ -81,7 +83,15 @@ type Factory struct {
 	ApricotPhase4Time time.Time
 }
 
+//type CombinedVM struct {
+//	Vm    *VM
+//	VmVal *validatorvm.ValidatorVM
+//}
+
 // New returns a new instance of the Platform Chain
 func (f *Factory) New(*snow.Context) (interface{}, error) {
-	return &VM{Factory: *f}, nil
+	return combinedvm.CombinedVM{
+		Vm:    &VM{Factory: *f},
+		VmVal: &validatorvm.ValidatorVM{},
+	}, nil
 }

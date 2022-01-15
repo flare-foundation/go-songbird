@@ -388,7 +388,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	consensusParams.Namespace = fmt.Sprintf("%s_%s", constants.PlatformName, primaryAlias)
 
 	// The validators of this blockchain
-	var vdrs validators.Set // Validators validating this blockchain
+	var vdrs validators.Set // ValidatorVMInterface validating this blockchain
 	var ok bool
 	if m.StakingEnabled {
 		vdrs, ok = m.Validators.GetValidators(chainParams.SubnetID)
@@ -438,6 +438,19 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 		if err != nil {
 			return nil, fmt.Errorf("error while creating new snowman vm %w", err)
 		}
+	case block.ValidatorVMInterface:
+		// todo
+		//chain, err = m.createSnowmanChain(
+		//	ctx,
+		//	chainParams.GenesisData,
+		//	vdrs,
+		//	beacons,
+		//	vm,
+		//	fxs,
+		//	consensusParams.Parameters,
+		//	bootstrapWeight,
+		//	sb,
+		//)
 	default:
 		return nil, errUnknownVMType
 	}
@@ -621,6 +634,10 @@ func (m *manager) createAvalancheChain(
 		Ctx:     ctx,
 	}, err
 }
+
+//func (m *manager) createSnowmanChainValidators(vm block.ValidatorVMInterface)(*chain, err){ // todo change name to something more meaningful
+//	return
+//}
 
 // Create a linear chain using the Snowman consensus engine
 func (m *manager) createSnowmanChain(
