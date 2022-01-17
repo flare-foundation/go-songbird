@@ -6,8 +6,13 @@ package proposer
 import (
 	"fmt"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/utils/subprocess"
 	"github.com/flare-foundation/flare/vms/rpcchainvm"
 	"github.com/flare-foundation/flare/vms/validatorvm"
+	"github.com/hashicorp/go-hclog"
+	"github.com/hashicorp/go-plugin"
+	"io/ioutil"
+	"log"
 	"sort"
 	"time"
 
@@ -50,8 +55,11 @@ type windower struct {
 }
 
 func New(state validators.State, subnetID, chainID ids.ID, vmValidator *validatorvm.ValidatorVM) Windower {
+	fmt.Println("windower new called......")
 	w := wrappers.Packer{Bytes: chainID[:]}
-	valClient := rpcchainvm.PluginMap["validators"].(rpcchainvm.PluginValidator).ValVM.(*rpcchainvm.ValidatorsClient)
+	fmt.Println(rpcchainvm.PluginMap)
+	//valClient := rpcchainvm.PluginMap["validators"].(*rpcchainvm.PluginValidator).ValVM.(block.ValidatorVMInterface).(*rpcchainvm.ValidatorsClient)
+	valClient := dispense(rpcchainvm.PluginMap)
 	return &windower{
 		state:       state,
 		subnetID:    subnetID,
@@ -60,6 +68,57 @@ func New(state validators.State, subnetID, chainID ids.ID, vmValidator *validato
 		vmValidator: vmValidator,
 		valClient:   valClient,
 	}
+}
+
+func dispense(pluginmap map[string]plugin.Plugin) *rpcchainvm.ValidatorsClient {
+	// Ignore warning from launching an executable with a variable command
+	// because the command is a controlled and required input
+	PluginMap := pluginmap
+	config := &plugin.ClientConfig{
+		HandshakeConfig: rpcchainvm.Handshake,
+		Plugins:         PluginMap,
+		Cmd:             subprocess.New("/Users/default/go/src/github.com/flare/build/plugins/evm"), //f.Path
+		AllowedProtocols: []plugin.Protocol{
+			plugin.ProtocolNetRPC,
+			plugin.ProtocolGRPC,
+		},
+		// We kill this client by calling kill() when the chain running this VM
+		// shuts down. However, there are some cases where the VM's Shutdown
+		// method is not called. Namely, if:
+		// 1) The node shuts down after the client is created but before the
+		//    chain is registered with the message router.
+		// 2) The chain doesn't handle a shutdown message before the node times
+		//    out on the chain's shutdown and dies, leaving the shutdown message
+		//    unhandled.
+		// We set managed to true so that we can call plugin.CleanupClients on
+		// node shutdown to ensure every plugin subprocess is killed.
+		Managed: true,
+	}
+
+	log.SetOutput(ioutil.Discard)
+	config.Stderr = ioutil.Discard
+	config.Logger = hclog.New(&hclog.LoggerOptions{
+		Output: ioutil.Discard,
+	})
+
+	client := plugin.NewClient(config)
+
+	rpcClient, err := client.Client()
+	if err != nil {
+		fmt.Println("rpcClient nil with error: ", err.Error())
+		client.Kill()
+	}
+	fmt.Println("rpclient: ", rpcClient)
+	raw1, err := rpcClient.Dispense("validators") //validators
+	if err != nil {
+		client.Kill()
+	}
+	valVM, ok := raw1.(*rpcchainvm.ValidatorsClient)
+	if !ok {
+		client.Kill()
+	}
+	valVM.SetProcess(client)
+	return valVM
 }
 
 func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
