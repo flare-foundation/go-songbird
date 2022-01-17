@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/flare-foundation/flare/combinedvm"
 	"sync"
 	"time"
 
@@ -271,6 +272,11 @@ func (m *manager) ForceCreateChain(chainParams ChainParameters) {
 	}
 
 	m.chainsLock.Lock()
+	//fmt.Println(chainParams)
+	fmt.Println(chain)
+	if chain == nil {
+		return
+	}
 	m.chains[chainParams.ID] = chain.Handler
 	m.chainsLock.Unlock()
 
@@ -451,7 +457,10 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 		//	bootstrapWeight,
 		//	sb,
 		//)
+	case combinedvm.CombinedVM, []interface {}:
 	default:
+		fmt.Println("vm type: ", vm)
+		fmt.Println(fmt.Sprintf("%T", vm))
 		return nil, errUnknownVMType
 	}
 

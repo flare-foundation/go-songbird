@@ -5,6 +5,7 @@ package rpcchainvm
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -24,6 +25,7 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 	// Ignore warning from launching an executable with a variable command
 	// because the command is a controlled and required input
 
+	fmt.Println("Factory New called", f.Path)
 	config := &plugin.ClientConfig{
 		HandshakeConfig: Handshake,
 		Plugins:         PluginMap,
@@ -59,15 +61,18 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 		})
 	}
 	client := plugin.NewClient(config)
+	fmt.Println("client is: ", client)
 
 	rpcClient, err := client.Client()
 	if err != nil {
+		fmt.Println("Factory New error 1")
 		client.Kill()
 		return nil, err
 	}
 
 	raw, err := rpcClient.Dispense("vm")
 	if err != nil {
+		fmt.Println("Factory New error 2")
 		client.Kill()
 		return nil, err
 	}
@@ -84,16 +89,19 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 
 	raw1, err := rpcClient.Dispense("validators")
 	if err != nil {
+		fmt.Println("Factory New error 3")
 		client.Kill()
 		return nil, err
 	}
 	valVM, ok := raw1.(*ValidatorsClient)
 	if !ok {
+		fmt.Println("Factory New error 4")
 		client.Kill()
 		return nil, errWrongVM
 	}
 	valVM.SetProcess(client)
 	valVM.ctx = ctx
 
-	return []interface{}{vm, valVM}, nil
+	//return []interface{}{vm, valVM}, nil
+	return vm, nil
 }

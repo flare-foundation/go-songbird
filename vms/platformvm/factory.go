@@ -4,8 +4,6 @@
 package platformvm
 
 import (
-	"github.com/flare-foundation/flare/combinedvm"
-	"github.com/flare-foundation/flare/vms/validatorvm"
 	"time"
 
 	"github.com/flare-foundation/flare/chains"
@@ -88,10 +86,15 @@ type Factory struct {
 //	VmVal *validatorvm.ValidatorVM
 //}
 
+//// New returns a new instance of the Platform Chain
+//func (f *Factory) New(*snow.Context) (interface{}, error) {
+//	return combinedvm.CombinedVM{
+//		Vm:    &VM{Factory: *f},
+//		VmVal: &validatorvm.ValidatorVM{},
+//	}, nil
+//}
+
 // New returns a new instance of the Platform Chain
 func (f *Factory) New(*snow.Context) (interface{}, error) {
-	return combinedvm.CombinedVM{
-		Vm:    &VM{Factory: *f},
-		VmVal: &validatorvm.ValidatorVM{},
-	}, nil
+	return &VM{Factory: *f}, nil
 }

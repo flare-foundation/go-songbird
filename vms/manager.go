@@ -93,7 +93,9 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 	if _, exists := m.factories[vmID]; exists {
 		return fmt.Errorf("%q was already registered as a vm", vmID)
 	}
+	fmt.Println("Alias getting called..")
 	if err := m.Alias(vmID, vmID.String()); err != nil {
+		fmt.Println("RegisterFactory error 1")
 		return err
 	}
 
@@ -112,6 +114,7 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 	//}
 	vm, err := factory.New(nil)
 	if err != nil {
+		fmt.Println("RegisterFactory error 2")
 		return err
 	}
 
@@ -143,15 +146,17 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 	//	return nil
 	//}
 	switch vm.(type) {
-	case combinedvm.CombinedVM, *secp256k1fx.Fx, *nftfx.Fx, *propertyfx.Fx:
+	case combinedvm.CombinedVM, *secp256k1fx.Fx, *nftfx.Fx, *propertyfx.Fx, []interface {}:
 		return nil
 	}
 	commonVM := vm.(common.VM)
 	version, err := commonVM.Version()
 	if err != nil {
+		fmt.Println("RegisterFactory error 3")
 		m.log.Error("fetching version for %q errored with: %s", vmID, err)
 
 		if err := commonVM.Shutdown(); err != nil {
+			fmt.Println("RegisterFactory error 4")
 			return fmt.Errorf("shutting down VM errored with: %s", err)
 		}
 		return nil
@@ -160,6 +165,7 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 
 	handlers, err := commonVM.CreateStaticHandlers()
 	if err != nil {
+		fmt.Println("RegisterFactory error 5")
 		m.log.Error("creating static API endpoints for %q errored with: %s", vmID, err)
 
 		if err := commonVM.Shutdown(); err != nil {
@@ -176,6 +182,7 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 	for extension, service := range handlers {
 		m.log.Verbo("adding static API endpoint: %s%s", defaultEndpoint, extension)
 		if err := m.apiServer.AddRoute(service, lock, defaultEndpoint, extension, m.log); err != nil {
+			fmt.Println("RegisterFactory error 6")
 			return fmt.Errorf(
 				"failed to add static API endpoint %s%s: %s",
 				defaultEndpoint,
