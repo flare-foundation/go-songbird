@@ -92,7 +92,7 @@ func (vm *VM) Initialize(
 	vm.State = state.New(vm.db)
 	vm.Windower = proposer.New(ctx.ValidatorState, ctx.SubnetID, ctx.ChainID, &validatorvm.ValidatorVM{
 		//VM:vm,
-	})
+	}) // todo get plugin path string in here
 	vm.Tree = tree.New()
 
 	scheduler, vmToEngine := scheduler.New(vm.ctx.Log, toEngine)

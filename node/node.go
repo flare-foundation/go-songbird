@@ -559,14 +559,17 @@ func (n *Node) initVMManager() error {
 // AVM, Simple Payments DAG, Simple Payments Chain, and Platform VM
 // Assumes n.DBManager, n.vdrs all initialized (non-nil)
 func (n *Node) initChainManager(avaxAssetID ids.ID) error {
+	fmt.Println("initChainManager called")
 	createAVMTx, err := genesis.VMGenesis(n.Config.GenesisBytes, avm.ID)
 	if err != nil {
+		fmt.Println("initChainManager called 1")
 		return err
 	}
 	xChainID := createAVMTx.ID()
 
 	createEVMTx, err := genesis.VMGenesis(n.Config.GenesisBytes, evm.ID)
 	if err != nil {
+		fmt.Println("initChainManager called 2")
 		return err
 	}
 	cChainID := createEVMTx.ID()
@@ -587,6 +590,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		requestsNamespace,
 		n.MetricsRegisterer,
 	); err != nil {
+		fmt.Println("initChainManager called 3")
 		return err
 	}
 	go n.Log.RecoverAndPanic(timeoutManager.Dispatch)
@@ -606,12 +610,14 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		n.MetricsRegisterer,
 	)
 	if err != nil {
+		fmt.Println("initChainManager called 1")
 		return fmt.Errorf("couldn't initialize chain router: %w", err)
 	}
 
 	fetchOnlyFrom := validators.NewSet()
 	for _, peerID := range n.Config.BootstrapIDs {
 		if err := fetchOnlyFrom.AddWeight(peerID, 1); err != nil {
+			fmt.Println("initChainManager called 4")
 			return fmt.Errorf("couldn't initialize fetch from set: %w", err)
 		}
 	}
@@ -701,10 +707,12 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		n.vmManager.RegisterFactory(propertyfx.ID, &propertyfx.Factory{}),
 	)
 	if errs.Errored() {
+		fmt.Println("initChainManager called 5")
 		return errs.Err
 	}
 
 	if err := n.registerRPCVMs(); err != nil {
+		fmt.Println("initChainManager called 6")
 		return err
 	}
 
@@ -717,6 +725,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 func (n *Node) registerRPCVMs() error {
 	files, err := ioutil.ReadDir(n.Config.PluginDir)
 	if err != nil {
+		fmt.Println("Error in registerRPCVMs 1")
 		return err
 	}
 
@@ -738,13 +747,16 @@ func (n *Node) registerRPCVMs() error {
 			// there is no alias with plugin name, try to use full vmID.
 			vmID, err = ids.FromString(name)
 			if err != nil {
+				fmt.Println("Error in registerRPCVMs 2")
 				return fmt.Errorf("invalid vmID %s", name)
 			}
 		}
 
+		fmt.Println("Calling registerfactory")
 		if err = n.vmManager.RegisterFactory(vmID, &rpcchainvm.Factory{
-			Path: filepath.Join(n.Config.PluginDir, file.Name()),
+			Path: filepath.Join(n.Config.PluginDir, file.Name()), // todo path for the validators plugin?
 		}); err != nil {
+			fmt.Println("Error in registerRPCVMs 3")
 			return err
 		}
 	}
@@ -1104,6 +1116,7 @@ func (n *Node) Initialize(
 	if err := n.initVMManager(); err != nil {
 		return fmt.Errorf("couldn't initialize API aliases: %w", err)
 	}
+	fmt.Println("Going to call initChainManager")
 	if err := n.initChainManager(n.Config.AvaxAssetID); err != nil { // Set up the chain manager
 		return fmt.Errorf("couldn't initialize chain manager: %w", err)
 	}

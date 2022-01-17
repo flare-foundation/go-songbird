@@ -806,6 +806,7 @@ func GetNodeConfig(v *viper.Viper, buildDir string) (node.Config, error) {
 
 	// Plugin directory defaults to [buildDir]/[pluginsDirName]
 	nodeConfig.PluginDir = filepath.Join(buildDir, pluginsDirName)
+	fmt.Println("filepath.Join(buildDir, pluginsDirName): ", filepath.Join(buildDir, pluginsDirName))
 
 	// Consensus Parameters
 	nodeConfig.ConsensusParams = getConsensusConfig(v)
