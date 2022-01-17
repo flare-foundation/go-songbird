@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"github.com/flare-foundation/flare/combinedvm"
 	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/vms/nftfx"
+	"github.com/flare-foundation/flare/vms/propertyfx"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 	"sync"
 
 	"github.com/flare-foundation/flare/api/server"
@@ -103,26 +106,30 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 
 	m.log.Debug("adding static API for vm %q", vmID)
 
-	vmsInterface, err := factory.New(nil)
+	//vmsInterface, err := factory.New(nil)
+	//if err != nil {
+	//	return err
+	//}
+	vm, err := factory.New(nil)
 	if err != nil {
 		return err
 	}
 
-	var vm interface{}
-	switch vmsInterface.(type) {
-	case combinedvm.CombinedVM:
-		vms := (vmsInterface).(combinedvm.CombinedVM) // todo Put the combinedVM in some outer package to avoid circular dependency
-		vm := vms.Vm
-		vm.Version()
-		valVM := vms.VmVal
-		fmt.Println("Calling GetValidators() in vms/manager")
-		valVM.GetValidators(ids.ID{})
-	default:
-		vm, err = factory.New(nil)
-		if err != nil {
-			return err
-		}
-	}
+	//var vm interface{}
+	//switch vmsInterface.(type) {
+	//case combinedvm.CombinedVM:
+	//	vms := (vmsInterface).(combinedvm.CombinedVM) // todo Put the combinedVM in some outer package to avoid circular dependency
+	//	vm = vms.Vm
+	//	//vm.Version()
+	//	//valVM := vms.VmVal
+	//	//fmt.Println("Calling GetValidators() in vms/manager")
+	//	//valVM.GetValidators(ids.ID{})
+	//default:
+	//	vm, err = factory.New(nil)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
 
 
 	//vms := (vmsInterface).(combinedvm.CombinedVM) // todo Put the combinedVM in some outer package to avoid circular dependency
@@ -135,6 +142,10 @@ func (m *manager) RegisterFactory(vmID ids.ID, factory Factory) error {
 	//if !ok {
 	//	return nil
 	//}
+	switch vm.(type) {
+	case combinedvm.CombinedVM, *secp256k1fx.Fx, *nftfx.Fx, *propertyfx.Fx:
+		return nil
+	}
 	commonVM := vm.(common.VM)
 	version, err := commonVM.Version()
 	if err != nil {

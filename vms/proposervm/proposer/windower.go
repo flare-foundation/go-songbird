@@ -4,6 +4,9 @@
 package proposer
 
 import (
+	"fmt"
+	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/vms/rpcchainvm"
 	"github.com/flare-foundation/flare/vms/validatorvm"
 	"sort"
 	"time"
@@ -31,26 +34,31 @@ type Windower interface {
 		validatorID ids.ShortID,
 		hash ids.ID,
 	) (time.Duration, error)
+	GetValidators(hash []byte) (map[string]float64, error)
 }
 
 // windower interfaces with P-Chain and it is responsible for calculating the
 // delay for the block submission window of a given validator
 type windower struct {
-	state       validators.State
-	subnetID    ids.ID
-	chainSource uint64
-	sampler     sampler.WeightedWithoutReplacement
-	vmValidator *validatorvm.ValidatorVM
+	state        validators.State
+	subnetID     ids.ID
+	chainSource  uint64
+	sampler      sampler.WeightedWithoutReplacement
+	vmValidator  *validatorvm.ValidatorVM
+	valClient    *rpcchainvm.ValidatorsClient
+	valInterface *block.ValidatorVMInterface
 }
 
 func New(state validators.State, subnetID, chainID ids.ID, vmValidator *validatorvm.ValidatorVM) Windower {
 	w := wrappers.Packer{Bytes: chainID[:]}
+	valClient := rpcchainvm.PluginMap["validators"].(rpcchainvm.PluginValidator).ValVM.(*rpcchainvm.ValidatorsClient)
 	return &windower{
 		state:       state,
 		subnetID:    subnetID,
 		chainSource: w.UnpackLong(),
 		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
 		vmValidator: vmValidator,
+		valClient:   valClient,
 	}
 }
 
@@ -60,6 +68,8 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 	// todo blockID
 	//bID, _ := w.vmValidator.VM.State.GetLastAccepted() //todo do we really need to use the VM here or can we do without it so that we can get rid of the circular dependency?
 	//(b.ParentID().([]byte))
+	fmt.Println("Inside windower Delay()")
+	fmt.Println(w.valClient)
 	validatorsMapNew, err := w.vmValidator.GetValidators(hash)
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
@@ -138,4 +148,24 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 		delay += WindowDuration
 	}
 	return delay, nil
+}
+
+func (w *windower) GetValidators(hash []byte) (map[string]float64, error) {
+	var id [32]byte
+	copy(id[:], hash)
+
+	m, err := w.valClient.GetValidators(id)
+	if err != nil {
+		return nil, err
+	}
+	return convertShortIdmapToStringMap(m), nil
+
+}
+
+func convertShortIdmapToStringMap(m map[ids.ShortID]float64) map[string]float64 {
+	retM := make(map[string]float64)
+	for key, val := range m {
+		retM[key.String()] = val
+	}
+	return retM
 }
