@@ -86,7 +86,7 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 	vm.SetProcess(client) // todo do the same for validators
 
 	vm.ctx = ctx
-
+	//
 	raw1, err := rpcClient.Dispense("validators")
 	if err != nil {
 		fmt.Println("Factory New error 3")
@@ -101,7 +101,7 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 	}
 	valVM.SetProcess(client)
 	valVM.ctx = ctx
-
+	GlobalValidatorClient = valVM
 	//return []interface{}{vm, valVM}, nil
 	return vm, nil
 }

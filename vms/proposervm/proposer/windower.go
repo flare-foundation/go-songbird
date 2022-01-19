@@ -57,16 +57,16 @@ type windower struct {
 func New(state validators.State, subnetID, chainID ids.ID, vmValidator *validatorvm.ValidatorVM) Windower {
 	fmt.Println("windower new called......")
 	w := wrappers.Packer{Bytes: chainID[:]}
-	fmt.Println(rpcchainvm.PluginMap)
+	fmt.Println(rpcchainvm.PluginMap) // todo how about create an exportable client as well? along with PluginMap
 	//valClient := rpcchainvm.PluginMap["validators"].(*rpcchainvm.PluginValidator).ValVM.(block.ValidatorVMInterface).(*rpcchainvm.ValidatorsClient)
-	valClient := dispense(rpcchainvm.PluginMap)
+	//valClient := dispense(rpcchainvm.PluginMap)
 	return &windower{
 		state:       state,
 		subnetID:    subnetID,
 		chainSource: w.UnpackLong(),
 		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
 		vmValidator: vmValidator,
-		valClient:   valClient,
+		valClient:   rpcchainvm.GlobalValidatorClient,
 	}
 }
 
@@ -115,9 +115,22 @@ func dispense(pluginmap map[string]plugin.Plugin) *rpcchainvm.ValidatorsClient {
 	}
 	valVM, ok := raw1.(*rpcchainvm.ValidatorsClient)
 	if !ok {
+		fmt.Println("cant convert")
 		client.Kill()
 	}
+	fmt.Println("valVM: ", valVM)
 	valVM.SetProcess(client)
+	//idString := "11111111111111111111111111111111LpoYY"
+	//
+	//id, err := ids.ToID([]byte(idString))
+	//if err != nil {
+	//	fmt.Println("error in converting to id", err.Error())
+	//}
+	//testRet, err := valVM.GetValidators(id)
+	//if err != nil {
+	//	fmt.Println("return from GetValidators test: ", testRet)
+	//	fmt.Println(err.Error())
+	//}
 	return valVM
 }
 
@@ -129,7 +142,9 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 	//(b.ParentID().([]byte))
 	fmt.Println("Inside windower Delay()")
 	fmt.Println(w.valClient)
-	validatorsMapNew, err := w.vmValidator.GetValidators(hash)
+	//validatorsMapNew, err := w.vmValidator.GetValidators(hash)
+	validatorsMapNew, err := w.valClient.GetValidators(hash)
+	fmt.Println("validatorsMapNew: ", validatorsMapNew)
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}

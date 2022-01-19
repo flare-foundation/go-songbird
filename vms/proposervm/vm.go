@@ -4,6 +4,7 @@
 package proposervm
 
 import (
+	"fmt"
 	"github.com/flare-foundation/flare/vms/validatorvm"
 	"time"
 
@@ -147,6 +148,7 @@ func (vm *VM) GetBlock(id ids.ID) (snowman.Block, error) {
 }
 
 func (vm *VM) SetPreference(preferred ids.ID) error {
+	fmt.Println("SetPreference.......")
 	if vm.preferred == preferred {
 		return nil
 	}
@@ -154,15 +156,18 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 
 	blk, err := vm.getPostForkBlock(preferred)
 	if err != nil {
+		fmt.Println("SetPreference Error 1: ",err.Error())
 		return vm.ChainVM.SetPreference(preferred)
 	}
 
 	if err := vm.ChainVM.SetPreference(blk.getInnerBlk().ID()); err != nil {
+		fmt.Println("SetPreference Error 2: ",err.Error())
 		return err
 	}
 
 	pChainHeight, err := blk.pChainHeight()
 	if err != nil {
+		fmt.Println("SetPreference Error 3: ",err.Error())
 		return err
 	}
 
@@ -170,6 +175,7 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 	// reset scheduler
 	minDelay, err := vm.Windower.Delay(blk.Height()+1, pChainHeight, vm.ctx.NodeID, bID)
 	if err != nil {
+		fmt.Println("SetPreference Error 4: ",err.Error())
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that
 		// bootstrapping caused the last accepted block to move past the latest

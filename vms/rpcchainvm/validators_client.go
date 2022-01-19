@@ -2,6 +2,7 @@ package rpcchainvm
 
 import (
 	"context"
+	"fmt"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto"
@@ -29,10 +30,18 @@ func (vm *ValidatorsClient) GetValidators(id ids.ID) (map[ids.ShortID]float64, e
 
 	var hash []byte
 	copy(hash[:], id.String())
-	resp, err := vm.client.GetValidators(context.Background(), &validatorproto.ValidatorsRequest{
-		Hash: hash,
-	})
+	fmt.Println("Printing hash and id")
 
+	fmt.Println(id.String(), hash)
+	hash = []byte(id.String())
+	fmt.Println(hash)
+	fmt.Println("id[:]: ", id[:])
+	var hash2 [32]byte
+	hash3 := hash2[:]
+	resp, err := vm.client.GetValidators(context.Background(), &validatorproto.ValidatorsRequest{
+		Hash: hash3,
+	})
+	fmt.Println(resp, err.Error())
 	return convertStringMaptoShortIDMap(resp.Validators), err
 }
 
