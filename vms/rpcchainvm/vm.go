@@ -54,12 +54,14 @@ func (p *Plugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *g
 }
 
 type PluginValidator struct {
-	plugin.NetRPCUnsupportedPlugin
+	//plugin.NetRPCUnsupportedPlugin
 	// Concrete implementation, written in Go. This is only used for plugins
 	// that are written in Go.
-	vm    block.ChainVM
-	ValVM block.ValidatorVMInterface // proposervm.ValidatorVM
-	*ValidatorsClient
+	// GRPCPlugin must still implement the Plugin interface
+    plugin.Plugin
+	vm        block.ChainVM
+	ValVM     block.ValidatorVMInterface // proposervm.ValidatorVM
+	valClient *ValidatorsClient
 }
 
 // NewPluginValidator creates a new PluginValidator from the provided VM
@@ -69,7 +71,7 @@ func NewPluginValidator(vm block.ValidatorVMInterface) *PluginValidator {
 
 // GRPCServer registers a new GRPC server.
 func (p *PluginValidator) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-	validatorproto.RegisterValidatorsServer(s, NewValidatorsServer(p.ValidatorsClient, broker)) //todo
+	validatorproto.RegisterValidatorsServer(s, NewValidatorsServer(p.ValVM, broker)) //todo
 	return nil
 }
 
