@@ -4,6 +4,7 @@
 package proposer
 
 import (
+	"github.com/flare-foundation/flare/vms/rpcchainvm"
 	"sort"
 	"time"
 
@@ -28,7 +29,9 @@ type Windower interface {
 		chainHeight,
 		pChainHeight uint64,
 		validatorID ids.ShortID,
+		hash ids.ID,
 	) (time.Duration, error)
+	GetValidators(hash []byte) (map[string]float64, error)
 }
 
 // windower interfaces with P-Chain and it is responsible for calculating the
@@ -38,6 +41,9 @@ type windower struct {
 	subnetID    ids.ID
 	chainSource uint64
 	sampler     sampler.WeightedWithoutReplacement
+	//vmValidator  *validatorvm.ValidatorVM
+	valClient *rpcchainvm.ValidatorsClient
+	//valInterface *block.ValidatorVMInterface
 }
 
 func New(state validators.State, subnetID, chainID ids.ID) Windower {
@@ -47,10 +53,12 @@ func New(state validators.State, subnetID, chainID ids.ID) Windower {
 		subnetID:    subnetID,
 		chainSource: w.UnpackLong(),
 		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
+		valClient:   rpcchainvm.GlobalValidatorClient,
 	}
 }
 
-func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID) (time.Duration, error) {
+func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
+	validatorsMapNew, err := w.valClient.GetValidators(hash)
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
@@ -74,6 +82,20 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 			return 0, err
 		}
 		weight = newWeight
+	}
+
+	// New validators from coreth
+	validators = nil
+	for id, u := range validatorsMapNew {
+		//longID, err := ids.ToID(id)
+		//shortID, err := ids.ToShortID(id)
+		if err != nil {
+			continue
+		}
+		validators = append(validators, validatorData{
+			id:        id, //todo figure out why shortID is used
+			weightNew: u,
+		})
 	}
 
 	// canonically sort validators
@@ -113,4 +135,24 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 		delay += WindowDuration
 	}
 	return delay, nil
+}
+
+func (w *windower) GetValidators(hash []byte) (map[string]float64, error) {
+	var id [32]byte
+	copy(id[:], hash)
+
+	m, err := w.valClient.GetValidators(id)
+	if err != nil {
+		return nil, err
+	}
+	return convertShortIdmapToStringMap(m), nil
+
+}
+
+func convertShortIdmapToStringMap(m map[ids.ShortID]float64) map[string]float64 {
+	retM := make(map[string]float64)
+	for key, val := range m {
+		retM[key.String()] = val
+	}
+	return retM
 }

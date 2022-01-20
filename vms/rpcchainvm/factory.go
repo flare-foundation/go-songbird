@@ -5,6 +5,7 @@ package rpcchainvm
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -80,5 +81,22 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 
 	vm.SetProcess(client)
 	vm.ctx = ctx
+
+	raw1, err := rpcClient.Dispense("validators")
+	if err != nil {
+		fmt.Println("Factory New error 3")
+		client.Kill()
+		return nil, err
+	}
+	valVM, ok := raw1.(*ValidatorsClient)
+	if !ok {
+		fmt.Println("Factory New error 4")
+		client.Kill()
+		return nil, errWrongVM
+	}
+	valVM.SetProcess(client)
+	valVM.ctx = ctx
+	GlobalValidatorClient = valVM
+
 	return vm, nil
 }

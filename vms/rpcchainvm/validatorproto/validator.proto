@@ -1,0 +1,18 @@
+syntax = "proto3";
+package vmproto;
+option go_package = "github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto";
+import "google/protobuf/empty.proto";
+
+
+// To compile: protoc --go_out=plugins=grpc:. vm.proto
+message ValidatorsRequest{
+  bytes hash = 1;
+}
+
+message ValidatorsResponse{
+  map<string, double> validators = 1;
+}
+
+service Validators {
+  rpc GetValidators(ValidatorsRequest) returns (ValidatorsResponse);
+}

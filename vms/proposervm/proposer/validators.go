@@ -12,6 +12,7 @@ import (
 type validatorData struct {
 	id     ids.ShortID
 	weight uint64
+	weightNew float64
 }
 
 type validatorsSlice []validatorData
