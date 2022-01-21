@@ -59,9 +59,7 @@ type PluginValidator struct {
 	// that are written in Go.
 	// GRPCPlugin must still implement the Plugin interface
     plugin.Plugin
-	vm        block.ChainVM
 	ValVM     block.ValidatorVMInterface // proposervm.ValidatorVM
-	valClient *ValidatorsClient
 }
 
 // NewPluginValidator creates a new PluginValidator from the provided VM
