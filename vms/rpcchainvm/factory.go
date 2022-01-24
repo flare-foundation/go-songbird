@@ -4,8 +4,10 @@
 package rpcchainvm
 
 import (
+	//"context"
 	"errors"
 	"fmt"
+	//"github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto"
 	"io/ioutil"
 	"log"
 
@@ -81,7 +83,11 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 
 	vm.SetProcess(client)
 	vm.ctx = ctx
-
+    version, err := vm.Version()
+	if err != nil {
+		fmt.Println("Error in version: ", err.Error())
+	}
+	fmt.Println("version: ",version)
 	raw1, err := rpcClient.Dispense("validators")
 	if err != nil {
 		fmt.Println("Factory New error 3")
@@ -97,6 +103,15 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 	valVM.SetProcess(client)
 	valVM.ctx = ctx
 	GlobalValidatorClient = valVM
-
+	//fmt.Println("ValidatorsClient: ", valVM)
+	//fmt.Println("VMClient: ", vm)
+	//var hash [32]byte
+	//hash2 := hash[:]
+	//re, err := valVM.client.GetValidators(context.Background(), &validatorproto.ValidatorsRequest{Hash: hash2})
+	//if err != nil {
+	//	fmt.Println("error is: ", err.Error())
+	//}
+	//fmt.Println(re)
+	//fmt.Println(re.Validators)
 	return vm, nil
 }
