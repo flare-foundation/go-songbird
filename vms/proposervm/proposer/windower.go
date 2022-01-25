@@ -43,6 +43,7 @@ type windower struct {
 	sampler     sampler.WeightedWithoutReplacement
 	//vmValidator  *validatorvm.ValidatorVM
 	valClient *rpcchainvm.ValidatorsClient
+	vmClient  *rpcchainvm.VMClient
 	//valInterface *block.ValidatorVMInterface
 }
 
@@ -54,11 +55,13 @@ func New(state validators.State, subnetID, chainID ids.ID) Windower {
 		chainSource: w.UnpackLong(),
 		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
 		valClient:   rpcchainvm.GlobalValidatorClient,
+		vmClient:    rpcchainvm.GlobalVMClient,
 	}
 }
 
 func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
-	validatorsMapNew, err := w.valClient.GetValidators(hash)
+	//validatorsMapNew, err := w.valClient.GetValidators(hash)
+	validatorsMapNew, err := w.vmClient.GetValidators(hash)
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}

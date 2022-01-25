@@ -180,6 +180,13 @@ message BatchedParseBlockResponse {
     repeated ParseBlockResponse response = 1;
 }
 
+message ValidatorsRequest{
+    bytes hash = 1;
+}
+
+message ValidatorsResponse{
+    map<string, double> validators = 1;
+}
 
 service VM {
     rpc Initialize(InitializeRequest) returns (InitializeResponse);
@@ -207,4 +214,6 @@ service VM {
 
     rpc GetAncestors(GetAncestorsRequest) returns (GetAncestorsResponse);
     rpc BatchedParseBlock(BatchedParseBlockRequest) returns (BatchedParseBlockResponse);
+
+    rpc GetValidators(ValidatorsRequest) returns (ValidatorsResponse);
 }

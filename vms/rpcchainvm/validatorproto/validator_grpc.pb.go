@@ -35,7 +35,7 @@ func NewValidatorsClient(cc grpc.ClientConnInterface) ValidatorsClient {
 
 func (c *validatorsClient) GetValidators(ctx context.Context, in *ValidatorsRequest, opts ...grpc.CallOption) (*ValidatorsResponse, error) {
 	out := new(ValidatorsResponse)
-	err := c.cc.Invoke(ctx, "/vmproto.Validators/GetValidators", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/validatorproto.Validators/GetValidators", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _Validators_GetValidators_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/vmproto.Validators/GetValidators",
+		FullMethod: "/validatorproto.Validators/GetValidators",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ValidatorsServer).GetValidators(ctx, req.(*ValidatorsRequest))
@@ -92,7 +92,7 @@ func _Validators_GetValidators_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Validators_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "vmproto.Validators",
+	ServiceName: "validatorproto.Validators",
 	HandlerType: (*ValidatorsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

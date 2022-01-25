@@ -49,6 +49,8 @@ type ChainVM interface {
 	// a definitionally accepted block, the Genesis block, that will be
 	// returned.
 	LastAccepted() (ids.ID, error)
+
+	ValidatorVMInterface
 }
 
 // Getter defines the functionality for fetching a block by its ID.

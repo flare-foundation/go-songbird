@@ -220,6 +220,10 @@ func (vm *VM) Initialize(
 	return vm.SetPreference(vm.lastAcceptedID)
 }
 
+func (vm *VM) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
+	return nil, nil
+}
+
 // Create all chains that exist that this node validates.
 func (vm *VM) initBlockchains() error {
 	if err := vm.createSubnet(constants.PrimaryNetworkID); err != nil {

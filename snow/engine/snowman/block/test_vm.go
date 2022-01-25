@@ -96,3 +96,7 @@ func (vm *TestVM) LastAccepted() (ids.ID, error) {
 	}
 	return ids.ID{}, errLastAccepted
 }
+
+func (vm *TestVM) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
+	return nil, nil
+}

@@ -123,6 +123,10 @@ func (vm *VM) Initialize(
 	return vm.setLastAcceptedOptionTime()
 }
 
+func (vm *VM) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
+	return nil, nil
+}
+
 func (vm *VM) BuildBlock() (snowman.Block, error) {
 	preferredBlock, err := vm.getBlock(vm.preferred)
 	if err != nil {

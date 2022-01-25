@@ -1,5 +1,5 @@
 syntax = "proto3";
-package vmproto;
+package validatorproto;
 option go_package = "github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto";
 import "google/protobuf/empty.proto";
 

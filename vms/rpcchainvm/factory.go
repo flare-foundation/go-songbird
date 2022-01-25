@@ -103,6 +103,7 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 	valVM.SetProcess(client)
 	valVM.ctx = ctx
 	GlobalValidatorClient = valVM
+	GlobalVMClient = vm
 	//fmt.Println("ValidatorsClient: ", valVM)
 	//fmt.Println("VMClient: ", vm)
 	//var hash [32]byte
