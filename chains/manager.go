@@ -646,6 +646,7 @@ func (m *manager) createSnowmanChain(
 
 	meterDBManager, err := m.DBManager.NewMeterDBManager("db", ctx.Registerer)
 	if err != nil {
+		fmt.Println("1", err.Error())
 		return nil, err
 	}
 	prefixDBManager := meterDBManager.NewPrefixDBManager(ctx.ChainID[:])
@@ -656,6 +657,7 @@ func (m *manager) createSnowmanChain(
 
 	blocked, err := queue.NewWithMissing(bootstrappingDB, "block", ctx.Registerer)
 	if err != nil {
+		fmt.Println("2", err.Error())
 		return nil, err
 	}
 
@@ -675,6 +677,7 @@ func (m *manager) createSnowmanChain(
 		m.AppGossipNonValidatorSize,
 		m.GossipAcceptedFrontierSize,
 	); err != nil {
+		fmt.Println("3", err.Error())
 		return nil, fmt.Errorf("couldn't initialize sender: %w", err)
 	}
 
@@ -683,6 +686,7 @@ func (m *manager) createSnowmanChain(
 		if m.ManagerConfig.StakingEnabled {
 			valState, ok := vm.(validators.State)
 			if !ok {
+				fmt.Println("4", err.Error())
 				return nil, fmt.Errorf("expected validators.State but got %T", vm)
 			}
 
@@ -702,6 +706,7 @@ func (m *manager) createSnowmanChain(
 	// Initialize the ProposerVM and the vm wrapped inside it
 	chainConfig, err := m.getChainConfig(ctx.ChainID)
 	if err != nil {
+		fmt.Println("5", err.Error())
 		return nil, fmt.Errorf("error while fetching chain config: %w", err)
 	}
 
@@ -721,6 +726,7 @@ func (m *manager) createSnowmanChain(
 		fxs,
 		&sender,
 	); err != nil {
+		fmt.Println("6", err.Error())
 		return nil, err
 	}
 
@@ -764,6 +770,7 @@ func (m *manager) createSnowmanChain(
 		Params:    consensusParams,
 		Consensus: &smcon.Topological{},
 	}); err != nil {
+		fmt.Println("7", err.Error())
 		return nil, fmt.Errorf("error initializing snowman engine: %w", err)
 	}
 
@@ -774,12 +781,14 @@ func (m *manager) createSnowmanChain(
 		msgChan,
 	)
 	if err != nil {
+		fmt.Println("8", err.Error())
 		return nil, fmt.Errorf("couldn't initialize message handler: %s", err)
 	}
 
 	// Register health checks
 	chainAlias, err := m.PrimaryAlias(ctx.ChainID)
 	if err != nil {
+		fmt.Println("9", err.Error())
 		chainAlias = ctx.ChainID.String()
 	}
 
@@ -789,6 +798,7 @@ func (m *manager) createSnowmanChain(
 		return engine.HealthCheck()
 	}
 	if err := m.HealthService.RegisterCheck(chainAlias, checkFn); err != nil {
+		fmt.Println("10", err.Error())
 		return nil, fmt.Errorf("couldn't add health check for chain %s: %w", chainAlias, err)
 	}
 

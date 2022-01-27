@@ -5,6 +5,7 @@ package gconn
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"time"
 
@@ -60,6 +61,7 @@ func (s *Server) Close(ctx context.Context, req *gconnproto.CloseRequest) (*gcon
 
 func (s *Server) SetDeadline(ctx context.Context, req *gconnproto.SetDeadlineRequest) (*gconnproto.SetDeadlineResponse, error) {
 	deadline := time.Time{}
+	fmt.Println(".UnmarshalBinary() 1")
 	err := deadline.UnmarshalBinary(req.Time)
 	if err != nil {
 		return nil, err
@@ -69,6 +71,7 @@ func (s *Server) SetDeadline(ctx context.Context, req *gconnproto.SetDeadlineReq
 
 func (s *Server) SetReadDeadline(ctx context.Context, req *gconnproto.SetReadDeadlineRequest) (*gconnproto.SetReadDeadlineResponse, error) {
 	deadline := time.Time{}
+	fmt.Println(".UnmarshalBinary() 2")
 	err := deadline.UnmarshalBinary(req.Time)
 	if err != nil {
 		return nil, err
@@ -78,6 +81,7 @@ func (s *Server) SetReadDeadline(ctx context.Context, req *gconnproto.SetReadDea
 
 func (s *Server) SetWriteDeadline(ctx context.Context, req *gconnproto.SetWriteDeadlineRequest) (*gconnproto.SetWriteDeadlineResponse, error) {
 	deadline := time.Time{}
+	fmt.Println(".UnmarshalBinary() 3")
 	err := deadline.UnmarshalBinary(req.Time)
 	if err != nil {
 		return nil, err

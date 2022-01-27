@@ -105,6 +105,7 @@ func GetTimestamp(db KeyValueReader, key []byte) (time.Time, error) {
 
 func ParseTimestamp(b []byte) (time.Time, error) {
 	val := time.Time{}
+	fmt.Println(".UnmarshalBinary() ParseTimestamp")
 	if err := val.UnmarshalBinary(b); err != nil {
 		return time.Time{}, err
 	}

@@ -480,6 +480,7 @@ func (vm *VMServer) AppRequest(_ context.Context, req *vmproto.AppRequestMsg) (*
 		return nil, err
 	}
 	var deadline time.Time
+	fmt.Println("deadline.UnmarshalBinary(req.Deadline)")
 	if err := deadline.UnmarshalBinary(req.Deadline); err != nil {
 		return nil, err
 	}

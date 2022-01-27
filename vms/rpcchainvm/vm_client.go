@@ -194,6 +194,7 @@ func (vm *VMClient) Initialize(
 	}
 
 	timestamp := time.Time{}
+	fmt.Println("b.time.UnmarshalBinary(resp.Timestamp) 1")
 	if err := timestamp.UnmarshalBinary(resp.Timestamp); err != nil {
 		return err
 	}
@@ -394,6 +395,7 @@ func (vm *VMClient) buildBlock() (snowman.Block, error) {
 	}
 
 	timestamp := time.Time{}
+	fmt.Println("b.time.UnmarshalBinary(resp.Timestamp) 2")
 	if err := timestamp.UnmarshalBinary(resp.Timestamp); err != nil {
 		return nil, err
 	}
@@ -433,6 +435,7 @@ func (vm *VMClient) parseBlock(bytes []byte) (snowman.Block, error) {
 	}
 
 	timestamp := time.Time{}
+	fmt.Println("b.time.UnmarshalBinary(resp.Timestamp) 3")
 	if err := timestamp.UnmarshalBinary(resp.Timestamp); err != nil {
 		return nil, err
 	}
@@ -469,6 +472,7 @@ func (vm *VMClient) getBlock(id ids.ID) (snowman.Block, error) {
 	}
 
 	timestamp := time.Time{}
+	fmt.Println("b.time.UnmarshalBinary(resp.Timestamp) 4")
 	if err := timestamp.UnmarshalBinary(resp.Timestamp); err != nil {
 		return nil, err
 	}
@@ -598,6 +602,7 @@ func (vm *VMClient) BatchedParseBlock(blksBytes [][]byte) ([]snowman.Block, erro
 		}
 
 		timestamp := time.Time{}
+		fmt.Println("b.time.UnmarshalBinary(resp.Timestamp) 5")
 		if err := timestamp.UnmarshalBinary(blkResp.Timestamp); err != nil {
 			return nil, err
 		}
@@ -686,6 +691,7 @@ func (b *BlockClient) Verify() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("b.time.UnmarshalBinary(resp.Timestamp) 6")
 	return b.time.UnmarshalBinary(resp.Timestamp)
 }
 
