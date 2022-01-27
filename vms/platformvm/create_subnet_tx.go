@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/utils/crypto"
@@ -22,6 +23,13 @@ type UnsignedCreateSubnetTx struct {
 	BaseTx `serialize:"true"`
 	// Who is authorized to manage this subnet
 	Owner Owner `serialize:"true" json:"owner"`
+}
+
+// InputUTXOs for [DecisionTxs] will return an empty set to diffrentiate from the [AtomicTxs] input UTXOs
+func (tx *UnsignedCreateSubnetTx) InputUTXOs() ids.Set { return nil }
+
+func (tx *UnsignedCreateSubnetTx) AtomicOperations() (ids.ID, *atomic.Requests, error) {
+	return ids.ID{}, nil, nil
 }
 
 // InitCtx sets the FxID fields in the inputs and outputs of this
@@ -70,11 +78,11 @@ func (tx *UnsignedCreateSubnetTx) Execute(
 	stx *Tx,
 ) (
 	func() error,
-	TxError,
+	error,
 ) {
 	// Make sure this transaction is well formed.
 	if err := tx.SyntacticVerify(vm.ctx); err != nil {
-		return nil, permError{err}
+		return nil, err
 	}
 
 	// Verify the flowcheck

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package message
@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
@@ -108,11 +107,7 @@ func TestCodecPackParseGzip(t *testing.T) {
 			fields: map[Field]interface{}{},
 		},
 		{
-			op:     Pong,
-			fields: map[Field]interface{}{},
-		},
-		{
-			op: UptimePong,
+			op: Pong,
 			fields: map[Field]interface{}{
 				Uptime: uint8(80),
 			},

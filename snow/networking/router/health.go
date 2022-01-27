@@ -1,9 +1,11 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package router
 
-import "time"
+import (
+	"time"
+)
 
 // HealthConfig describes parameters for router health checks.
 type HealthConfig struct {

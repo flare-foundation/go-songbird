@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package admin
@@ -15,11 +15,10 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/utils/constants"
+	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/perms"
 	"github.com/flare-foundation/flare/utils/profiler"
-
-	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 const (

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -24,8 +24,10 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowball"
+	smcon "github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/queue"
+	smeng "github.com/flare-foundation/flare/snow/engine/snowman"
 	"github.com/flare-foundation/flare/snow/engine/snowman/bootstrap"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/router"
@@ -44,9 +46,6 @@ import (
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-
-	smcon "github.com/flare-foundation/flare/snow/consensus/snowman"
-	smeng "github.com/flare-foundation/flare/snow/engine/snowman"
 )
 
 var (
@@ -83,7 +82,8 @@ var (
 	testSubnet1            *UnsignedCreateSubnetTx
 	testSubnet1ControlKeys []*crypto.PrivateKeySECP256K1R
 
-	avmID = ids.Empty.Prefix(0)
+	xChainID = ids.Empty.Prefix(0)
+	cChainID = ids.Empty.Prefix(1)
 )
 
 var (
@@ -115,10 +115,22 @@ func init() {
 	testSubnet1ControlKeys = keys[0:3]
 }
 
+type snLookup struct {
+	chainsToSubnet map[ids.ID]ids.ID
+}
+
+func (sn *snLookup) SubnetID(chainID ids.ID) (ids.ID, error) {
+	subnetID, ok := sn.chainsToSubnet[chainID]
+	if !ok {
+		return ids.ID{}, errors.New("")
+	}
+	return subnetID, nil
+}
+
 func defaultContext() *snow.Context {
 	ctx := snow.DefaultContextTest()
 	ctx.NetworkID = testNetworkID
-	ctx.XChainID = avmID
+	ctx.XChainID = xChainID
 	ctx.AVAXAssetID = avaxAssetID
 	aliaser := ids.NewAliaser()
 
@@ -126,13 +138,23 @@ func defaultContext() *snow.Context {
 	errs.Add(
 		aliaser.Alias(constants.PlatformChainID, "P"),
 		aliaser.Alias(constants.PlatformChainID, constants.PlatformChainID.String()),
-		aliaser.Alias(avmID, "X"),
-		aliaser.Alias(avmID, avmID.String()),
+		aliaser.Alias(xChainID, "X"),
+		aliaser.Alias(xChainID, xChainID.String()),
+		aliaser.Alias(cChainID, "C"),
+		aliaser.Alias(cChainID, cChainID.String()),
 	)
 	if errs.Errored() {
 		panic(errs.Err)
 	}
 	ctx.BCLookup = aliaser
+
+	ctx.SNLookup = &snLookup{
+		chainsToSubnet: map[ids.ID]ids.ID{
+			constants.PlatformChainID: constants.PrimaryNetworkID,
+			xChainID:                  constants.PrimaryNetworkID,
+			cChainID:                  constants.PrimaryNetworkID,
+		},
+	}
 	return ctx
 }
 
@@ -298,6 +320,8 @@ func defaultVM() (*VM, database.Database, *common.SenderTest) {
 		MaxStakeDuration:       defaultMaxStakingDuration,
 		StakeMintingPeriod:     defaultMaxStakingDuration,
 		ApricotPhase3Time:      defaultValidateEndTime,
+		ApricotPhase4Time:      defaultValidateEndTime,
+		ApricotPhase5Time:      defaultValidateEndTime,
 	}}
 
 	baseDBManager := manager.NewMemDB(version.DefaultVersion1_0_0)
@@ -706,12 +730,9 @@ func TestInvalidAddValidatorCommit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	preferredID := preferred.ID()
 	preferredHeight := preferred.Height()
-	lastAcceptedID, err := vm.LastAccepted()
-	if err != nil {
-		t.Fatal(err)
-	}
-	blk, err := vm.newProposalBlock(lastAcceptedID, preferredHeight+1, *tx)
+	blk, err := vm.newProposalBlock(preferredID, preferredHeight+1, *tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -725,19 +746,8 @@ func TestInvalidAddValidatorCommit(t *testing.T) {
 	if err := parsedBlock.Verify(); err == nil {
 		t.Fatalf("Should have errored during verification")
 	}
-	if status := parsedBlock.Status(); status != choices.Rejected {
-		t.Fatalf("Should have marked the block as rejected")
-	}
 	if _, ok := vm.droppedTxCache.Get(blk.Tx.ID()); !ok {
 		t.Fatal("tx should be in dropped tx cache")
-	}
-
-	parsedBlk, err := vm.GetBlock(blk.ID())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if status := parsedBlk.Status(); status != choices.Rejected {
-		t.Fatalf("Should have marked the block as rejected")
 	}
 }
 
@@ -2024,6 +2034,8 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 
 	vm.clock.Set(defaultGenesisTime)
 	ctx := defaultContext()
+	consensusCtx := snow.DefaultConsensusContextTest()
+	consensusCtx.Context = ctx
 	ctx.Lock.Lock()
 
 	msgChan := make(chan common.Message, 1)
@@ -2093,7 +2105,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 
 	// Passes messages from the consensus engine to the network
 	sender := sender.Sender{}
-	err = sender.Initialize(ctx, mc, externalSender, chainRouter, &timeoutManager, "", metrics, 1, 1, 1)
+	err = sender.Initialize(consensusCtx, mc, externalSender, chainRouter, &timeoutManager, 1, 1, 1)
 	assert.NoError(t, err)
 
 	var reqID uint32
@@ -2122,7 +2134,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 	err = engine.Initialize(smeng.Config{
 		Config: bootstrap.Config{
 			Config: common.Config{
-				Ctx:                           ctx,
+				Ctx:                           consensusCtx,
 				Validators:                    vdrs,
 				Beacons:                       beacons,
 				SampleK:                       beacons.Len(),
@@ -2137,7 +2149,6 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 			VM:      vm,
 		},
 		Params: snowball.Parameters{
-			Metrics:               prometheus.NewRegistry(),
 			K:                     1,
 			Alpha:                 1,
 			BetaVirtuous:          20,
@@ -2160,8 +2171,6 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 		&engine,
 		vdrs,
 		msgChan,
-		"",
-		prometheus.NewRegistry(),
 	)
 	assert.NoError(t, err)
 
@@ -2395,6 +2404,7 @@ func TestUnverifiedParentPanic(t *testing.T) {
 	_, genesisBytes := defaultGenesis()
 
 	baseDBManager := manager.NewMemDB(version.DefaultVersion1_0_0)
+	atomicDB := prefixdb.New([]byte{1}, baseDBManager.Current().Database)
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
@@ -2419,6 +2429,12 @@ func TestUnverifiedParentPanic(t *testing.T) {
 	if err := vm.Initialize(ctx, baseDBManager, genesisBytes, nil, nil, msgChan, nil, nil); err != nil {
 		t.Fatal(err)
 	}
+	m := &atomic.Memory{}
+	err := m.Initialize(logging.NoLog{}, atomicDB)
+	if err != nil {
+		panic(err)
+	}
+	vm.ctx.SharedMemory = m.NewSharedMemory(ctx.ChainID)
 
 	key0 := keys[0]
 	key1 := keys[1]

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -24,7 +24,7 @@ type AbortBlock struct {
 }
 
 func (a *AbortBlock) Accept() error {
-	if a.vm.bootstrapped {
+	if a.vm.bootstrapped.GetValue() {
 		if a.wasPreferred {
 			a.vm.metrics.numVotesWon.Inc()
 		} else {
@@ -43,10 +43,6 @@ func (a *AbortBlock) Verify() error {
 	blkID := a.ID()
 
 	if err := a.DoubleDecisionBlock.Verify(); err != nil {
-		a.vm.ctx.Log.Trace("rejecting block %s due to a failed verification: %s", blkID, err)
-		if err := a.Reject(); err != nil {
-			a.vm.ctx.Log.Error("failed to reject abort block %s due to %s", blkID, err)
-		}
 		return err
 	}
 
@@ -58,14 +54,10 @@ func (a *AbortBlock) Verify() error {
 	// The parent of an Abort block should always be a proposal
 	parent, ok := parentIntf.(*ProposalBlock)
 	if !ok {
-		a.vm.ctx.Log.Trace("rejecting block %s due to an incorrect parent type", blkID)
-		if err := a.Reject(); err != nil {
-			a.vm.ctx.Log.Error("failed to reject abort block %s due to %s", blkID, err)
-		}
 		return errInvalidBlockType
 	}
 
-	a.onAcceptState, a.onAcceptFunc = parent.onAbort()
+	a.onAcceptState = parent.onAbortState
 	a.timestamp = a.onAcceptState.GetTimestamp()
 
 	a.vm.currentBlocks[blkID] = a

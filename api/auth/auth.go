@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package auth
@@ -18,11 +18,10 @@ import (
 
 	"github.com/gorilla/rpc/v2"
 
+	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/password"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
-
-	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 const (
@@ -261,7 +260,7 @@ func (a *auth) CreateHandler() (http.Handler, error) {
 	server.RegisterCodec(codec, "application/json")
 	server.RegisterCodec(codec, "application/json;charset=UTF-8")
 	return server, server.RegisterService(
-		&service{auth: a},
+		&Service{auth: a},
 		"auth",
 	)
 }

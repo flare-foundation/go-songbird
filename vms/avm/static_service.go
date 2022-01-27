@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package avm
@@ -15,14 +15,13 @@ import (
 	"github.com/flare-foundation/flare/codec/reflectcodec"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/formatting"
+	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/components/verify"
 	"github.com/flare-foundation/flare/vms/nftfx"
 	"github.com/flare-foundation/flare/vms/propertyfx"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-
-	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 var (

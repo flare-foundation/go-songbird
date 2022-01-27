@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package chain
@@ -9,13 +9,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/stretchr/testify/assert"
 )
 
 type TestBlock struct {
@@ -635,8 +636,6 @@ func TestBuildBlockError(t *testing.T) {
 
 func TestMeteredCache(t *testing.T) {
 	registry := prometheus.NewRegistry()
-	namespace1 := "Joe"
-	namespace2 := "Namath"
 
 	testBlks := NewTestBlocks(1)
 	genesisBlock := testBlks[0]
@@ -654,17 +653,13 @@ func TestMeteredCache(t *testing.T) {
 		BuildBlock:          cantBuildBlock,
 		GetBlockIDAtHeight:  getCanonicalBlockID,
 	}
-	_, err := NewMeteredState(registry, namespace1, config)
+	_, err := NewMeteredState(registry, config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = NewMeteredState(registry, namespace1, config)
+	_, err = NewMeteredState(registry, config)
 	if err == nil {
-		t.Fatal("Expected creating a second NewMeteredState with the same namespace to error due to a registry conflict")
-	}
-	_, err = NewMeteredState(registry, namespace2, config)
-	if err != nil {
-		t.Fatal(err)
+		t.Fatal("Expected creating a second NewMeteredState to error due to a registry conflict")
 	}
 }
 

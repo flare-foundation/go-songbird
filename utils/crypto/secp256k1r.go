@@ -1,18 +1,16 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package crypto
 
 import (
 	"bytes"
+	stdecdsa "crypto/ecdsa"
 	"errors"
 	"sort"
 
-	stdecdsa "crypto/ecdsa"
-
-	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
-
 	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
+	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
 
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/ids"

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
@@ -74,14 +74,6 @@ func (v *application) App() string    { return v.app }
 func (v *application) String() string { return v.str }
 
 func (v *application) Compatible(o Application) error {
-	// NOTE: We hard-code support for our first own tagged version here, so that
-	// we can then upgrade them and they don't drop the new peers that send this
-	// version. This should be removed once we reject Avalanche versions.
-	if o.App() == "flare" &&
-		o.Major() == 0 &&
-		o.Minor() == 3 {
-		return nil
-	}
 	switch {
 	case v.App() != o.App():
 		return errDifferentApps
@@ -93,17 +85,8 @@ func (v *application) Compatible(o Application) error {
 }
 
 func (v *application) Before(o Application) bool {
-	// NOTE: We hard-code support for our first own tagged version here, so that
-	// we can then upgrade them and they don't drop the new peers that send this
-	// version. This should be removed once we reject Avalanche versions.
-	if o.App() == "flare" &&
-		o.Major() == 0 &&
-		o.Minor() == 3 {
-		return true
-	}
 	if v.App() != o.App() {
 		return false
 	}
-
 	return v.Compare(o) < 0
 }

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package rpcchainvm
@@ -9,15 +9,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/go-plugin"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/hashicorp/go-plugin"
-
 	"github.com/flare-foundation/flare/api/keystore/gkeystore"
 	"github.com/flare-foundation/flare/api/keystore/gkeystore/gkeystoreproto"
+	"github.com/flare-foundation/flare/api/metrics"
 	"github.com/flare-foundation/flare/chains/atomic/gsharedmemory"
 	"github.com/flare-foundation/flare/chains/atomic/gsharedmemory/gsharedmemoryproto"
+	"github.com/flare-foundation/flare/database/corruptabledb"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/database/rpcdb"
 	"github.com/flare-foundation/flare/database/rpcdb/rpcdbproto"
@@ -89,11 +90,6 @@ func (vm *VMServer) Initialize(_ context.Context, req *vmproto.InitializeRequest
 		return nil, err
 	}
 
-	epochFirstTransition := time.Time{}
-	if err := epochFirstTransition.UnmarshalBinary(req.EpochFirstTransition); err != nil {
-		return nil, err
-	}
-
 	// Dial each database in the request and construct the database manager
 	versionedDBs := make([]*manager.VersionedDatabase, len(req.DbServers))
 	versionParser := version.NewDefaultParser()
@@ -112,9 +108,9 @@ func (vm *VMServer) Initialize(_ context.Context, req *vmproto.InitializeRequest
 			return nil, err
 		}
 		vm.connCloser.Add(dbConn)
-
+		db := rpcdb.NewClient(rpcdbproto.NewDatabaseClient(dbConn))
 		versionedDBs[i] = &manager.VersionedDatabase{
-			Database: rpcdb.NewClient(rpcdbproto.NewDatabaseClient(dbConn)),
+			Database: corruptabledb.New(db),
 			Version:  version,
 		}
 	}
@@ -198,21 +194,22 @@ func (vm *VMServer) Initialize(_ context.Context, req *vmproto.InitializeRequest
 	}()
 
 	vm.ctx = &snow.Context{
-		NetworkID:            req.NetworkID,
-		SubnetID:             subnetID,
-		ChainID:              chainID,
-		NodeID:               nodeID,
-		XChainID:             xChainID,
-		AVAXAssetID:          avaxAssetID,
-		Log:                  logging.NoLog{},
-		DecisionDispatcher:   nil,
-		ConsensusDispatcher:  nil,
-		Keystore:             keystoreClient,
-		SharedMemory:         sharedMemoryClient,
-		BCLookup:             bcLookupClient,
-		SNLookup:             snLookupClient,
-		EpochFirstTransition: epochFirstTransition,
-		EpochDuration:        time.Duration(req.EpochDuration),
+		NetworkID: req.NetworkID,
+		SubnetID:  subnetID,
+		ChainID:   chainID,
+		NodeID:    nodeID,
+
+		XChainID:    xChainID,
+		AVAXAssetID: avaxAssetID,
+
+		Log:          logging.NoLog{},
+		Keystore:     keystoreClient,
+		SharedMemory: sharedMemoryClient,
+		BCLookup:     bcLookupClient,
+		SNLookup:     snLookupClient,
+		Metrics:      metrics.NewOptionalGatherer(),
+
+		// TODO: support snowman++ fields
 	}
 
 	if err := vm.vm.Initialize(vm.ctx, dbManager, req.GenesisBytes, req.UpgradeBytes, req.ConfigBytes, toEngine, nil, appSenderClient); err != nil {
@@ -256,7 +253,6 @@ func (vm *VMServer) Bootstrapping(context.Context, *emptypb.Empty) (*emptypb.Emp
 }
 
 func (vm *VMServer) Bootstrapped(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	vm.ctx.Bootstrapped()
 	return &emptypb.Empty{}, vm.vm.Bootstrapped()
 }
 

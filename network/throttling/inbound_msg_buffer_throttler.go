@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package throttling
@@ -7,10 +7,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/metric"
 	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // See inbound_msg_throttler.go

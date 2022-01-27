@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
@@ -9,17 +9,23 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
+// NOTE: We are doing a three-phase deploy to get rid of legacy Avalanche
+// versioning and to transition to Flare versioning.
+// 1. Roll out upgrade with hard-coded Flare versioning support.
+// 2. Roll out upgrade sending Flare application name and version numbers.
+// 3. Roll out upgrade removing hard-coded Flare versioning support.
+
 // These are globals that describe network upgrades and node versions
 var (
-	Current                      = NewDefaultVersion(1, 6, 5)
+	// TODO: Change to Flare versions after all nodes on Songbird have hard-coded
+	// Flare versioning support.
+	Current                      = NewDefaultVersion(1, 7, 2)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 6, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 7, 0)
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 1, 1, 0)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 1, 0, 0)
 	VersionParser                = NewDefaultApplicationParser()
-
-	MinUptimeVersion = NewDefaultApplication(constants.PlatformName, 1, 6, 5)
 
 	CurrentDatabase = DatabaseVersion1_4_5
 	PrevDatabase    = DatabaseVersion1_0_0
@@ -37,13 +43,25 @@ var (
 	ApricotPhase2DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase3Times = map[uint32]time.Time{
-		constants.LocalID: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)}
-	ApricotPhase3DefaultTime = time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC)
+		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+	}
+	ApricotPhase3DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase4Times = map[uint32]time.Time{
-		constants.LocalID: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
-	ApricotPhase4DefaultTime = time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC)
+	ApricotPhase4DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	ApricotPhase5Times = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+	}
+	ApricotPhase5DefaultTime = time.Date(2000, time.December, 5, 5, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
@@ -91,11 +109,18 @@ func GetApricotPhase4MinPChainHeight(networkID uint32) uint64 {
 	return ApricotPhase4DefaultMinPChainHeight
 }
 
+func GetApricotPhase5Time(networkID uint32) time.Time {
+	if upgradeTime, exists := ApricotPhase5Times[networkID]; exists {
+		return upgradeTime
+	}
+	return ApricotPhase5DefaultTime
+}
+
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetApricotPhase4Time(networkID),
+		GetApricotPhase5Time(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
 		GetApricotPhase0Time(networkID),

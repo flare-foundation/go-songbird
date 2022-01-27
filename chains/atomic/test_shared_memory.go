@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package atomic
@@ -7,10 +7,11 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/units"
-	"github.com/stretchr/testify/assert"
 )
 
 // SharedMemoryTests is a list of all shared memory tests

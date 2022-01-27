@@ -105,22 +105,18 @@ var (
 		TxFeeConfig: TxFeeConfig{
 			TxFee:                 units.MilliAvax,
 			CreateAssetTxFee:      10 * units.MilliAvax,
-			CreateSubnetTxFee:     100 * units.MilliAvax,
-			CreateBlockchainTxFee: 100 * units.MilliAvax,
+			CreateSubnetTxFee:     1 * units.Avax,
+			CreateBlockchainTxFee: 1 * units.Avax,
 		},
 		StakingConfig: StakingConfig{
-			UptimeRequirement:  .6, // 60%
-			MinValidatorStake:  1 * units.Avax,
+			UptimeRequirement:  .8, // 80%
+			MinValidatorStake:  2 * units.KiloAvax,
 			MaxValidatorStake:  3 * units.MegaAvax,
-			MinDelegatorStake:  1 * units.Avax,
+			MinDelegatorStake:  25 * units.Avax,
 			MinDelegationFee:   20000, // 2%
-			MinStakeDuration:   24 * time.Hour,
+			MinStakeDuration:   2 * 7 * 24 * time.Hour,
 			MaxStakeDuration:   365 * 24 * time.Hour,
 			StakeMintingPeriod: 365 * 24 * time.Hour,
-		},
-		EpochConfig: EpochConfig{
-			EpochFirstTransition: time.Unix(1607626800, 0),
-			EpochDuration:        6 * time.Hour,
 		},
 	}
 )

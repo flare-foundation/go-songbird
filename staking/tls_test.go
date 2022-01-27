@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package staking
@@ -10,8 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 func TestMakeKeys(t *testing.T) {

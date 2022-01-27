@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package formatting
@@ -11,8 +11,9 @@ import (
 	"math"
 	"strings"
 
-	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/mr-tron/base58/base58"
+
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 const (

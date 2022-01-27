@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package indexer
@@ -8,6 +8,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/database/memdb"
 	"github.com/flare-foundation/flare/database/versiondb"
@@ -25,7 +27,6 @@ import (
 	"github.com/flare-foundation/flare/snow/triggers"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/stretchr/testify/assert"
 )
 
 type apiServerMock struct {
@@ -149,7 +150,7 @@ func TestIndexer(t *testing.T) {
 	idxr.clock.Set(now)
 
 	// Assert state is right
-	chain1Ctx := snow.DefaultContextTest()
+	chain1Ctx := snow.DefaultConsensusContextTest()
 	chain1Ctx.ChainID = ids.GenerateTestID()
 	isIncomplete, err := idxr.isIncomplete(chain1Ctx.ChainID)
 	assert.NoError(err)
@@ -266,7 +267,7 @@ func TestIndexer(t *testing.T) {
 	assert.Equal(blkID, container.ID)
 
 	// Register a DAG chain
-	chain2Ctx := snow.DefaultContextTest()
+	chain2Ctx := snow.DefaultConsensusContextTest()
 	chain2Ctx.ChainID = ids.GenerateTestID()
 	isIncomplete, err = idxr.isIncomplete(chain2Ctx.ChainID)
 	assert.NoError(err)
@@ -449,7 +450,7 @@ func TestIncompleteIndex(t *testing.T) {
 	assert.False(idxr.indexingEnabled)
 
 	// Register a chain
-	chain1Ctx := snow.DefaultContextTest()
+	chain1Ctx := snow.DefaultConsensusContextTest()
 	chain1Ctx.ChainID = ids.GenerateTestID()
 	isIncomplete, err := idxr.isIncomplete(chain1Ctx.ChainID)
 	assert.NoError(err)
@@ -503,7 +504,7 @@ func TestIncompleteIndex(t *testing.T) {
 	config.DB = versiondb.New(baseDB)
 	idxrIntf, err = NewIndexer(config)
 	assert.NoError(err)
-	idxr, ok = idxrIntf.(*indexer)
+	_, ok = idxrIntf.(*indexer)
 	assert.True(ok)
 }
 
@@ -534,7 +535,7 @@ func TestIgnoreNonDefaultChains(t *testing.T) {
 	assert.True(ok)
 
 	// Assert state is right
-	chain1Ctx := snow.DefaultContextTest()
+	chain1Ctx := snow.DefaultConsensusContextTest()
 	chain1Ctx.ChainID = ids.GenerateTestID()
 	chain1Ctx.SubnetID = ids.GenerateTestID()
 

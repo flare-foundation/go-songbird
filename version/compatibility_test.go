@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
@@ -13,18 +13,18 @@ import (
 
 func TestCompatibility(t *testing.T) {
 	v := NewDefaultApplication("avalanche", 1, 4, 3)
-	minCompatable := NewDefaultApplication("avalanche", 1, 4, 0)
-	minCompatableTime := time.Unix(9000, 0)
-	prevMinCompatable := NewDefaultApplication("avalanche", 1, 3, 0)
+	minCompatible := NewDefaultApplication("avalanche", 1, 4, 0)
+	minCompatibleTime := time.Unix(9000, 0)
+	prevMinCompatible := NewDefaultApplication("avalanche", 1, 3, 0)
 	minUnmaskable := NewDefaultApplication("avalanche", 1, 2, 0)
 	minUnmaskableTime := time.Unix(7000, 0)
 	prevMinUnmaskable := NewDefaultApplication("avalanche", 1, 1, 0)
 
 	compatibility := NewCompatibility(
 		v,
-		minCompatable,
-		minCompatableTime,
-		prevMinCompatable,
+		minCompatible,
+		minCompatibleTime,
+		prevMinCompatible,
 		minUnmaskable,
 		minUnmaskableTime,
 		prevMinUnmaskable,
@@ -42,7 +42,7 @@ func TestCompatibility(t *testing.T) {
 	}{
 		{
 			peer:        NewDefaultApplication("avalanche", 1, 5, 0),
-			time:        minCompatableTime,
+			time:        minCompatibleTime,
 			connectable: true,
 			compatible:  true,
 			unmaskable:  true,
@@ -58,7 +58,7 @@ func TestCompatibility(t *testing.T) {
 		},
 		{
 			peer:        NewDefaultApplication("ava", 1, 5, 0),
-			time:        minCompatableTime,
+			time:        minCompatibleTime,
 			connectable: false,
 			compatible:  false,
 			unmaskable:  false,
@@ -66,7 +66,7 @@ func TestCompatibility(t *testing.T) {
 		},
 		{
 			peer:        NewDefaultApplication("avalanche", 0, 1, 0),
-			time:        minCompatableTime,
+			time:        minCompatibleTime,
 			connectable: false,
 			compatible:  false,
 			unmaskable:  false,
@@ -74,7 +74,7 @@ func TestCompatibility(t *testing.T) {
 		},
 		{
 			peer:        NewDefaultApplication("avalanche", 1, 3, 5),
-			time:        minCompatableTime,
+			time:        minCompatibleTime,
 			connectable: true,
 			compatible:  false,
 			unmaskable:  false,

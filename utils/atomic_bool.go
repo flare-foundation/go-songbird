@@ -1,9 +1,11 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package utils
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+)
 
 type AtomicBool struct {
 	value uint32

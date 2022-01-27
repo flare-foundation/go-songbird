@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package compression
@@ -7,8 +7,9 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/flare-foundation/flare/utils/units"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 func TestGzipCompressDecompress(t *testing.T) {

@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -23,13 +23,12 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/formatting"
+	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/avm"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-
-	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 var (
@@ -198,7 +197,7 @@ func TestGetTxStatus(t *testing.T) {
 	}
 
 	sm := m.NewSharedMemory(service.vm.ctx.ChainID)
-	peerSharedMemory := m.NewSharedMemory(avmID)
+	peerSharedMemory := m.NewSharedMemory(xChainID)
 
 	// #nosec G404
 	utxo := &avax.UTXO{
@@ -235,7 +234,7 @@ func TestGetTxStatus(t *testing.T) {
 	newAtomicUTXOManager := avax.NewAtomicUTXOManager(sm, Codec)
 
 	service.vm.AtomicUTXOManager = newAtomicUTXOManager
-	tx, err := service.vm.newImportTx(avmID, ids.ShortEmpty, []*crypto.PrivateKeySECP256K1R{recipientKey}, ids.ShortEmpty)
+	tx, err := service.vm.newImportTx(xChainID, ids.ShortEmpty, []*crypto.PrivateKeySECP256K1R{recipientKey}, ids.ShortEmpty)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -279,8 +278,8 @@ func TestGetTxStatus(t *testing.T) {
 		t.Fatal(err)
 	} else if block, err := service.vm.BuildBlock(); err != nil {
 		t.Fatal(err)
-	} else if blk, ok := block.(*AtomicBlock); !ok {
-		t.Fatalf("should be *AtomicBlock but is %T", block)
+	} else if blk, ok := block.(*StandardBlock); !ok {
+		t.Fatalf("should be *StandardBlock but is %T", block)
 	} else if err := blk.Verify(); err != nil {
 		t.Fatal(err)
 	} else if err := blk.Accept(); err != nil {

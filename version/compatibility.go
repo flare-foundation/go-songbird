@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package version
@@ -43,7 +43,7 @@ type compatibility struct {
 
 	minCompatible     Application
 	minCompatibleTime time.Time
-	prevMinCompatable Application
+	prevMinCompatible Application
 
 	minUnmaskable     Application
 	minUnmaskableTime time.Time
@@ -57,7 +57,7 @@ func NewCompatibility(
 	version Application,
 	minCompatible Application,
 	minCompatibleTime time.Time,
-	prevMinCompatable Application,
+	prevMinCompatible Application,
 	minUnmaskable Application,
 	minUnmaskableTime time.Time,
 	prevMinUnmaskable Application,
@@ -66,7 +66,7 @@ func NewCompatibility(
 		version:           version,
 		minCompatible:     minCompatible,
 		minCompatibleTime: minCompatibleTime,
-		prevMinCompatable: prevMinCompatable,
+		prevMinCompatible: prevMinCompatible,
 		minUnmaskable:     minUnmaskable,
 		minUnmaskableTime: minUnmaskableTime,
 		prevMinUnmaskable: prevMinUnmaskable,
@@ -76,6 +76,14 @@ func NewCompatibility(
 func (c *compatibility) Version() Application { return c.version }
 
 func (c *compatibility) Compatible(peer Application) error {
+	// NOTE: This hard-coded Flare versioning support ensures that we don't drop
+	// newer nodes which send Flare application name and version numbers.
+	// TODO: Remove when all nodes on Songbird are sending Flare application
+	// name and version numbers.
+	if peer.App() == "flare" {
+		return nil
+	}
+
 	if err := c.version.Compatible(peer); err != nil {
 		return err
 	}
@@ -91,8 +99,7 @@ func (c *compatibility) Compatible(peer Application) error {
 		return errIncompatible
 	}
 
-	// The minCompatible check isn't being enforced yet.
-	if !peer.Before(c.prevMinCompatable) {
+	if !peer.Before(c.prevMinCompatible) {
 		// The peer is at least the previous minimum compatible version.
 		return nil
 	}
@@ -100,6 +107,14 @@ func (c *compatibility) Compatible(peer Application) error {
 }
 
 func (c *compatibility) Unmaskable(peer Application) error {
+	// NOTE: This hard-coded Flare versioning support ensures that we don't drop
+	// newer nodes which send Flare application name and version numbers.
+	// TODO: Remove when all nodes on Songbird are sending Flare application
+	// name and version numbers.
+	if peer.App() == "flare" {
+		return nil
+	}
+
 	if err := c.Compatible(peer); err != nil {
 		return err
 	}
@@ -115,7 +130,6 @@ func (c *compatibility) Unmaskable(peer Application) error {
 		return errMaskable
 	}
 
-	// The minCompatible check isn't being enforced yet.
 	if !peer.Before(c.prevMinUnmaskable) {
 		// The peer is at least the previous minimum unmaskable version.
 		return nil
@@ -124,6 +138,14 @@ func (c *compatibility) Unmaskable(peer Application) error {
 }
 
 func (c *compatibility) WontMask(peer Application) error {
+	// NOTE: This hard-coded Flare versioning support ensures that we don't drop
+	// newer nodes which send Flare application name and version numbers.
+	// TODO: Remove when all nodes on Songbird are sending Flare application
+	// name and version numbers.
+	if peer.App() == "flare" {
+		return nil
+	}
+
 	if err := c.Compatible(peer); err != nil {
 		return err
 	}

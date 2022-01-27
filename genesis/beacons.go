@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package genesis
@@ -16,7 +16,10 @@ func getIPs(networkID uint32) []string {
 	case constants.SongbirdID:
 		return []string{}
 	case constants.CostonID:
-		return []string{}
+		return []string{
+			"34.159.59.126:9651",
+			"34.159.241.96:9651",
+		}
 	}
 	return nil
 }
@@ -29,7 +32,10 @@ func getNodeIDs(networkID uint32) []string {
 	case constants.SongbirdID:
 		return []string{}
 	case constants.CostonID:
-		return []string{}
+		return []string{
+			"NodeID-577wsCQeeVmkEt1AcMd84oi8LrHpexNU2",
+			"NodeID-5ifRWcYdqF4mh5xjWv1MnRka4M6wjx3N1",
+		}
 	}
 	return nil
 }

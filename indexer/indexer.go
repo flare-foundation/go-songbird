@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package indexer
@@ -9,27 +9,27 @@ import (
 	"math"
 	"sync"
 
+	"github.com/gorilla/rpc/v2"
+
 	"github.com/flare-foundation/flare/api/server"
 	"github.com/flare-foundation/flare/chains"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/flare-foundation/flare/utils/json"
-	"github.com/flare-foundation/flare/utils/timer/mockable"
-	"github.com/flare-foundation/flare/utils/wrappers"
-
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/codec/linearcodec"
 	"github.com/flare-foundation/flare/codec/reflectcodec"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/prefixdb"
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/avalanche"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman"
 	"github.com/flare-foundation/flare/snow/triggers"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/gorilla/rpc/v2"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 const (
@@ -145,7 +145,7 @@ type indexer struct {
 }
 
 // Assumes [engine]'s context lock is not held
-func (i *indexer) RegisterChain(name string, ctx *snow.Context, engine common.Engine) {
+func (i *indexer) RegisterChain(name string, ctx *snow.ConsensusContext, engine common.Engine) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 

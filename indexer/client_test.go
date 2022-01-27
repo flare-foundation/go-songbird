@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package indexer
@@ -6,9 +6,10 @@ package indexer
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/stretchr/testify/assert"
 )
 
 type mockClient struct {

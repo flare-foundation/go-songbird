@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package router
@@ -6,13 +6,14 @@ package router
 import (
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/health"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Router routes consensus messages to the Handler of the consensus

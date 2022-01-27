@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package node
@@ -20,6 +20,7 @@ import (
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/profiler"
 	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/vms"
 )
 
 type IPCConfig struct {
@@ -43,11 +44,14 @@ type HTTPConfig struct {
 	HTTPHost  string `json:"httpHost"`
 	HTTPPort  uint16 `json:"httpPort"`
 
-	HTTPSEnabled  bool   `json:"httpsEnabled"`
-	HTTPSKeyFile  string `json:"httpsKeyFile"`
-	HTTPSCertFile string `json:"httpsCertFile"`
+	HTTPSEnabled bool   `json:"httpsEnabled"`
+	HTTPSKey     []byte `json:"-"`
+	HTTPSCert    []byte `json:"-"`
 
 	APIAllowedOrigins []string `json:"apiAllowedOrigins"`
+
+	ShutdownTimeout time.Duration `json:"shutdownTimeout"`
+	ShutdownWait    time.Duration `json:"shutdownWait"`
 }
 
 type APIConfig struct {
@@ -126,7 +130,6 @@ type Config struct {
 	IPConfig            `json:"ipConfig"`
 	StakingConfig       `json:"stakingConfig"`
 	genesis.TxFeeConfig `json:"txFeeConfig"`
-	genesis.EpochConfig `json:"epochConfig"`
 	BootstrapConfig     `json:"bootstrapConfig"`
 	DatabaseConfig      `json:"databaseConfig"`
 
@@ -185,6 +188,6 @@ type Config struct {
 	// ChainConfigs
 	ChainConfigs map[string]chains.ChainConfig `json:"-"`
 
-	// VM Aliases
-	VMAliases map[ids.ID][]string `json:"vmAliases"`
+	// VM management
+	VMManager vms.Manager `json:"-"`
 }

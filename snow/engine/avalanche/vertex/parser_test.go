@@ -1,4 +1,4 @@
-// (c) 2019-2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package vertex
@@ -6,8 +6,9 @@ package vertex
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestParseInvalid(t *testing.T) {
@@ -19,17 +20,13 @@ func TestParseInvalid(t *testing.T) {
 func TestParseValid(t *testing.T) {
 	chainID := ids.ID{1}
 	height := uint64(2)
-	epoch := uint32(0)
 	parentIDs := []ids.ID{{4}, {5}}
 	txs := [][]byte{{6}, {7}}
-	restrictions := []ids.ID(nil)
 	vtx, err := Build(
 		chainID,
 		height,
-		epoch,
 		parentIDs,
 		txs,
-		restrictions,
 	)
 	assert.NoError(t, err)
 

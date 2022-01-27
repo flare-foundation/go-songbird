@@ -1,15 +1,14 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package rpcchainvm
 
 import (
 	"github.com/flare-foundation/flare/vms/rpcchainvm/validatorproto"
-	"golang.org/x/net/context"
-
-	"google.golang.org/grpc"
 
 	"github.com/hashicorp/go-plugin"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/vmproto"

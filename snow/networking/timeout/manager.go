@@ -1,4 +1,4 @@
-// (c) 2019-2020, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package timeout
@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/utils/timer"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Manager registers and fires timeouts for the snow API.
@@ -48,11 +49,11 @@ func (m *Manager) IsBenched(validatorID ids.ShortID, chainID ids.ID) bool {
 	return m.benchlistMgr.IsBenched(validatorID, chainID)
 }
 
-func (m *Manager) RegisterChain(ctx *snow.Context, namespace string) error {
-	if err := m.metrics.RegisterChain(ctx, namespace); err != nil {
+func (m *Manager) RegisterChain(ctx *snow.ConsensusContext) error {
+	if err := m.metrics.RegisterChain(ctx); err != nil {
 		return fmt.Errorf("couldn't register timeout metrics for chain %s: %w", ctx.ChainID, err)
 	}
-	if err := m.benchlistMgr.RegisterChain(ctx, namespace); err != nil {
+	if err := m.benchlistMgr.RegisterChain(ctx); err != nil {
 		return fmt.Errorf("couldn't register chain %s with benchlist manager: %w", ctx.ChainID, err)
 	}
 	return nil

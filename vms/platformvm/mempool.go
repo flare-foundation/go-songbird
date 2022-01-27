@@ -1,4 +1,4 @@
-// (c) 2021, Ava Labs, Inc. All rights reserved.
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
 package platformvm
@@ -39,19 +39,15 @@ type Mempool interface {
 	Get(txID ids.ID) *Tx
 
 	AddDecisionTx(tx *Tx)
-	AddAtomicTx(tx *Tx)
 	AddProposalTx(tx *Tx)
 
 	HasDecisionTxs() bool
-	HasAtomicTx() bool
 	HasProposalTx() bool
 
 	RemoveDecisionTxs(txs []*Tx)
-	RemoveAtomicTx(tx *Tx)
 	RemoveProposalTx(tx *Tx)
 
 	PopDecisionTxs(numTxs int) []*Tx
-	PopAtomicTx() *Tx
 	PopProposalTx() *Tx
 
 	MarkDropped(txID ids.ID)
@@ -65,7 +61,6 @@ type mempool struct {
 	bytesAvailable       int
 
 	unissuedDecisionTxs TxHeap
-	unissuedAtomicTxs   TxHeap
 	unissuedProposalTxs TxHeap
 	unknownTxs          prometheus.Counter
 
@@ -87,15 +82,6 @@ func NewMempool(namespace string, registerer prometheus.Registerer) (Mempool, er
 	unissuedDecisionTxs, err := NewTxHeapWithMetrics(
 		NewTxHeapByAge(),
 		fmt.Sprintf("%s_decision_txs", namespace),
-		registerer,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	unissuedAtomicTxs, err := NewTxHeapWithMetrics(
-		NewTxHeapByAge(),
-		fmt.Sprintf("%s_atomic_txs", namespace),
 		registerer,
 	)
 	if err != nil {
@@ -125,7 +111,6 @@ func NewMempool(namespace string, registerer prometheus.Registerer) (Mempool, er
 		bytesAvailableMetric: bytesAvailableMetric,
 		bytesAvailable:       maxMempoolSize,
 		unissuedDecisionTxs:  unissuedDecisionTxs,
-		unissuedAtomicTxs:    unissuedAtomicTxs,
 		unissuedProposalTxs:  unissuedProposalTxs,
 		unknownTxs:           unknownTxs,
 		droppedTxIDs:         &cache.LRU{Size: droppedTxIDsCacheSize},
@@ -153,8 +138,6 @@ func (m *mempool) Add(tx *Tx) error {
 		m.AddProposalTx(tx)
 	case UnsignedDecisionTx:
 		m.AddDecisionTx(tx)
-	case UnsignedAtomicTx:
-		m.AddAtomicTx(tx)
 	default:
 		m.unknownTxs.Inc()
 		return errUnknownTxType
@@ -176,19 +159,11 @@ func (m *mempool) Get(txID ids.ID) *Tx {
 	if tx := m.unissuedDecisionTxs.Get(txID); tx != nil {
 		return tx
 	}
-	if tx := m.unissuedAtomicTxs.Get(txID); tx != nil {
-		return tx
-	}
 	return m.unissuedProposalTxs.Get(txID)
 }
 
 func (m *mempool) AddDecisionTx(tx *Tx) {
 	m.unissuedDecisionTxs.Add(tx)
-	m.register(tx)
-}
-
-func (m *mempool) AddAtomicTx(tx *Tx) {
-	m.unissuedAtomicTxs.Add(tx)
 	m.register(tx)
 }
 
@@ -199,8 +174,6 @@ func (m *mempool) AddProposalTx(tx *Tx) {
 
 func (m *mempool) HasDecisionTxs() bool { return m.unissuedDecisionTxs.Len() > 0 }
 
-func (m *mempool) HasAtomicTx() bool { return m.unissuedAtomicTxs.Len() > 0 }
-
 func (m *mempool) HasProposalTx() bool { return m.unissuedProposalTxs.Len() > 0 }
 
 func (m *mempool) RemoveDecisionTxs(txs []*Tx) {
@@ -209,13 +182,6 @@ func (m *mempool) RemoveDecisionTxs(txs []*Tx) {
 		if m.unissuedDecisionTxs.Remove(txID) != nil {
 			m.deregister(tx)
 		}
-	}
-}
-
-func (m *mempool) RemoveAtomicTx(tx *Tx) {
-	txID := tx.ID()
-	if m.unissuedAtomicTxs.Remove(txID) != nil {
-		m.deregister(tx)
 	}
 }
 
@@ -238,12 +204,6 @@ func (m *mempool) PopDecisionTxs(numTxs int) []*Tx {
 		txs[i] = tx
 	}
 	return txs
-}
-
-func (m *mempool) PopAtomicTx() *Tx {
-	tx := m.unissuedAtomicTxs.RemoveTop()
-	m.deregister(tx)
-	return tx
 }
 
 func (m *mempool) PopProposalTx() *Tx {
