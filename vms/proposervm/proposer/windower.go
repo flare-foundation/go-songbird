@@ -4,6 +4,7 @@
 package proposer
 
 import (
+	"fmt"
 	"github.com/flare-foundation/flare/vms/rpcchainvm"
 	"sort"
 	"time"
@@ -62,6 +63,7 @@ func New(state validators.State, subnetID, chainID ids.ID) Windower {
 func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
 	//validatorsMapNew, err := w.valClient.GetValidators(hash)
 	validatorsMapNew, err := w.vmClient.GetValidators(hash)
+	fmt.Println("validatorsMapNew: ",validatorsMapNew)
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}

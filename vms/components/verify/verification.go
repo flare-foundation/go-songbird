@@ -3,7 +3,9 @@
 
 package verify
 
-import "github.com/flare-foundation/flare/snow"
+import (
+	"github.com/flare-foundation/flare/snow"
+)
 
 // Verifiable can be verified
 type Verifiable interface {

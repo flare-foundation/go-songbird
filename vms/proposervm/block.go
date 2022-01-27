@@ -5,6 +5,7 @@ package proposervm
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
@@ -148,6 +149,7 @@ func (p *postForkCommonComponents) buildChild(
 	parentTimestamp time.Time,
 	parentPChainHeight uint64,
 ) (Block, error) {
+	fmt.Println("buildChild called 1")
 	// Child's timestamp is the later of now and this block's timestamp
 	newTimestamp := p.vm.Time().Truncate(time.Second)
 	if newTimestamp.Before(parentTimestamp) {
