@@ -173,8 +173,9 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 		return err
 	}
 
+	bID, _ := vm.State.GetLastAccepted()
 	// reset scheduler
-	minDelay, err := vm.Windower.Delay(blk.Height()+1, pChainHeight, vm.ctx.NodeID)
+	minDelay, err := vm.Windower.Delay(blk.Height()+1, pChainHeight, vm.ctx.NodeID, bID)
 	if err != nil {
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that
@@ -434,4 +435,8 @@ func (vm *VM) optimalPChainHeight(minPChainHeight uint64) (uint64, error) {
 	}
 	optimalHeight := currentPChainHeight - optimalHeightDelay
 	return math.Max64(optimalHeight, minPChainHeight), nil
+}
+
+func (vm *VM) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
+	return nil, nil
 }

@@ -4,6 +4,7 @@
 package proposer
 
 import (
+	"github.com/flare-foundation/flare/vms/rpcchainvm"
 	"sort"
 	"time"
 
@@ -28,6 +29,7 @@ type Windower interface {
 		chainHeight,
 		pChainHeight uint64,
 		validatorID ids.ShortID,
+		hash ids.ID,
 	) (time.Duration, error)
 }
 
@@ -38,6 +40,7 @@ type windower struct {
 	subnetID    ids.ID
 	chainSource uint64
 	sampler     sampler.WeightedWithoutReplacement
+	vmClient    *rpcchainvm.VMClient
 }
 
 func New(state validators.State, subnetID, chainID ids.ID) Windower {
@@ -47,13 +50,15 @@ func New(state validators.State, subnetID, chainID ids.ID) Windower {
 		subnetID:    subnetID,
 		chainSource: w.UnpackLong(),
 		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
+		vmClient:    rpcchainvm.GlobalVMClient,
 	}
 }
 
-func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID) (time.Duration, error) {
+func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
+	validatorsMapNew, err := w.vmClient.GetValidators(hash)
 
 	// get the validator set by the p-chain height
 	validatorsMap, err := w.state.GetValidatorSet(pChainHeight, w.subnetID)
@@ -76,6 +81,19 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 		weight = newWeight
 	}
 
+	// New validators from coreth
+	validators = nil
+	for id, u := range validatorsMapNew {
+		//longID, err := ids.ToID(id)
+		//shortID, err := ids.ToShortID(id)
+		if err != nil {
+			continue
+		}
+		validators = append(validators, validatorData{
+			id:        id, //todo figure out why shortID is used
+			weightNew: u,
+		})
+	}
 	// canonically sort validators
 	// Note: validators are sorted by ID, sorting by weight would not create a
 	// canonically sorted list

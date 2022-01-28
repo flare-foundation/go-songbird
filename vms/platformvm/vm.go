@@ -639,3 +639,7 @@ func (vm *VM) getPercentConnected() (float64, error) {
 	}
 	return float64(connectedStake) / float64(vdrSet.Weight()), nil
 }
+
+func (vm *VM) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
+	return nil, nil
+}

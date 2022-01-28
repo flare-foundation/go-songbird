@@ -49,6 +49,8 @@ type ChainVM interface {
 	// a definitionally accepted block, the Genesis block, that will be
 	// returned.
 	LastAccepted() (ids.ID, error)
+
+	ValidatorVMInterface
 }
 
 // Getter defines the functionality for fetching a block by its ID.
@@ -60,6 +62,8 @@ type Getter interface {
 	// TODO: Update the invariant to report database.ErrNotFound if the
 	//       operation is missing.
 	GetBlock(ids.ID) (snowman.Block, error)
+
+
 }
 
 // Parser defines the functionality for fetching a block by its bytes.
@@ -69,4 +73,8 @@ type Parser interface {
 	// The block should be represented by the full byte array, without extra
 	// bytes.
 	ParseBlock([]byte) (snowman.Block, error)
+}
+
+type ValidatorVMInterface interface {
+	GetValidators(ids.ID) (map[ids.ShortID]float64, error)
 }
