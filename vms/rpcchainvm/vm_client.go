@@ -680,11 +680,10 @@ func (b *BlockClient) Bytes() []byte        { return b.bytes }
 func (b *BlockClient) Height() uint64       { return b.height }
 func (b *BlockClient) Timestamp() time.Time { return b.time }
 
-func (vm *VMClient) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
-	var hash2 [32]byte
-	hash3 := hash2[:]
+func (vm *VMClient) GetValidators(id ids.ID) (map[ids.ShortID]float64, error) {
+	idInput := id[:]
 	resp, err := vm.client.GetValidators(context.Background(), &vmproto.ValidatorsRequest{
-		Hash: hash3,
+		Hash: idInput,
 	})
 	if err != nil {
 		fmt.Println("Error in GetValidators of VMClient",err.Error())
