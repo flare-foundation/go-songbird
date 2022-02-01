@@ -4,8 +4,8 @@ Node implementation for the [Flare](https://flare.network) network.
 
 ## Installation
 
-Flare is an incredibly lightweight protocol, so the minimum computer requirements are quite modest.
-Note that as network usage increases, hardware requirements may change.
+Flare uses a relatively lightweight consensus protocol, so the minimum computer requirements are modest.
+Note that as network usage increases, hardware requirements may increase beyond what is listed.
 
 - CPU: Equivalent of 8 AWS vCPU
 - RAM: 16 GB
@@ -42,8 +42,7 @@ The Flare binary, named `flare`, is in the `build` directory.
 To connect to the Songbird canary network, run:
 
 ```sh
-export WEB3_API=enabled
-export FBA_VALs=./scripts/configs/songbird/fba_validators.json
+export FBA_VALs=./scripts/configs/songbird/validators.json
 ./build/flare --network-id=songbird \
   --bootstrap-ips="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeIP" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.ip")" \
   --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.nodeID")"
@@ -53,7 +52,32 @@ You should see some _fire_ ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
-Please note that you currently need to be whitelisted to connect to beacon node.
+Please note that you currently need to be whitelisted to connect to the beacon nodes.
+
+### Pruning & APIs
+
+The configuration for the chain is loaded from a configuration file, located at `{chain-config-dir}/C/config.json`:
+
+```json
+{
+  "snowman-api-enabled": false,
+  "coreth-admin-api-enabled": false,
+  "net-api-enabled": true,
+  "eth-api-enabled": true,
+  "personal-api-enabled": false,
+  "tx-pool-api-enabled": true,
+  "debug-api-enabled": true,
+  "web3-api-enabled": true,
+  "local-txs-enabled": true,
+  "pruning-enabled": false
+}
+```
+
+The directory for configuration files defaults to `HOME/.flare/configs` and can be changed using the `--chain-config-dir` flag.
+
+In order to disable pruning and run a full archival node, `pruning-enabled` should be set to `false`.
+
+The various node APIs can also be enabled and disabled by setting the respective parameters.
 
 ### Launching Flare locally
 
