@@ -53,8 +53,12 @@ func New(state validators.State, subnetID, chainID ids.ID) Windower {
 		vmClient:    rpcchainvm.GlobalVMClient,
 	}
 }
-
+var p = 0
 func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID, hash ids.ID) (time.Duration, error) {
+	if p > 0 {
+		time.Sleep(100*time.Second) // Because we don't need to call it frequently. So this can be controlled to call once a week.
+	}
+	p++
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
