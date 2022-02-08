@@ -4,12 +4,10 @@
 package constants
 
 // Const variables to be exported
-// TODO: Change to Flare platform and application name after all nodes on the
-// Songbird network have hard-coded Flare versioning support.
 const (
-	// PlatformName exports the name of the platform
-	PlatformName = "avalanche"
+	LegacyPlatformName = "avalanche"
+	LegacyAppName      = "avalanchego"
 
-	// AppName exports the name of the avalanche application
-	AppName = "avalanchego"
+	PlatformName = "flare"
+	AppName      = "flare"
 )

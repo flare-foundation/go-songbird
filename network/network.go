@@ -115,6 +115,7 @@ type network struct {
 	log                    logging.Logger
 	currentIP              utils.DynamicIPDesc
 	versionCompatibility   version.Compatibility
+	legacyCompatibility    version.Compatibility
 	parser                 version.ApplicationParser
 	listener               net.Listener
 	dialer                 dialer.Dialer
@@ -296,6 +297,7 @@ func NewNetwork(
 		benchlistManager:            benchlistManager,
 		latestPeerIP:                make(map[ids.ShortID]signedPeerIP),
 		versionCompatibility:        version.GetCompatibility(config.NetworkID),
+		legacyCompatibility:         version.GetLegacyCompatibility(config.NetworkID),
 		config:                      config,
 		mc:                          msgCreator,
 	}
@@ -339,6 +341,28 @@ func NewNetwork(
 		return nil, fmt.Errorf("initializing network failed with: %s", err)
 	}
 	return netw, nil
+}
+
+func (n *network) compatibilities() []version.Compatibility {
+	// AP3: start accepting Flare versions
+	// AP4: start sending Flare versions
+	// AP5: stop accepting legacy versions
+	// => before AP3, we should accept only legacy versions
+	// => at AP3 and AP4, we should accept both versions
+	// => after AP4, we should accept only Flare versions
+	now := time.Now().UTC()
+	ap3 := version.GetApricotPhase3Time(n.config.NetworkID)
+	ap5 := version.GetApricotPhase5Time(n.config.NetworkID)
+	var compatibilities []version.Compatibility
+	if now.Before(ap3) {
+		compatibilities = append(compatibilities, n.legacyCompatibility)
+	} else if now.Before(ap5) {
+		compatibilities = append(compatibilities, n.legacyCompatibility)
+		compatibilities = append(compatibilities, n.versionCompatibility)
+	} else {
+		compatibilities = append(compatibilities, n.versionCompatibility)
+	}
+	return compatibilities
 }
 
 // Assumes [n.stateLock] is not held.
@@ -1093,7 +1117,7 @@ func (n *network) validatorIPs() ([]utils.IPCertDesc, error) {
 		}
 
 		peerVersion := peer.versionStruct.GetValue().(version.Application)
-		if n.versionCompatibility.Unmaskable(peerVersion) != nil {
+		if version.Unmaskable(n.compatibilities(), peerVersion) != nil {
 			continue
 		}
 
@@ -1125,7 +1149,7 @@ func (n *network) connected(p *peer) {
 	peerVersion := p.versionStruct.GetValue().(version.Application)
 
 	if n.hasMasked {
-		if n.versionCompatibility.Unmaskable(peerVersion) != nil {
+		if version.Unmaskable(n.compatibilities(), peerVersion) != nil {
 			if err := n.config.Validators.MaskValidator(p.nodeID); err != nil {
 				n.log.Error("failed to mask validator %s due to %s", p.nodeID, err)
 			}
@@ -1136,7 +1160,7 @@ func (n *network) connected(p *peer) {
 		}
 		n.log.Verbo("The new staking set is:\n%s", n.config.Validators)
 	} else {
-		if n.versionCompatibility.WontMask(peerVersion) != nil {
+		if version.WontMask(n.compatibilities(), peerVersion) != nil {
 			n.maskedValidators.Add(p.nodeID)
 		} else {
 			n.maskedValidators.Remove(p.nodeID)

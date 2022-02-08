@@ -24,7 +24,7 @@ import (
 
 // Results of parsing the CLI
 var (
-	defaultNetworkName     = constants.SongbirdName
+	defaultNetworkName     = constants.CostonName
 	homeDir                = os.ExpandEnv("$HOME")
 	prefixedAppName        = fmt.Sprintf(".%s", constants.AppName)
 	defaultDataDir         = filepath.Join(homeDir, prefixedAppName)
