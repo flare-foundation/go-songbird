@@ -16,7 +16,7 @@ const (
 	FlareID    uint32 = 1
 	SongbirdID uint32 = 5
 	CostonID   uint32 = 7
-	StagingID  uint32 = 9999
+	StagingID  uint32 = 10
 	LocalID    uint32 = 12345
 
 	FlareName    = "flare"
