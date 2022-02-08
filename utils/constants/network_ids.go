@@ -16,19 +16,19 @@ const (
 	FlareID    uint32 = 1
 	SongbirdID uint32 = 5
 	CostonID   uint32 = 7
-	TestingID  uint32 = 10
+	StagingID  uint32 = 9999
 	LocalID    uint32 = 12345
 
 	FlareName    = "flare"
 	SongbirdName = "songbird"
 	CostonName   = "coston"
-	TestingName  = "testing"
+	StagingName  = "staging"
 	LocalName    = "local"
 
 	FlareHRP    = "flare"
 	SongbirdHRP = "songbird"
 	CostonHRP   = "coston"
-	TestingHRP  = "testing"
+	StatingHRP  = "staging"
 	LocalHRP    = "local"
 	FallbackHRP = "custom"
 )
@@ -42,14 +42,14 @@ var (
 		FlareID:    FlareName,
 		SongbirdID: SongbirdName,
 		CostonID:   CostonName,
-		TestingID:  TestingName,
+		StagingID:  StagingName,
 		LocalID:    LocalName,
 	}
 	NetworkNameToNetworkID = map[string]uint32{
 		FlareName:    FlareID,
 		SongbirdName: SongbirdID,
 		CostonName:   CostonID,
-		TestingName:  TestingID,
+		StagingName:  StagingID,
 		LocalName:    LocalID,
 	}
 
@@ -57,14 +57,14 @@ var (
 		FlareID:    FlareHRP,
 		SongbirdID: SongbirdHRP,
 		CostonID:   CostonHRP,
-		TestingID:  TestingHRP,
+		StagingID:  StatingHRP,
 		LocalID:    LocalHRP,
 	}
 	NetworkHRPToNetworkID = map[string]uint32{
 		FlareHRP:    FlareID,
 		SongbirdHRP: SongbirdID,
 		CostonHRP:   CostonID,
-		TestingHRP:  TestingID,
+		StatingHRP:  StagingID,
 		LocalHRP:    LocalID,
 	}
 
