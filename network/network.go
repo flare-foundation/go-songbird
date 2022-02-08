@@ -343,13 +343,22 @@ func NewNetwork(
 	return netw, nil
 }
 
+func (n *network) compatibility() version.Compatibility {
+	// => AP3-: send legacy version
+	// => AP4+: send Flare version
+	now := time.Now().UTC()
+	ap4 := version.GetApricotPhase3Time(n.config.NetworkID)
+	if now.Before(ap4) {
+		return n.legacyCompatibility
+	} else {
+		return n.versionCompatibility
+	}
+}
+
 func (n *network) compatibilities() []version.Compatibility {
-	// AP3: start accepting Flare versions
-	// AP4: start sending Flare versions
-	// AP5: stop accepting legacy versions
-	// => before AP3, we should accept only legacy versions
-	// => at AP3 and AP4, we should accept both versions
-	// => after AP4, we should accept only Flare versions
+	// => AP2-: accept legacy version only
+	// => AP3/AP4: accept legacy & Flare version
+	// => AP5+: accept Flare version only
 	now := time.Now().UTC()
 	ap3 := version.GetApricotPhase3Time(n.config.NetworkID)
 	ap5 := version.GetApricotPhase5Time(n.config.NetworkID)
@@ -553,7 +562,8 @@ func (n *network) Dispatch() error {
 	go n.inboundConnUpgradeThrottler.Dispatch()
 	defer n.inboundConnUpgradeThrottler.Stop()
 	go func() {
-		duration := time.Until(n.versionCompatibility.MaskTime())
+		compatibility := n.compatibility()
+		duration := time.Until(compatibility.MaskTime())
 		time.Sleep(duration)
 
 		n.stateLock.Lock()
@@ -1116,8 +1126,9 @@ func (n *network) validatorIPs() ([]utils.IPCertDesc, error) {
 			continue
 		}
 
+		compatibilities := n.compatibilities()
 		peerVersion := peer.versionStruct.GetValue().(version.Application)
-		if version.Unmaskable(n.compatibilities(), peerVersion) != nil {
+		if version.Unmaskable(compatibilities, peerVersion) != nil {
 			continue
 		}
 
@@ -1146,10 +1157,11 @@ func (n *network) connected(p *peer) {
 
 	p.finishedHandshake.SetValue(true)
 
+	compatibilities := n.compatibilities()
 	peerVersion := p.versionStruct.GetValue().(version.Application)
 
 	if n.hasMasked {
-		if version.Unmaskable(n.compatibilities(), peerVersion) != nil {
+		if version.Unmaskable(compatibilities, peerVersion) != nil {
 			if err := n.config.Validators.MaskValidator(p.nodeID); err != nil {
 				n.log.Error("failed to mask validator %s due to %s", p.nodeID, err)
 			}
@@ -1160,7 +1172,7 @@ func (n *network) connected(p *peer) {
 		}
 		n.log.Verbo("The new staking set is:\n%s", n.config.Validators)
 	} else {
-		if version.WontMask(n.compatibilities(), peerVersion) != nil {
+		if version.WontMask(compatibilities, peerVersion) != nil {
 			n.maskedValidators.Add(p.nodeID)
 		} else {
 			n.maskedValidators.Remove(p.nodeID)
