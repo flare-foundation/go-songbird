@@ -51,21 +51,21 @@ var (
 	ApricotPhase2DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase3Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.February, 9, 8, 40, 0, 0, time.UTC),
 		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 	ApricotPhase3DefaultTime = time.Date(2022, time.February, 9, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase4Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.February, 9, 8, 45, 0, 0, time.UTC),
 		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
 	ApricotPhase4DefaultTime = time.Date(2022, time.February, 10, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase5Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.February, 9, 8, 50, 0, 0, time.UTC),
 		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
 	}
