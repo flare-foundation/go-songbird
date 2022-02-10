@@ -361,15 +361,23 @@ func (n *network) compatibilities() []version.Compatibility {
 	// => AP5+: accept Flare version only
 	now := time.Now().UTC()
 	ap3 := version.GetApricotPhase3Time(n.config.NetworkID)
+	ap4 := version.GetApricotPhase4Time(n.config.NetworkID)
 	ap5 := version.GetApricotPhase5Time(n.config.NetworkID)
 	var compatibilities []version.Compatibility
+	fmt.Println("now.Unix(): ", now.Unix())
+	fmt.Println("ap3: ", ap3.Unix())
+	fmt.Println("ap4: ", ap4.Unix())
+	fmt.Println("ap5: ", ap5.Unix())
 	if now.Before(ap3) {
 		compatibilities = append(compatibilities, n.legacyCompatibility)
+		fmt.Println("now.Before(ap3)")
 	} else if now.Before(ap5) {
 		compatibilities = append(compatibilities, n.legacyCompatibility)
 		compatibilities = append(compatibilities, n.versionCompatibility)
+		fmt.Println("now.Before(ap5)")
 	} else {
 		compatibilities = append(compatibilities, n.versionCompatibility)
+		fmt.Println("now.After(ap5)")
 	}
 	return compatibilities
 }
