@@ -118,8 +118,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 
 		childHeight := child.Height()
 		proposerID := child.Proposer()
-		bID, _ := p.vm.State.GetLastAccepted()
-		minDelay, err := p.vm.Windower.Delay(childHeight, parentPChainHeight, proposerID, bID)
+		minDelay, err := p.vm.Windower.Delay(childHeight, parentPChainHeight, proposerID, expectedInnerParentID)
 		if err != nil {
 			return err
 		}
