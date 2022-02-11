@@ -164,8 +164,8 @@ func (p *postForkCommonComponents) buildChild(
 	if delay < proposer.MaxDelay {
 		parentHeight := p.innerBlk.Height()
 		proposerID := p.vm.ctx.NodeID
-		bID, _ := p.vm.State.GetLastAccepted()
-		minDelay, err := p.vm.Windower.Delay(parentHeight+1, parentPChainHeight, proposerID, bID)
+		expectedInnerParentID := p.innerBlk.ID()
+		minDelay, err := p.vm.Windower.Delay(parentHeight+1, parentPChainHeight, proposerID, expectedInnerParentID)
 		if err != nil {
 			return nil, err
 		}
