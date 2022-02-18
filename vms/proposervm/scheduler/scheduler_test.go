@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 func TestDelayFromNew(t *testing.T) {

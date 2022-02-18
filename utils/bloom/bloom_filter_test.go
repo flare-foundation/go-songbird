@@ -6,9 +6,8 @@ package bloom
 import (
 	"testing"
 
+	"github.com/flare-foundation/flare/utils/units"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 func TestNew(t *testing.T) {

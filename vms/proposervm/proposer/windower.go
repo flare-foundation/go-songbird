@@ -7,11 +7,11 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/sampler"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/math"
+	"github.com/flare-foundation/flare/utils/sampler"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 // Proposer list constants

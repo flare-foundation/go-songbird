@@ -9,8 +9,8 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 const (

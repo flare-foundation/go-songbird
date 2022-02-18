@@ -7,9 +7,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 var (

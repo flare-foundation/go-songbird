@@ -6,8 +6,8 @@ package meterdb
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
 
 var (
@@ -184,7 +184,7 @@ func (b *batch) Reset() {
 	b.db.bReset.Observe(float64(end.Sub(start)))
 }
 
-func (b *batch) Replay(w database.KeyValueWriter) error {
+func (b *batch) Replay(w database.KeyValueWriterDeleter) error {
 	start := b.db.clock.Time()
 	err := b.batch.Replay(w)
 	end := b.db.clock.Time()

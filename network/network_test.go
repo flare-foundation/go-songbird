@@ -16,22 +16,23 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/message"
-	"github.com/ava-labs/avalanchego/network/dialer"
-	"github.com/ava-labs/avalanchego/network/throttling"
-	"github.com/ava-labs/avalanchego/snow/networking/benchlist"
-	"github.com/ava-labs/avalanchego/snow/networking/router"
-	"github.com/ava-labs/avalanchego/snow/uptime"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/staking"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/hashing"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
+	"github.com/flare-foundation/flare/network/dialer"
+	"github.com/flare-foundation/flare/network/throttling"
+	"github.com/flare-foundation/flare/snow/networking/benchlist"
+	"github.com/flare-foundation/flare/snow/networking/router"
+	"github.com/flare-foundation/flare/snow/uptime"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/staking"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/version"
 )
 
 const (
@@ -219,8 +220,8 @@ func (c *testConn) SetWriteDeadline(time.Time) error { return nil }
 
 type testHandler struct {
 	router.Router
-	ConnectedF    func(ids.ShortID)
-	DisconnectedF func(ids.ShortID)
+	ConnectedF    func(nodeID ids.ShortID, nodeVersion version.Application)
+	DisconnectedF func(nodeID ids.ShortID)
 	PutF          func(
 		validatorID ids.ShortID,
 		chainID ids.ID,
@@ -229,15 +230,17 @@ type testHandler struct {
 		container []byte,
 		onFinishedHandling func(),
 	)
-	AppGossipF func(nodeID ids.ShortID,
+	AppGossipF func(
+		nodeID ids.ShortID,
 		chainID ids.ID,
 		appGossipBytes []byte,
-		onFinishedHandling func())
+		onFinishedHandling func(),
+	)
 }
 
-func (h *testHandler) Connected(id ids.ShortID) {
+func (h *testHandler) Connected(id ids.ShortID, nodeVersion version.Application) {
 	if h.ConnectedF != nil {
-		h.ConnectedF(id)
+		h.ConnectedF(id, nodeVersion)
 	}
 }
 
@@ -256,12 +259,14 @@ func (h *testHandler) HandleInbound(msg message.InboundMessage) {
 		container, _ := msg.Get(message.ContainerBytes).([]byte)
 
 		if h.PutF != nil {
-			h.PutF(msg.NodeID(),
+			h.PutF(
+				msg.NodeID(),
 				chainID,
 				requestID,
 				containerID,
 				container,
-				msg.OnFinishedHandling)
+				msg.OnFinishedHandling,
+			)
 		}
 	case message.AppGossip:
 		chainID, _ := ids.ToID(msg.Get(message.ChainID).([]byte))
@@ -444,7 +449,7 @@ func TestEstablishConnection(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -455,7 +460,7 @@ func TestEstablishConnection(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -581,7 +586,7 @@ func TestDoubleTrack(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -592,7 +597,7 @@ func TestDoubleTrack(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -719,7 +724,7 @@ func TestDoubleClose(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -730,7 +735,7 @@ func TestDoubleClose(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -862,7 +867,7 @@ func TestTrackConnected(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -873,7 +878,7 @@ func TestTrackConnected(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -1180,7 +1185,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id1 {
 				wg0.Done()
 				return
@@ -1201,7 +1206,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg0.Done()
 				return
@@ -1218,7 +1223,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if cleanup {
 				return
 			}
@@ -1231,7 +1236,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator3, err := message.NewCreator(metrics3, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler3 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg2.Done()
 				return
@@ -1569,7 +1574,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id1 {
 				wg0.Done()
 				return
@@ -1601,7 +1606,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg0.Done()
 				return
@@ -1618,7 +1623,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if cleanup {
 				return
 			}
@@ -1631,7 +1636,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator3, err := message.NewCreator(metrics3, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler3 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg3.Done()
 				return
@@ -1938,7 +1943,7 @@ func TestPeerSignature(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				handledLock.Lock()
 				handled[id0.String()+":"+id.String()] = struct{}{}
@@ -1952,7 +1957,7 @@ func TestPeerSignature(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				handledLock.Lock()
 				handled[id1.String()+":"+id.String()] = struct{}{}
@@ -1966,7 +1971,7 @@ func TestPeerSignature(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id2 {
 				handledLock.Lock()
 				handled[id2.String()+":"+id.String()] = struct{}{}
@@ -2499,7 +2504,7 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id0, id)
 			wg0.Done()
 		},
@@ -2509,7 +2514,7 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id1, id)
 			wg1.Done()
 		},
@@ -2688,7 +2693,7 @@ func TestPeerGossip(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id0, id)
 			wg0.Done()
 		},
@@ -2701,7 +2706,7 @@ func TestPeerGossip(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id1, id)
 			wg1.Done()
 		},
@@ -2715,7 +2720,7 @@ func TestPeerGossip(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id2, id)
 			wg2.Done()
 		},
@@ -2926,14 +2931,16 @@ func TestAppGossip(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id0, id)
 			wg0.Done()
 		},
-		AppGossipF: func(nodeID ids.ShortID,
+		AppGossipF: func(
+			nodeID ids.ShortID,
 			chainID ids.ID,
 			appGossipBytes []byte,
-			onFinishedHandling func()) {
+			onFinishedHandling func(),
+		) {
 			assert.Fail(t, "this should not receive any App Gossips")
 		},
 	}
@@ -2942,14 +2949,16 @@ func TestAppGossip(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id1, id)
 			wg1.Done()
 		},
-		AppGossipF: func(nodeID ids.ShortID,
+		AppGossipF: func(
+			nodeID ids.ShortID,
 			chainID ids.ID,
 			appGossipBytes []byte,
-			onFinishedHandling func()) {
+			onFinishedHandling func(),
+		) {
 			assert.Equal(t, testAppGossipBytes, appGossipBytes)
 			wg1P.Done()
 		},
@@ -2959,14 +2968,16 @@ func TestAppGossip(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id2, id)
 			wg2.Done()
 		},
-		AppGossipF: func(nodeID ids.ShortID,
+		AppGossipF: func(
+			nodeID ids.ShortID,
 			chainID ids.ID,
 			appGossipBytes []byte,
-			onFinishedHandling func()) {
+			onFinishedHandling func(),
+		) {
 			assert.Contains(t, [][]byte{testAppGossipBytes, testAppGossipSpecificBytes}, appGossipBytes)
 			wg2P.Done()
 		},

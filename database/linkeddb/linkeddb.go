@@ -6,8 +6,8 @@ package linkeddb
 import (
 	"sync"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/database"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/database"
 )
 
 const (
@@ -23,8 +23,7 @@ var (
 
 // LinkedDB provides a key value interface while allowing iteration.
 type LinkedDB interface {
-	database.KeyValueReader
-	database.KeyValueWriter
+	database.KeyValueReaderWriterDeleter
 
 	IsEmpty() (bool, error)
 	HeadKey() ([]byte, error)

@@ -4,10 +4,10 @@
 package proposervm
 
 import (
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
-	"github.com/ava-labs/avalanchego/vms/proposervm/block"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/vms/proposervm/block"
 )
 
 var _ Block = &postForkBlock{}
@@ -28,7 +28,7 @@ func (b *postForkBlock) Accept() error {
 		return err
 	}
 
-	// Persist this block with its status
+	// Persist this block, its height index, and its status
 	b.status = choices.Accepted
 	if err := b.vm.storePostForkBlock(b); err != nil {
 		return err

@@ -11,9 +11,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
-	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/vms/platformvm/reward"
+	"github.com/flare-foundation/flare/vms/platformvm/status"
 )
 
 func TestAddDelegatorTxSyntacticVerify(t *testing.T) {
@@ -94,7 +96,7 @@ func TestAddDelegatorTxExecute(t *testing.T) {
 			newValidatorEndTime,                     // end time
 			newValidatorID,                          // node ID
 			rewardAddress,                           // Reward Address
-			PercentDenominator,                      // subnet
+			reward.PercentDenominator,               // subnet
 			[]*crypto.PrivateKeySECP256K1R{keys[0]}, // key
 			ids.ShortEmpty,                          // change addr
 		)
@@ -103,7 +105,7 @@ func TestAddDelegatorTxExecute(t *testing.T) {
 		}
 
 		vm.internalState.AddCurrentStaker(tx, 0)
-		vm.internalState.AddTx(tx, Committed)
+		vm.internalState.AddTx(tx, status.Committed)
 		if err := vm.internalState.Commit(); err != nil {
 			t.Fatal(err)
 		}
@@ -121,7 +123,7 @@ func TestAddDelegatorTxExecute(t *testing.T) {
 			newValidatorEndTime,                     // end time
 			newValidatorID,                          // node ID
 			rewardAddress,                           // Reward Address
-			PercentDenominator,                      // subnet
+			reward.PercentDenominator,               // subnet
 			[]*crypto.PrivateKeySECP256K1R{keys[0]}, // key
 			ids.ShortEmpty,                          // change addr
 		)
@@ -130,7 +132,7 @@ func TestAddDelegatorTxExecute(t *testing.T) {
 		}
 
 		vm.internalState.AddCurrentStaker(tx, 0)
-		vm.internalState.AddTx(tx, Committed)
+		vm.internalState.AddTx(tx, status.Committed)
 		if err := vm.internalState.Commit(); err != nil {
 			t.Fatal(err)
 		}
@@ -365,7 +367,7 @@ func TestAddDelegatorTxOverDelegatedRegression(t *testing.T) {
 		uint64(validatorEndTime.Unix()),
 		id,
 		id,
-		PercentDenominator,
+		reward.PercentDenominator,
 		[]*crypto.PrivateKeySECP256K1R{keys[0]},
 		ids.ShortEmpty, // change addr
 	)
@@ -530,7 +532,7 @@ func TestAddDelegatorTxHeapCorruption(t *testing.T) {
 				uint64(validatorEndTime.Unix()),
 				id,
 				id,
-				PercentDenominator,
+				reward.PercentDenominator,
 				[]*crypto.PrivateKeySECP256K1R{keys[0], keys[1]},
 				changeAddr,
 			)

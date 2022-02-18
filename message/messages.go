@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/constants"
 )
 
 var (
@@ -80,7 +80,7 @@ func (inMsg *inboundMessage) String() string {
 		sb.WriteString(fmt.Sprintf(", NumContainerIDs: %d)", len(inMsg.fields[ContainerIDs].([][]byte))))
 	case Get, GetAncestors, Put, PushQuery, PullQuery:
 		sb.WriteString(fmt.Sprintf(", ContainerID: 0x%x)", inMsg.fields[ContainerID].([]byte)))
-	case MultiPut:
+	case Ancestors:
 		sb.WriteString(fmt.Sprintf(", NumContainers: %d)", len(inMsg.fields[MultiContainerBytes].([][]byte))))
 	case Notify:
 		sb.WriteString(fmt.Sprintf(", Notification: %d)", inMsg.fields[VMMessage].(uint32)))

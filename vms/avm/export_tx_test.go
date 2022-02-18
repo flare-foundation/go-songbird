@@ -11,18 +11,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/api/keystore"
-	"github.com/ava-labs/avalanchego/chains/atomic"
-	"github.com/ava-labs/avalanchego/database/manager"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/version"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/api/keystore"
+	"github.com/flare-foundation/flare/chains/atomic"
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/version"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/components/verify"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 func TestExportTxSyntacticVerify(t *testing.T) {
@@ -1056,11 +1057,11 @@ func TestExportTxSemanticVerifyInvalidFx(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	if err := vm.Bootstrapping(); err != nil {
+	if err := vm.SetState(snow.Bootstrapping); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := vm.Bootstrapped(); err != nil {
+	if err := vm.SetState(snow.NormalOp); err != nil {
 		t.Fatal(err)
 	}
 
@@ -1217,11 +1218,11 @@ func TestIssueExportTx(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	if err := vm.Bootstrapping(); err != nil {
+	if err := vm.SetState(snow.Bootstrapping); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := vm.Bootstrapped(); err != nil {
+	if err := vm.SetState(snow.NormalOp); err != nil {
 		t.Fatal(err)
 	}
 
@@ -1355,12 +1356,11 @@ func TestClearForceAcceptedExportTx(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
-	if err != nil {
+	if err = vm.SetState(snow.Bootstrapping); err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}

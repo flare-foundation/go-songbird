@@ -8,8 +8,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/gconn/gconnproto"
-	"github.com/ava-labs/avalanchego/vms/rpcchainvm/grpcutils"
+	"github.com/flare-foundation/flare/api/proto/gconnproto"
+	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
 )
 
 var _ gconnproto.ConnServer = &Server{}

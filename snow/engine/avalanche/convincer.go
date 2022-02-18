@@ -4,10 +4,10 @@
 package avalanche
 
 import (
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/consensus/avalanche"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/consensus/avalanche"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 // convincer sends chits to [vdr] after its dependencies are met.

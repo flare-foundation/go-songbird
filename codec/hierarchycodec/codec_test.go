@@ -6,7 +6,7 @@ package hierarchycodec
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/codec"
+	"github.com/flare-foundation/flare/codec"
 )
 
 func TestVectors(t *testing.T) {

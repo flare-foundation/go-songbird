@@ -8,12 +8,12 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/ava-labs/avalanchego/api/keystore"
-	"github.com/ava-labs/avalanchego/api/keystore/gkeystore/gkeystoreproto"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/encdb"
-	"github.com/ava-labs/avalanchego/database/rpcdb"
-	"github.com/ava-labs/avalanchego/database/rpcdb/rpcdbproto"
+	"github.com/flare-foundation/flare/api/keystore"
+	"github.com/flare-foundation/flare/api/proto/gkeystoreproto"
+	"github.com/flare-foundation/flare/api/proto/rpcdbproto"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/encdb"
+	"github.com/flare-foundation/flare/database/rpcdb"
 )
 
 var _ keystore.BlockchainKeystore = &Client{}

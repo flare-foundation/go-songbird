@@ -10,8 +10,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/wrappers"
-	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/gconn/gconnproto"
+	"github.com/flare-foundation/flare/api/proto/gconnproto"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 var _ net.Conn = &Client{}

@@ -4,24 +4,24 @@
 package atomic
 
 import (
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/versiondb"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/versiondb"
+	"github.com/flare-foundation/flare/ids"
 )
 
 var _ SharedMemory = &sharedMemory{}
 
 type Requests struct {
-	RemoveRequests [][]byte
-	PutRequests    []*Element
+	RemoveRequests [][]byte   `serialize:"true"`
+	PutRequests    []*Element `serialize:"true"`
 
 	peerChainID ids.ID
 }
 
 type Element struct {
-	Key    []byte
-	Value  []byte
-	Traits [][]byte
+	Key    []byte   `serialize:"true"`
+	Value  []byte   `serialize:"true"`
+	Traits [][]byte `serialize:"true"`
 }
 
 type SharedMemory interface {

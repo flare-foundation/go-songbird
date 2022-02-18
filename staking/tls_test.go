@@ -10,9 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ava-labs/avalanchego/utils/hashing"
 )
 
 func TestMakeKeys(t *testing.T) {

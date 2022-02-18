@@ -4,25 +4,26 @@
 package genesis
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
+	"sort"
 	"time"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/codec/linearcodec"
-	"github.com/ava-labs/avalanchego/codec/reflectcodec"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
-	"github.com/ava-labs/avalanchego/vms/avm"
-	"github.com/ava-labs/avalanchego/vms/evm"
-	"github.com/ava-labs/avalanchego/vms/nftfx"
-	"github.com/ava-labs/avalanchego/vms/platformvm"
-	"github.com/ava-labs/avalanchego/vms/propertyfx"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/codec/linearcodec"
+	"github.com/flare-foundation/flare/codec/reflectcodec"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/flare-foundation/flare/vms/avm"
+	"github.com/flare-foundation/flare/vms/nftfx"
+	"github.com/flare-foundation/flare/vms/platformvm"
+	"github.com/flare-foundation/flare/vms/propertyfx"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 const (
@@ -208,7 +209,7 @@ func FromConfig(config *Config) ([]byte, ids.ID, error) {
 		{
 			GenesisData: avmReply.Bytes,
 			SubnetID:    constants.PrimaryNetworkID,
-			VMID:        avm.ID,
+			VMID:        constants.AVMID,
 			FxIDs: []ids.ID{
 				secp256k1fx.ID,
 				nftfx.ID,
@@ -219,7 +220,7 @@ func FromConfig(config *Config) ([]byte, ids.ID, error) {
 		{
 			GenesisData: genesisStr,
 			SubnetID:    constants.PrimaryNetworkID,
-			VMID:        evm.ID,
+			VMID:        constants.EVMID,
 			Name:        "C-Chain",
 		},
 	}
@@ -257,7 +258,7 @@ func VMGenesis(genesisBytes []byte, vmID ids.ID) (*platformvm.Tx, error) {
 
 func AVAXAssetID(avmGenesisBytes []byte) (ids.ID, error) {
 	c := linearcodec.New(reflectcodec.DefaultTagName, 1<<20)
-	m := codec.NewManager(math.MaxUint32)
+	m := codec.NewManager(math.MaxInt32)
 	errs := wrappers.Errs{}
 	errs.Add(
 		c.RegisterType(&avm.BaseTx{}),

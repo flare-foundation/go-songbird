@@ -9,16 +9,17 @@ import (
 
 	"github.com/gorilla/rpc/v2"
 
-	"github.com/ava-labs/avalanchego/api"
-	"github.com/ava-labs/avalanchego/api/server"
-	"github.com/ava-labs/avalanchego/chains"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	cjson "github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/perms"
-	"github.com/ava-labs/avalanchego/utils/profiler"
+	"github.com/flare-foundation/flare/api"
+	"github.com/flare-foundation/flare/api/server"
+	"github.com/flare-foundation/flare/chains"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/perms"
+	"github.com/flare-foundation/flare/utils/profiler"
+
+	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 const (

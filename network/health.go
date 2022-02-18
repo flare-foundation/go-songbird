@@ -3,9 +3,7 @@
 
 package network
 
-import (
-	"time"
-)
+import "time"
 
 // HealthConfig describes parameters for network layer health checks.
 type HealthConfig struct {

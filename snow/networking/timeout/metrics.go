@@ -10,11 +10,11 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/message"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/utils/metric"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/utils/metric"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 const (
@@ -46,7 +46,11 @@ func (m *metrics) RegisterChain(ctx *snow.ConsensusContext) error {
 }
 
 // Record that a response of type [op] took [latency]
+<<<<<<< HEAD
 func (m *metrics) Observe(chainID ids.ID, op message.Op, latency time.Duration) {
+=======
+func (m *metrics) Observe(validatorID ids.ShortID, chainID ids.ID, op message.Op, latency time.Duration) {
+>>>>>>> upstream-v1.7.5
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
@@ -55,7 +59,11 @@ func (m *metrics) Observe(chainID ids.ID, op message.Op, latency time.Duration) 
 		// TODO should this log an error?
 		return
 	}
+<<<<<<< HEAD
 	cm.observe(ids.ShortEmpty, op, latency)
+=======
+	cm.observe(validatorID, op, latency)
+>>>>>>> upstream-v1.7.5
 }
 
 // chainMetrics contains message response time metrics for a chain

@@ -6,19 +6,21 @@ package avalanche
 import (
 	"testing"
 
+	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/engine/avalanche/vertex"
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestVotingFinishesWithAbandonedDep(t *testing.T) {
-	transitive := &Transitive{}
-
-	config := DefaultConfig()
-	config.Manager = vertex.NewTestManager(t)
-	err := transitive.Initialize(config)
+	_, bootCfg, engCfg := DefaultConfig()
+	mngr := vertex.NewTestManager(t)
+	bootCfg.Manager = mngr
+	engCfg.Manager = mngr
+	transitive, err := newTransitive(engCfg)
 	assert.NoError(t, err)
+	assert.NoError(t, transitive.Start( /*startReqID*/ 0))
 
 	// prepare 3 validators
 	vdr1 := ids.ShortID{1}
@@ -104,12 +106,13 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 }
 
 func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
-	transitive := &Transitive{}
-
-	config := DefaultConfig()
-	config.Manager = vertex.NewTestManager(t)
-	err := transitive.Initialize(config)
+	_, bootCfg, engCfg := DefaultConfig()
+	mngr := vertex.NewTestManager(t)
+	bootCfg.Manager = mngr
+	engCfg.Manager = mngr
+	transitive, err := newTransitive(engCfg)
 	assert.NoError(t, err)
+	assert.NoError(t, transitive.Start( /*startReqID*/ 0))
 
 	// prepare 3 validators
 	vdr1 := ids.ShortID{1}
@@ -238,12 +241,13 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 }
 
 func TestSharedDependency(t *testing.T) {
-	transitive := &Transitive{}
-
-	config := DefaultConfig()
-	config.Manager = vertex.NewTestManager(t)
-	err := transitive.Initialize(config)
+	_, bootCfg, engCfg := DefaultConfig()
+	mngr := vertex.NewTestManager(t)
+	bootCfg.Manager = mngr
+	engCfg.Manager = mngr
+	transitive, err := newTransitive(engCfg)
 	assert.NoError(t, err)
+	assert.NoError(t, transitive.Start( /*startReqID*/ 0))
 
 	// prepare 3 validators
 	vdr1 := ids.ShortID{1}

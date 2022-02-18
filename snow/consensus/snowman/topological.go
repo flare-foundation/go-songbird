@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/consensus/metrics"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/consensus/metrics"
+	"github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
 // TopologicalFactory implements Factory by returning a topological struct
@@ -163,32 +163,26 @@ func (ts *Topological) Add(blk Block) error {
 	return nil
 }
 
-// AcceptedOrProcessing implements the Snowman interface
-func (ts *Topological) AcceptedOrProcessing(blk Block) bool {
-	// If the block is accepted, then it mark it as so.
-	if blk.Status() == choices.Accepted {
-		return true
-	}
-	return ts.processing(blk.ID())
-}
-
-// DecidedOrProcessing implements the Snowman interface
-func (ts *Topological) DecidedOrProcessing(blk Block) bool {
+// Decided implements the Snowman interface
+func (ts *Topological) Decided(blk Block) bool {
 	// If the block is decided, then it must have been previously issued.
 	if blk.Status().Decided() {
 		return true
 	}
 	// If the block is marked as fetched, we can check if it has been
 	// transitively rejected.
-	if blk.Status() == choices.Processing && blk.Height() <= ts.height {
-		return true
-	}
-	return ts.processing(blk.ID())
+	return blk.Status() == choices.Processing && blk.Height() <= ts.height
 }
 
-func (ts *Topological) processing(blkID ids.ID) bool {
-	// If the block is in the map of current blocks, then the block is currently
-	// processing.
+// Processing implements the Snowman interface
+func (ts *Topological) Processing(blkID ids.ID) bool {
+	// The last accepted block is in the blocks map, so we first must ensure the
+	// requested block isn't the last accepted block.
+	if blkID == ts.head {
+		return false
+	}
+	// If the block is in the map of current blocks and not the head, then the
+	// block is currently processing.
 	_, ok := ts.blocks[blkID]
 	return ok
 }

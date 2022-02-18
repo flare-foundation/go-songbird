@@ -11,11 +11,12 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/wrappers"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 type LockedAmount struct {

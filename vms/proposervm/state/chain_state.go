@@ -4,8 +4,8 @@
 package state
 
 import (
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
 )
 
 const (
@@ -22,8 +22,11 @@ type ChainState interface {
 	SetLastAccepted(blkID ids.ID) error
 	DeleteLastAccepted() error
 	GetLastAccepted() (ids.ID, error)
+<<<<<<< HEAD
 
 	clearCache() // useful for UTs
+=======
+>>>>>>> upstream-v1.7.5
 }
 
 type chainState struct {
@@ -63,7 +66,10 @@ func (s *chainState) GetLastAccepted() (ids.ID, error) {
 	s.lastAccepted = lastAccepted
 	return lastAccepted, nil
 }
+<<<<<<< HEAD
 
 func (s *chainState) clearCache() {
 	s.lastAccepted = ids.Empty
 }
+=======
+>>>>>>> upstream-v1.7.5

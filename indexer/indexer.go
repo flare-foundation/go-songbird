@@ -9,27 +9,26 @@ import (
 	"math"
 	"sync"
 
-	"github.com/gorilla/rpc/v2"
+	"github.com/flare-foundation/flare/api/server"
+	"github.com/flare-foundation/flare/chains"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/utils/wrappers"
 
-	"github.com/ava-labs/avalanchego/api/server"
-	"github.com/ava-labs/avalanchego/chains"
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/codec/linearcodec"
-	"github.com/ava-labs/avalanchego/codec/reflectcodec"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/engine/avalanche"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/snow/engine/snowman"
-	"github.com/ava-labs/avalanchego/snow/triggers"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/hashing"
-	"github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/codec/linearcodec"
+	"github.com/flare-foundation/flare/codec/reflectcodec"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/engine/avalanche"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/engine/snowman"
+	"github.com/flare-foundation/flare/snow/triggers"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/gorilla/rpc/v2"
 )
 
 const (
@@ -96,7 +95,7 @@ func NewIndexer(config Config) (Indexer, error) {
 		codecVersion,
 		linearcodec.New(reflectcodec.DefaultTagName, math.MaxUint32),
 	); err != nil {
-		return nil, fmt.Errorf("couldn't register codec: %s", err)
+		return nil, fmt.Errorf("couldn't register codec: %w", err)
 	}
 	hasRun, err := indexer.hasRun()
 	if err != nil {
@@ -145,10 +144,11 @@ type indexer struct {
 }
 
 // Assumes [engine]'s context lock is not held
-func (i *indexer) RegisterChain(name string, ctx *snow.ConsensusContext, engine common.Engine) {
+func (i *indexer) RegisterChain(name string, engine common.Engine) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
+	ctx := engine.Context()
 	if i.closed {
 		i.log.Debug("not registering chain %s because indexer is closed", name)
 		return

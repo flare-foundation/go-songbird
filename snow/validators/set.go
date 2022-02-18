@@ -8,10 +8,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/sampler"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/sampler"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 const (

@@ -8,18 +8,18 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/ava-labs/avalanchego/app"
-	"github.com/ava-labs/avalanchego/database/leveldb"
-	"github.com/ava-labs/avalanchego/database/manager"
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/database/rocksdb"
-	"github.com/ava-labs/avalanchego/nat"
-	"github.com/ava-labs/avalanchego/node"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/dynamicip"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/perms"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/flare-foundation/flare/app"
+	"github.com/flare-foundation/flare/database/leveldb"
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/database/rocksdb"
+	"github.com/flare-foundation/flare/nat"
+	"github.com/flare-foundation/flare/node"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/dynamicip"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/perms"
+	"github.com/flare-foundation/flare/version"
 )
 
 const (
@@ -61,10 +61,10 @@ func NewApp(config node.Config) app.App {
 func (p *process) Start() error {
 	// Set the data directory permissions to be read write.
 	if err := perms.ChmodR(p.config.DatabaseConfig.Path, true, perms.ReadWriteExecute); err != nil {
-		return fmt.Errorf("failed to restrict the permissions of the database directory with: %s", err)
+		return fmt.Errorf("failed to restrict the permissions of the database directory with: %w", err)
 	}
 	if err := perms.ChmodR(p.config.LoggingConfig.Directory, true, perms.ReadWriteExecute); err != nil {
-		return fmt.Errorf("failed to restrict the permissions of the log directory with: %s", err)
+		return fmt.Errorf("failed to restrict the permissions of the log directory with: %w", err)
 	}
 
 	// we want to create the logger after the plugin has started the app

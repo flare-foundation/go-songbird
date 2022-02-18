@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/json"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/json"
 )
 
 type service struct {
@@ -52,7 +52,7 @@ func (s *service) GetLastAccepted(_ *http.Request, args *GetLastAcceptedArgs, re
 	}
 	index, err := s.Index.GetIndex(container.ID)
 	if err != nil {
-		return fmt.Errorf("couldn't get index: %s", err)
+		return fmt.Errorf("couldn't get index: %w", err)
 	}
 	*reply, err = newFormattedContainer(container, index, args.Encoding)
 	return err
@@ -70,7 +70,7 @@ func (s *service) GetContainerByIndex(_ *http.Request, args *GetContainer, reply
 	}
 	index, err := s.Index.GetIndex(container.ID)
 	if err != nil {
-		return fmt.Errorf("couldn't get index: %s", err)
+		return fmt.Errorf("couldn't get index: %w", err)
 	}
 	*reply, err = newFormattedContainer(container, index, args.Encoding)
 	return err
@@ -101,7 +101,7 @@ func (s *service) GetContainerRange(r *http.Request, args *GetContainerRangeArgs
 	for i, container := range containers {
 		index, err := s.Index.GetIndex(container.ID)
 		if err != nil {
-			return fmt.Errorf("couldn't get index: %s", err)
+			return fmt.Errorf("couldn't get index: %w", err)
 		}
 		reply.Containers[i], err = newFormattedContainer(container, index, args.Encoding)
 		if err != nil {
@@ -150,7 +150,7 @@ func (s *service) GetContainerByID(r *http.Request, args *GetIndexArgs, reply *F
 	}
 	index, err := s.Index.GetIndex(container.ID)
 	if err != nil {
-		return fmt.Errorf("couldn't get index: %s", err)
+		return fmt.Errorf("couldn't get index: %w", err)
 	}
 	*reply, err = newFormattedContainer(container, index, args.Encoding)
 	return err

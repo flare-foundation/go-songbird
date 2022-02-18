@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/api"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/flare-foundation/flare/api"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/formatting"
 )
 
 // strongPassword defines a password used for the following tests that

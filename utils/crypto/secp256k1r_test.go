@@ -7,12 +7,13 @@ import (
 	"bytes"
 	"testing"
 
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/hashing"
+	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
+
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 func TestRecover(t *testing.T) {

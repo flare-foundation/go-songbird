@@ -6,7 +6,7 @@ package platformvm
 import (
 	"container/heap"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/ids"
 )
 
 var _ TxHeap = &txHeap{}

@@ -7,20 +7,20 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/ava-labs/avalanchego/chains"
-	"github.com/ava-labs/avalanchego/genesis"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/nat"
-	"github.com/ava-labs/avalanchego/network"
-	"github.com/ava-labs/avalanchego/snow/consensus/avalanche"
-	"github.com/ava-labs/avalanchego/snow/networking/benchlist"
-	"github.com/ava-labs/avalanchego/snow/networking/router"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/dynamicip"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/profiler"
-	"github.com/ava-labs/avalanchego/utils/timer"
-	"github.com/ava-labs/avalanchego/vms"
+	"github.com/flare-foundation/flare/chains"
+	"github.com/flare-foundation/flare/genesis"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/nat"
+	"github.com/flare-foundation/flare/network"
+	"github.com/flare-foundation/flare/snow/consensus/avalanche"
+	"github.com/flare-foundation/flare/snow/networking/benchlist"
+	"github.com/flare-foundation/flare/snow/networking/router"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/dynamicip"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/profiler"
+	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/vms"
 )
 
 type IPCConfig struct {
@@ -98,12 +98,12 @@ type BootstrapConfig struct {
 	// Timeout when connecting to bootstrapping beacons
 	BootstrapBeaconConnectionTimeout time.Duration `json:"bootstrapBeaconConnectionTimeout"`
 
-	// Max number of containers in a multiput message sent by this node.
-	BootstrapMultiputMaxContainersSent int `json:"bootstrapMultiputMaxContainersSent"`
+	// Max number of containers in an ancestors message sent by this node.
+	BootstrapAncestorsMaxContainersSent int `json:"bootstrapAncestorsMaxContainersSent"`
 
-	// This node will only consider the first [MultiputMaxContainersReceived]
-	// containers in a multiput it receives.
-	BootstrapMultiputMaxContainersReceived int `json:"bootstrapMultiputMaxContainersReceived"`
+	// This node will only consider the first [AncestorsMaxContainersReceived]
+	// containers in an ancestors message it receives.
+	BootstrapAncestorsMaxContainersReceived int `json:"bootstrapAncestorsMaxContainersReceived"`
 
 	// Max time to spend fetching a container and its
 	// ancestors while responding to a GetAncestors message
@@ -190,4 +190,7 @@ type Config struct {
 
 	// VM management
 	VMManager vms.Manager `json:"-"`
+
+	// Reset proposerVM height index
+	ResetProposerVMHeightIndex bool `json:"resetProposerVMHeightIndex"`
 }

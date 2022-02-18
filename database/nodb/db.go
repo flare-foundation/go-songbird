@@ -4,7 +4,7 @@
 package nodb
 
 import (
-	"github.com/ava-labs/avalanchego/database"
+	"github.com/flare-foundation/flare/database"
 )
 
 var (
@@ -73,7 +73,7 @@ func (*Batch) Write() error { return database.ErrClosed }
 func (*Batch) Reset() {}
 
 // Replay does nothing
-func (*Batch) Replay(database.KeyValueWriter) error { return database.ErrClosed }
+func (*Batch) Replay(database.KeyValueWriterDeleter) error { return database.ErrClosed }
 
 // Inner returns itself
 func (b *Batch) Inner() database.Batch { return b }

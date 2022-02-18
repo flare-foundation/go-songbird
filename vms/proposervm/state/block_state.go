@@ -9,12 +9,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/cache/metercacher"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/vms/proposervm/block"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/cache/metercacher"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/vms/proposervm/block"
 )
 
 const (
@@ -30,9 +30,12 @@ var (
 type BlockState interface {
 	GetBlock(blkID ids.ID) (block.Block, choices.Status, error)
 	PutBlock(blk block.Block, status choices.Status) error
+<<<<<<< HEAD
 	DeleteBlock(blkID ids.ID) error
 
 	clearCache() // useful for UTs
+=======
+>>>>>>> upstream-v1.7.5
 }
 
 type blockState struct {
@@ -127,6 +130,7 @@ func (s *blockState) PutBlock(blk block.Block, status choices.Status) error {
 	s.blkCache.Put(blkID, &blkWrapper)
 	return s.db.Put(blkID[:], bytes)
 }
+<<<<<<< HEAD
 
 func (s *blockState) DeleteBlock(blkID ids.ID) error {
 	s.blkCache.Put(blkID, nil)
@@ -136,3 +140,5 @@ func (s *blockState) DeleteBlock(blkID ids.ID) error {
 func (s *blockState) clearCache() {
 	s.blkCache.Flush()
 }
+=======
+>>>>>>> upstream-v1.7.5

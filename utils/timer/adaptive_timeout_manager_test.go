@@ -9,10 +9,11 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/message"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
 )
 
 // Test that Initialize works

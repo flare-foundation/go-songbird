@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/ids"
 )
 
 func testChainState(a *assert.Assertions, cs ChainState) {
@@ -25,8 +25,11 @@ func testChainState(a *assert.Assertions, cs ChainState) {
 	err = cs.SetLastAccepted(lastAccepted)
 	a.NoError(err)
 
+<<<<<<< HEAD
 	cs.clearCache()
 
+=======
+>>>>>>> upstream-v1.7.5
 	fetchedLastAccepted, err := cs.GetLastAccepted()
 	a.NoError(err)
 	a.Equal(lastAccepted, fetchedLastAccepted)

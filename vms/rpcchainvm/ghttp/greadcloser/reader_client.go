@@ -8,7 +8,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/greadcloser/greadcloserproto"
+	"github.com/flare-foundation/flare/api/proto/greadcloserproto"
 )
 
 var _ io.ReadCloser = &Client{}

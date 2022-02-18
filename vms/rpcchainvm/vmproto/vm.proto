@@ -1,6 +1,6 @@
 syntax = "proto3";
 package vmproto;
-option go_package = "github.com/ava-labs/avalanchego/vms/rpcchainvm/vmproto";
+option go_package = "github.com/flare-foundation/flare/vms/rpcchainvm/vmproto";
 import "google/protobuf/empty.proto";
 
 // import from https://github.com/prometheus/client_model/blob/master/io/prometheus/client/metrics.proto

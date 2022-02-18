@@ -6,8 +6,8 @@ package metervm
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/utils/metric"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/utils/metric"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 type vertexMetrics struct {
@@ -36,6 +36,5 @@ func (m *vertexMetrics) Initialize(
 	m.verifyErr = newAverager(namespace, "verify_tx_err", reg, &errs)
 	m.accept = newAverager(namespace, "accept", reg, &errs)
 	m.reject = newAverager(namespace, "reject", reg, &errs)
-
 	return errs.Err
 }

@@ -6,9 +6,9 @@ package uptime
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
 
 var _ TestManager = &manager{}

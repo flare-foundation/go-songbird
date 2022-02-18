@@ -4,9 +4,9 @@
 package snowman
 
 import (
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
 // Consensus represents a general snowman instance that can be used directly to
@@ -30,13 +30,11 @@ type Consensus interface {
 	// Returns if a critical error has occurred.
 	Add(Block) error
 
-	// AcceptedOrProcessing returns true if the block has been accepted or is
-	// currently processing
-	AcceptedOrProcessing(Block) bool
+	// Decided returns true if the block has been decided.
+	Decided(Block) bool
 
-	// DecidedOrProcessing returns true if the block has been decided or is
-	// currently processing.
-	DecidedOrProcessing(Block) bool
+	// Processing returns true if the block ID is currently processing.
+	Processing(ids.ID) bool
 
 	// IsPreferred returns true if the block is currently on the preferred
 	// chain.

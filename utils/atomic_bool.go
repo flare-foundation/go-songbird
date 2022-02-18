@@ -3,9 +3,7 @@
 
 package utils
 
-import (
-	"sync/atomic"
-)
+import "sync/atomic"
 
 type AtomicBool struct {
 	value uint32

@@ -5,34 +5,38 @@ package avm
 
 import (
 	"bytes"
-	json2 "encoding/json"
 	"fmt"
 	"math/rand"
 	"strings"
 	"testing"
 	"time"
 
+	json2 "encoding/json"
+
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/api"
-	"github.com/ava-labs/avalanchego/chains/atomic"
-	"github.com/ava-labs/avalanchego/database/manager"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/sampler"
-	"github.com/ava-labs/avalanchego/version"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/components/index"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
-	"github.com/ava-labs/avalanchego/vms/nftfx"
-	"github.com/ava-labs/avalanchego/vms/propertyfx"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/api"
+	"github.com/flare-foundation/flare/chains/atomic"
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/utils/sampler"
+	"github.com/flare-foundation/flare/version"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/components/index"
+	"github.com/flare-foundation/flare/vms/components/keystore"
+	"github.com/flare-foundation/flare/vms/components/verify"
+	"github.com/flare-foundation/flare/vms/nftfx"
+	"github.com/flare-foundation/flare/vms/propertyfx"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 var testChangeAddr = ids.GenerateTestShortID()
@@ -94,23 +98,18 @@ func setupWithKeys(t *testing.T, isAVAXAsset bool) ([]byte, *VM, *Service, *atom
 	genesisBytes, vm, s, m, tx := setup(t, isAVAXAsset)
 
 	// Import the initially funded private keys
-	user := userState{vm: vm}
-	db, err := s.vm.ctx.Keystore.GetDatabase(username, password)
+	user, err := keystore.NewUserFromKeystore(s.vm.ctx.Keystore, username, password)
 	if err != nil {
-		t.Fatalf("Failed to get user database: %s", err)
+		t.Fatal(err)
 	}
 
-	addrs := []ids.ShortID{}
-	for _, sk := range keys {
-		if err := user.SetKey(db, sk); err != nil {
-			t.Fatalf("Failed to set key for user: %s", err)
-		}
-		addrs = append(addrs, sk.PublicKey().Address())
-	}
-	if err := user.SetAddresses(db, addrs); err != nil {
-		t.Fatalf("Failed to set user addresses: %s", err)
+	if err := user.PutKeys(keys...); err != nil {
+		t.Fatalf("Failed to set key for user: %s", err)
 	}
 
+	if err := user.Close(); err != nil {
+		t.Fatal(err)
+	}
 	return genesisBytes, vm, s, m, tx
 }
 
@@ -822,12 +821,12 @@ func TestServiceGetTxJSON_CreateAssetTx(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -912,12 +911,12 @@ func TestServiceGetTxJSON_OperationTxWithNftxMintOp(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1017,12 +1016,12 @@ func TestServiceGetTxJSON_OperationTxWithMultipleNftxMintOp(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1124,12 +1123,12 @@ func TestServiceGetTxJSON_OperationTxWithSecpMintOp(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1231,12 +1230,12 @@ func TestServiceGetTxJSON_OperationTxWithMultipleSecpMintOp(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1339,12 +1338,12 @@ func TestServiceGetTxJSON_OperationTxWithPropertyFxMintOp(t *testing.T) {
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1444,12 +1443,12 @@ func TestServiceGetTxJSON_OperationTxWithPropertyFxMintOpMultiple(t *testing.T) 
 	}
 	vm.batchTimeout = 0
 
-	err = vm.Bootstrapping()
+	err = vm.SetState(snow.Bootstrapping)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = vm.Bootstrapped()
+	err = vm.SetState(snow.NormalOp)
 	if err != nil {
 		t.Fatal(err)
 	}

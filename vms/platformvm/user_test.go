@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/database/encdb"
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/flare-foundation/flare/database/encdb"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/crypto"
 )
 
 func TestUserNilDB(t *testing.T) {

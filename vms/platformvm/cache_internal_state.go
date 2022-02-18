@@ -10,20 +10,22 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/cache/metercacher"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/linkeddb"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/database/versiondb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/uptime"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/hashing"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/cache/metercacher"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/linkeddb"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/database/versiondb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/uptime"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/platformvm/status"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 var (
@@ -71,6 +73,7 @@ const (
 type InternalState interface {
 	MutableState
 	uptime.State
+	avax.UTXOReader
 
 	SetHeight(height uint64)
 
@@ -89,8 +92,6 @@ type InternalState interface {
 
 	GetBlock(blockID ids.ID) (Block, error)
 	AddBlock(block Block)
-
-	UTXOIDs(addr []byte, start ids.ID, limit int) ([]ids.ID, error)
 
 	Abort()
 	Commit() error
@@ -226,8 +227,8 @@ type heightWithSubnet struct {
 }
 
 type stateTx struct {
-	Tx     []byte `serialize:"true"`
-	Status Status `serialize:"true"`
+	Tx     []byte        `serialize:"true"`
+	Status status.Status `serialize:"true"`
 }
 
 type stateBlk struct {
@@ -533,13 +534,13 @@ func (st *internalStateImpl) getChainDB(subnetID ids.ID) linkeddb.LinkedDB {
 	return chainDB
 }
 
-func (st *internalStateImpl) GetTx(txID ids.ID) (*Tx, Status, error) {
+func (st *internalStateImpl) GetTx(txID ids.ID) (*Tx, status.Status, error) {
 	if tx, exists := st.addedTxs[txID]; exists {
 		return tx.tx, tx.status, nil
 	}
 	if txIntf, cached := st.txCache.Get(txID); cached {
 		if txIntf == nil {
-			return nil, Unknown, database.ErrNotFound
+			return nil, status.Unknown, database.ErrNotFound
 		}
 		tx := txIntf.(*txStatusImpl)
 		return tx.tx, tx.status, nil
@@ -547,22 +548,22 @@ func (st *internalStateImpl) GetTx(txID ids.ID) (*Tx, Status, error) {
 	txBytes, err := st.txDB.Get(txID[:])
 	if err == database.ErrNotFound {
 		st.txCache.Put(txID, nil)
-		return nil, Unknown, database.ErrNotFound
+		return nil, status.Unknown, database.ErrNotFound
 	} else if err != nil {
-		return nil, Unknown, err
+		return nil, status.Unknown, err
 	}
 
 	stx := stateTx{}
 	if _, err := GenesisCodec.Unmarshal(txBytes, &stx); err != nil {
-		return nil, Unknown, err
+		return nil, status.Unknown, err
 	}
 
 	tx := Tx{}
 	if _, err := GenesisCodec.Unmarshal(stx.Tx, &tx); err != nil {
-		return nil, Unknown, err
+		return nil, status.Unknown, err
 	}
 	if err := tx.Sign(GenesisCodec, nil); err != nil {
-		return nil, Unknown, err
+		return nil, status.Unknown, err
 	}
 
 	ptx := &txStatusImpl{
@@ -574,7 +575,7 @@ func (st *internalStateImpl) GetTx(txID ids.ID) (*Tx, Status, error) {
 	return ptx.tx, ptx.status, nil
 }
 
-func (st *internalStateImpl) AddTx(tx *Tx, status Status) {
+func (st *internalStateImpl) AddTx(tx *Tx, status status.Status) {
 	st.addedTxs[tx.ID()] = &txStatusImpl{
 		tx:     tx,
 		status: status,
@@ -939,7 +940,7 @@ func (st *internalStateImpl) writeCurrentStakers() error {
 
 	for _, tx := range st.deletedCurrentStakers {
 		var (
-			db       database.KeyValueWriter
+			db       database.KeyValueDeleter
 			subnetID ids.ID
 			nodeID   ids.ShortID
 			weight   uint64
@@ -1076,7 +1077,7 @@ func (st *internalStateImpl) writePendingStakers() error {
 	st.addedPendingStakers = nil
 
 	for _, tx := range st.deletedPendingStakers {
-		var db database.KeyValueWriter
+		var db database.KeyValueDeleter
 		switch tx.UnsignedTx.(type) {
 		case *UnsignedAddValidatorTx:
 			db = st.pendingValidatorList
@@ -1559,11 +1560,10 @@ func (st *internalStateImpl) init(genesisBytes []byte) error {
 		stakeDuration := tx.Validator.Duration()
 		currentSupply := st.GetCurrentSupply()
 
-		r := reward(
+		r := st.vm.rewards.Calculate(
 			stakeDuration,
 			stakeAmount,
 			currentSupply,
-			st.vm.StakeMintingPeriod,
 		)
 		newCurrentSupply, err := safemath.Add64(currentSupply, r)
 		if err != nil {
@@ -1571,7 +1571,7 @@ func (st *internalStateImpl) init(genesisBytes []byte) error {
 		}
 
 		st.AddCurrentStaker(vdrTx, r)
-		st.AddTx(vdrTx, Committed)
+		st.AddTx(vdrTx, status.Committed)
 		st.SetCurrentSupply(newCurrentSupply)
 	}
 
@@ -1588,7 +1588,7 @@ func (st *internalStateImpl) init(genesisBytes []byte) error {
 		}
 
 		st.AddChain(chain)
-		st.AddTx(chain, Committed)
+		st.AddTx(chain, status.Committed)
 	}
 
 	// Create the genesis block and save it as being accepted (We don't just

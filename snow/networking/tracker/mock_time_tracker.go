@@ -3,7 +3,7 @@
 package tracker
 
 import (
-	ids "github.com/ava-labs/avalanchego/ids"
+	ids "github.com/flare-foundation/flare/ids"
 	mock "github.com/stretchr/testify/mock"
 
 	time "time"
@@ -28,11 +28,14 @@ func (_m *MockTimeTracker) CumulativeUtilization(_a0 time.Time) float64 {
 	return r0
 }
 
+<<<<<<< HEAD
 // EndInterval provides a mock function with given fields: _a0
 func (_m *MockTimeTracker) EndInterval(_a0 time.Time) {
 	_m.Called(_a0)
 }
 
+=======
+>>>>>>> upstream-v1.7.5
 // Len provides a mock function with given fields:
 func (_m *MockTimeTracker) Len() int {
 	ret := _m.Called()
@@ -61,7 +64,18 @@ func (_m *MockTimeTracker) Utilization(_a0 ids.ShortID, _a1 time.Time) float64 {
 	return r0
 }
 
+<<<<<<< HEAD
 // UtilizeTime provides a mock function with given fields: _a0, _a1, _a2
 func (_m *MockTimeTracker) UtilizeTime(_a0 ids.ShortID, _a1 time.Time, _a2 time.Time) {
 	_m.Called(_a0, _a1, _a2)
+=======
+// StartCPU provides a mock function with given fields: _a0, _a1
+func (_m *MockTimeTracker) StartCPU(_a0 ids.ShortID, _a1 time.Time) {
+	_m.Called(_a0, _a1)
+}
+
+// StopCPU provides a mock function with given fields: _a0, _a1
+func (_m *MockTimeTracker) StopCPU(_a0 ids.ShortID, _a1 time.Time) {
+	_m.Called(_a0, _a1)
+>>>>>>> upstream-v1.7.5
 }

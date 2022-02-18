@@ -4,9 +4,9 @@
 package common
 
 import (
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/validators"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/validators"
 )
 
 // DefaultConfigTest returns a test configuration
@@ -18,14 +18,15 @@ func DefaultConfigTest() Config {
 	}
 
 	return Config{
-		Ctx:                           snow.DefaultConsensusContextTest(),
-		Validators:                    validators.NewSet(),
-		Beacons:                       validators.NewSet(),
-		Sender:                        &SenderTest{},
-		Bootstrapable:                 &BootstrapableTest{},
-		Subnet:                        subnet,
-		Timer:                         &TimerTest{},
-		MultiputMaxContainersSent:     2000,
-		MultiputMaxContainersReceived: 2000,
+		Ctx:                            snow.DefaultConsensusContextTest(),
+		Validators:                     validators.NewSet(),
+		Beacons:                        validators.NewSet(),
+		Sender:                         &SenderTest{},
+		Bootstrapable:                  &BootstrapableTest{},
+		Subnet:                         subnet,
+		Timer:                          &TimerTest{},
+		AncestorsMaxContainersSent:     2000,
+		AncestorsMaxContainersReceived: 2000,
+		SharedCfg:                      &SharedConfig{},
 	}
 }

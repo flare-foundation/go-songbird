@@ -9,60 +9,45 @@ import (
 	"time"
 
 	"github.com/gorilla/rpc/v2"
+	
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/chains"
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/codec/linearcodec"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/manager"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/snow/engine/snowman/block"
-	"github.com/ava-labs/avalanchego/snow/uptime"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	"github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/avalanchego/utils/units"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
-	"github.com/ava-labs/avalanchego/version"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/chains"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/codec/linearcodec"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/uptime"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/flare-foundation/flare/version"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/platformvm/reward"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 const (
-	// PercentDenominator is the denominator used to calculate percentages
-	PercentDenominator = 1000000
-
 	droppedTxCacheSize     = 64
 	validatorSetsCacheSize = 64
-
-	maxUTXOsToFetch = 1024
-
-	// TODO: Turn these constants into governable parameters
-
-	// MaxSubMinConsumptionRate is the % consumption that incentivizes staking
-	// longer
-	MaxSubMinConsumptionRate = 20000 // 2%
-	// MinConsumptionRate is the minimum % consumption of the remaining tokens
-	// to be minted
-	MinConsumptionRate = 100000 // 10%
 
 	// MaxValidatorWeightFactor is the maximum factor of the validator stake
 	// that is allowed to be placed on a validator.
 	MaxValidatorWeightFactor uint64 = 5
-
-	// SupplyCap is the maximum amount of AVAX that should ever exist
-	SupplyCap = 720 * units.MegaAvax
 
 	// Maximum future start time for staking/delegating
 	maxFutureStartTime = 24 * 7 * 2 * time.Hour
@@ -98,6 +83,8 @@ type VM struct {
 	blockBuilder blockBuilder
 
 	uptimeManager uptime.Manager
+
+	rewards reward.Calculator
 
 	// The context of this vm
 	ctx       *snow.Context
@@ -190,6 +177,7 @@ func (vm *VM) Initialize(
 		)
 	}
 	vm.network = newNetwork(vm.ApricotPhase4Time, appSender, vm)
+	vm.rewards = reward.NewCalculator(vm.RewardConfig)
 
 	is, err := NewMeteredInternalState(vm, vm.dbManager.Current().Database, genesisBytes, registerer)
 	if err != nil {
@@ -291,14 +279,14 @@ func (vm *VM) createChain(tx *Tx) error {
 	return nil
 }
 
-// Bootstrapping marks this VM as bootstrapping
-func (vm *VM) Bootstrapping() error {
+// onBootstrapStarted marks this VM as bootstrapping
+func (vm *VM) onBootstrapStarted() error {
 	vm.bootstrapped.SetValue(false)
 	return vm.fx.Bootstrapping()
 }
 
-// Bootstrapped marks this VM as bootstrapped
-func (vm *VM) Bootstrapped() error {
+// onNormalOperationsStarted marks this VM as bootstrapped
+func (vm *VM) onNormalOperationsStarted() error {
 	if vm.bootstrapped.GetValue() {
 		return nil
 	}
@@ -307,8 +295,18 @@ func (vm *VM) Bootstrapped() error {
 	if err := vm.fx.Bootstrapped(); err != nil {
 		return err
 	}
-
 	return vm.internalState.Commit()
+}
+
+func (vm *VM) SetState(state snow.State) error {
+	switch state {
+	case snow.Bootstrapping:
+		return vm.onBootstrapStarted()
+	case snow.NormalOp:
+		return vm.onNormalOperationsStarted()
+	default:
+		return snow.ErrUnknownState
+	}
 }
 
 // Shutdown this blockchain
@@ -454,7 +452,11 @@ func (vm *VM) CreateStaticHandlers() (map[string]*common.HTTPHandler, error) {
 }
 
 // Connected implements validators.Connector
+<<<<<<< HEAD
 func (vm *VM) Connected(vdrID ids.ShortID) error {
+=======
+func (vm *VM) Connected(vdrID ids.ShortID, nodeVersion version.Application) error {
+>>>>>>> upstream-v1.7.5
 	return vm.uptimeManager.Connect(vdrID)
 }
 
@@ -559,6 +561,7 @@ func (vm *VM) GetCurrentHeight() (uint64, error) {
 }
 
 func (vm *VM) updateValidators() error {
+<<<<<<< HEAD
 	localValidators := validators.FBA
 	if err := vm.Validators.Set(constants.PrimaryNetworkID, localValidators); err != nil {
 		return err
@@ -570,6 +573,27 @@ func (vm *VM) updateValidators() error {
 
 	for subnetID := range vm.WhitelistedSubnets {
 		if err := vm.Validators.Set(subnetID, localValidators); err != nil {
+=======
+	currentValidators := vm.internalState.CurrentStakerChainState()
+	primaryValidators, err := currentValidators.ValidatorSet(constants.PrimaryNetworkID)
+	if err != nil {
+		return err
+	}
+	if err := vm.Validators.Set(constants.PrimaryNetworkID, primaryValidators); err != nil {
+		return err
+	}
+
+	weight, _ := primaryValidators.GetWeight(vm.ctx.NodeID)
+	vm.localStake.Set(float64(weight))
+	vm.totalStake.Set(float64(primaryValidators.Weight()))
+
+	for subnetID := range vm.WhitelistedSubnets {
+		subnetValidators, err := currentValidators.ValidatorSet(subnetID)
+		if err != nil {
+			return err
+		}
+		if err := vm.Validators.Set(subnetID, subnetValidators); err != nil {
+>>>>>>> upstream-v1.7.5
 			return err
 		}
 	}

@@ -6,8 +6,8 @@ package scheduler
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 type Scheduler interface {
@@ -77,7 +77,11 @@ waitloop:
 				default:
 					// If the channel to the engine is full, drop the message
 					// from the VM to avoid deadlock
+<<<<<<< HEAD
 					s.log.Debug("dropping message from VM because channel to engine is full")
+=======
+					s.log.Debug("dropping message %s from VM because channel to engine is full", msg)
+>>>>>>> upstream-v1.7.5
 				}
 			case buildBlockTime, ok := <-s.newBuildBlockTime:
 				// The time at which we should notify the engine that it should

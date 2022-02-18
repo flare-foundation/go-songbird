@@ -6,8 +6,8 @@ package snowball
 import (
 	"math/rand"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/sampler"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 type Network struct {

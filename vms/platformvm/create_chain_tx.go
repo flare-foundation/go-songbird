@@ -9,15 +9,15 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/ava-labs/avalanchego/chains/atomic"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	"github.com/ava-labs/avalanchego/utils/units"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
+	"github.com/flare-foundation/flare/chains/atomic"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/units"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/components/verify"
 )
 
 var (
@@ -49,7 +49,7 @@ type UnsignedCreateChainTx struct {
 	FxIDs []ids.ID `serialize:"true" json:"fxIDs"`
 	// Byte representation of genesis state of the new chain
 	GenesisData []byte `serialize:"true" json:"genesisData"`
-	// Auth that will be allowing this validator into the network
+	// Authorizes this blockchain to be added to this subnet
 	SubnetAuth verify.Verifiable `serialize:"true" json:"subnetAuthorization"`
 }
 

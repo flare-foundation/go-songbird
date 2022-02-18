@@ -6,11 +6,9 @@ package network
 import (
 	"context"
 	"crypto"
-	cryptorand "crypto/rand"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	gomath "math"
 	"math/rand"
 	"net"
 	"strings"
@@ -18,29 +16,31 @@ import (
 	"sync/atomic"
 	"time"
 
+	cryptorand "crypto/rand"
+	gomath "math"
+
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/health"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/message"
-	"github.com/ava-labs/avalanchego/network/dialer"
-	"github.com/ava-labs/avalanchego/network/throttling"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/networking/benchlist"
-	"github.com/ava-labs/avalanchego/snow/networking/router"
-	"github.com/ava-labs/avalanchego/snow/networking/sender"
-	"github.com/ava-labs/avalanchego/snow/triggers"
-	"github.com/ava-labs/avalanchego/snow/uptime"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/sampler"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/avalanchego/version"
+	"github.com/flare-foundation/flare/api/health"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
+	"github.com/flare-foundation/flare/network/dialer"
+	"github.com/flare-foundation/flare/network/throttling"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/networking/benchlist"
+	"github.com/flare-foundation/flare/snow/networking/router"
+	"github.com/flare-foundation/flare/snow/networking/sender"
+	"github.com/flare-foundation/flare/snow/uptime"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/math"
+	"github.com/flare-foundation/flare/utils/sampler"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/version"
 )
 
 var (
@@ -61,7 +61,7 @@ type Network interface {
 
 	// The network must be able to broadcast accepted decisions to random peers.
 	// Thread safety must be managed internally in the network.
-	triggers.Acceptor
+	snow.Acceptor
 
 	// Should only be called once, will run until either a fatal error occurs,
 	// or the network is closed. Returns a non-nil error.
@@ -92,7 +92,7 @@ type Network interface {
 	NodeUptime() (UptimeResult, bool)
 
 	// Has a health check
-	health.Checkable
+	health.Checker
 }
 
 type UptimeResult struct {
@@ -192,13 +192,7 @@ type PeerListGossipConfig struct {
 	PeerListSize                 uint32        `json:"peerListSize"`
 	PeerListGossipSize           uint32        `json:"peerListGossipSize"`
 	PeerListStakerGossipFraction uint32        `json:"peerListStakerGossipFraction"`
-	PeerListGossipFreq           time.Duration `json:"peerListGossipFreq"`
-}
-
-type TimeoutConfig struct {
-	GetVersionTimeout    time.Duration `json:"getVersionTimeout"`
-	PingPongTimeout      time.Duration `json:"pingPongTimeout"`
-	ReadHandshakeTimeout time.Duration `json:"readHandshakeTimeout"`
+	PeerListGossipFreq >t time.Duration `json:"readHandshakeTimeout"`
 	// peerAliasTimeout is the age a peer alias must
 	// be before we attempt to release it (so that we
 	// attempt to dial the IP again if gossiped to us).
@@ -319,7 +313,7 @@ func NewNetwork(
 		config.ThrottlerConfig.InboundMsgThrottlerConfig,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("initializing inbound message throttler failed with: %s", err)
+		return nil, fmt.Errorf("initializing inbound message throttler failed with: %w", err)
 	}
 	netw.inboundMsgThrottler = inboundMsgThrottler
 
@@ -331,14 +325,14 @@ func NewNetwork(
 		config.ThrottlerConfig.OutboundMsgThrottlerConfig,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("initializing outbound message throttler failed with: %s", err)
+		return nil, fmt.Errorf("initializing outbound message throttler failed with: %w", err)
 	}
 	netw.outboundMsgThrottler = outboundMsgThrottler
 
 	netw.peers.initialize()
 	netw.sendFailRateCalculator = math.NewSyncAverager(math.NewAverager(0, config.MaxSendFailRateHalflife, netw.clock.Time()))
 	if err := netw.metrics.initialize(config.Namespace, metricsRegisterer); err != nil {
-		return nil, fmt.Errorf("initializing network failed with: %s", err)
+		return nil, fmt.Errorf("initializing network failed with: %w", err)
 	}
 	return netw, nil
 }
@@ -405,7 +399,7 @@ func (n *network) Gossip(
 // Accept is called after every consensus decision
 // Assumes [n.stateLock] is not held.
 func (n *network) Accept(ctx *snow.ConsensusContext, containerID ids.ID, container []byte) error {
-	if !ctx.IsBootstrapped() {
+	if ctx.GetState() != snow.NormalOp {
 		// don't gossip during bootstrapping
 		return nil
 	}
@@ -1193,7 +1187,7 @@ func (n *network) connected(p *peer) {
 		n.connectedIPs[str] = struct{}{}
 	}
 
-	n.router.Connected(p.nodeID)
+	n.router.Connected(p.nodeID, peerVersion)
 	n.metrics.connected.Inc()
 }
 

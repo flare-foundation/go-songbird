@@ -5,17 +5,19 @@ package crypto
 
 import (
 	"bytes"
-	stdecdsa "crypto/ecdsa"
 	"errors"
 	"sort"
 
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
+	stdecdsa "crypto/ecdsa"
+
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/hashing"
+	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
+
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 const (

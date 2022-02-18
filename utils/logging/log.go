@@ -14,12 +14,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/perms"
+	"github.com/flare-foundation/flare/utils/perms"
 )
 
 var (
 	fileSuffix = "utils/logging/log.go"
 	filePrefix string
+	timeFormat = "01-02|15:04:05.000"
 )
 
 func init() {
@@ -207,7 +208,7 @@ func (l *Log) format(level Level, format string, args ...interface{}) string {
 
 	return fmt.Sprintf("%s[%s]%s %s\n",
 		level.AlignedString(),
-		time.Now().Format("01-02|15:04:05"),
+		time.Now().Format(timeFormat),
 		prefix,
 		text)
 }

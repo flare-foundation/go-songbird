@@ -7,13 +7,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	"github.com/ava-labs/avalanchego/utils/hashing"
-	"github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/math"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/components/verify"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 var (
@@ -52,7 +52,7 @@ func (vm *VM) stake(
 	for _, key := range keys {
 		addrs.Add(key.PublicKey().Address())
 	}
-	utxos, err := vm.getAllUTXOs(addrs) // The UTXOs controlled by [keys]
+	utxos, err := avax.GetAllUTXOs(vm.internalState, addrs) // The UTXOs controlled by [keys]
 	if err != nil {
 		return nil, nil, nil, nil, fmt.Errorf("couldn't get UTXOs: %w", err)
 	}

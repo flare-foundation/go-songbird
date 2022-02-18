@@ -3,9 +3,7 @@
 
 package logging
 
-import (
-	"strings"
-)
+import "strings"
 
 func Sanitize(s string) string {
 	return strings.ReplaceAll(s, "\n", "\\n")

@@ -6,8 +6,8 @@ package snowman
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
 )
 
 // Block is a possible decision that dictates the next canonical block.

@@ -6,8 +6,8 @@ package snowstorm
 import (
 	"testing"
 
-	sbcon "github.com/ava-labs/avalanchego/snow/consensus/snowball"
-	"github.com/ava-labs/avalanchego/utils/sampler"
+	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 func TestConflictGraphEquality(t *testing.T) {

@@ -6,8 +6,8 @@ package network
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/json"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/json"
 )
 
 type PeerInfo struct {
@@ -19,4 +19,5 @@ type PeerInfo struct {
 	LastReceived   time.Time  `json:"lastReceived"`
 	Benched        []ids.ID   `json:"benched"`
 	ObservedUptime json.Uint8 `json:"observedUptime"`
+	TrackedSubnets []ids.ID   `json:"trackedSubnets"`
 }

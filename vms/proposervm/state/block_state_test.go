@@ -11,12 +11,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/staking"
-	"github.com/ava-labs/avalanchego/vms/proposervm/block"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/staking"
+	"github.com/flare-foundation/flare/vms/proposervm/block"
 )
 
 func testBlockState(a *assert.Assertions, bs BlockState) {
@@ -57,18 +57,24 @@ func testBlockState(a *assert.Assertions, bs BlockState) {
 	a.Equal(choices.Accepted, fetchedStatus)
 	a.Equal(b.Bytes(), fetchedBlock.Bytes())
 
+<<<<<<< HEAD
 	bs.clearCache()
 
+=======
+>>>>>>> upstream-v1.7.5
 	fetchedBlock, fetchedStatus, err = bs.GetBlock(b.ID())
 	a.NoError(err)
 	a.Equal(choices.Accepted, fetchedStatus)
 	a.Equal(b.Bytes(), fetchedBlock.Bytes())
+<<<<<<< HEAD
 
 	err = bs.DeleteBlock(b.ID())
 	a.NoError(err)
 
 	_, _, err = bs.GetBlock(b.ID())
 	a.Equal(database.ErrNotFound, err)
+=======
+>>>>>>> upstream-v1.7.5
 }
 
 func TestBlockState(t *testing.T) {

@@ -11,12 +11,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/flare-foundation/flare/vms/components/avax"
 )
 
 var (
@@ -138,13 +138,13 @@ func (i *indexer) Accept(txID ids.ID, inputUTXOs []*avax.UTXO, outputUTXOs []*av
 				idxBytes = make([]byte, wrappers.LongLen)
 			default:
 				// Unexpected error
-				return fmt.Errorf("unexpected error when indexing txID %s: %s", txID, err)
+				return fmt.Errorf("unexpected error when indexing txID %s: %w", txID, err)
 			}
 
 			// write the [txID] at the index
 			i.log.Verbo("writing address/assetID/index/txID %s/%s/%d/%s", address, assetID, idx, txID)
 			if err := assetPrefixDB.Put(idxBytes, txID[:]); err != nil {
-				return fmt.Errorf("failed to write txID while indexing %s: %s", txID, err)
+				return fmt.Errorf("failed to write txID while indexing %s: %w", txID, err)
 			}
 
 			// increment and store the index for next use
@@ -152,7 +152,7 @@ func (i *indexer) Accept(txID ids.ID, inputUTXOs []*avax.UTXO, outputUTXOs []*av
 			binary.BigEndian.PutUint64(idxBytes, idx)
 
 			if err := assetPrefixDB.Put(idxKey, idxBytes); err != nil {
-				return fmt.Errorf("failed to write index txID while indexing %s: %s", txID, err)
+				return fmt.Errorf("failed to write index txID while indexing %s: %w", txID, err)
 			}
 		}
 	}

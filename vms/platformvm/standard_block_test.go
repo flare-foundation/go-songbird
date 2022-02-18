@@ -7,15 +7,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flare-foundation/flare/chains/atomic"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/platformvm/status"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ava-labs/avalanchego/chains/atomic"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 func TestAtomicTxImports(t *testing.T) {
@@ -89,10 +89,10 @@ func TestAtomicTxImports(t *testing.T) {
 	assert.NoError(err)
 	err = b.Accept()
 	assert.NoError(err)
-	_, status, err := vm.internalState.GetTx(tx.ID())
+	_, txStatus, err := vm.internalState.GetTx(tx.ID())
 	assert.NoError(err)
 	// Ensure transaction is in the committed state
-	assert.Equal(status, Committed)
+	assert.Equal(txStatus, status.Committed)
 	// Ensure standard block contains one atomic transaction
 	assert.Equal(b.(*StandardBlock).inputs.Len(), 1)
 }

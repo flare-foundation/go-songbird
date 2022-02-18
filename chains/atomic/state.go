@@ -7,13 +7,13 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/linkeddb"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/linkeddb"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 var errDuplicatedOperation = errors.New("duplicated operation on provided value")
@@ -105,7 +105,7 @@ func (s *state) RemoveValue(key []byte) error {
 			return err
 		}
 
-		// The value doesn't exist, so we should optimistically deleted it
+		// The value doesn't exist, so we should optimistically delete it
 		dbElem := dbElement{Present: false}
 		valueBytes, err := s.c.Marshal(codecVersion, &dbElem)
 		if err != nil {

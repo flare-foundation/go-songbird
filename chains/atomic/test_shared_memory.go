@@ -7,11 +7,10 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/units"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 // SharedMemoryTests is a list of all shared memory tests

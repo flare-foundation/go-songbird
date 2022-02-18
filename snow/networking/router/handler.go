@@ -8,16 +8,16 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/message"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/snow/networking/tracker"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/avalanchego/utils/uptime"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/networking/tracker"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/utils/uptime"
 )
 
 var errDuplicatedContainerID = errors.New("inbound message contains duplicated container ID")

@@ -3,9 +3,13 @@
 
 package router
 
+<<<<<<< HEAD
 import (
 	"time"
 )
+=======
+import "time"
+>>>>>>> upstream-v1.7.5
 
 // HealthConfig describes parameters for router health checks.
 type HealthConfig struct {

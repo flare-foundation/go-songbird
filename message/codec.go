@@ -12,12 +12,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/compression"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/metric"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/compression"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/metric"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 var (
@@ -156,7 +156,7 @@ func (c *codec) Pack(
 	startTime := time.Now()
 	compressedPayloadBytes, err := c.compressor.Compress(payloadBytes)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't compress payload of %s message: %s", op, err)
+		return nil, fmt.Errorf("couldn't compress payload of %s message: %w", op, err)
 	}
 	c.compressTimeMetrics[op].Observe(float64(time.Since(startTime)))
 	msg.bytesSavedCompression = len(payloadBytes) - len(compressedPayloadBytes) // may be negative
@@ -198,7 +198,7 @@ func (c *codec) Parse(bytes []byte, nodeID ids.ShortID, onFinishedHandling func(
 		startTime := time.Now()
 		payloadBytes, err := c.compressor.Decompress(compressedPayloadBytes)
 		if err != nil {
-			return nil, fmt.Errorf("couldn't decompress payload of %s message: %s", op, err)
+			return nil, fmt.Errorf("couldn't decompress payload of %s message: %w", op, err)
 		}
 		c.decompressTimeMetrics[op].Observe(float64(time.Since(startTime)))
 		// Replace the compressed payload with the decompressed payload.

@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 var _ snow.EventDispatcher = &EventDispatcher{}
@@ -46,7 +46,11 @@ func (ed *EventDispatcher) Accept(ctx *snow.ConsensusContext, containerID ids.ID
 	defer ed.lock.Unlock()
 
 	for id, handler := range ed.handlers {
+<<<<<<< HEAD
 		handler, ok := handler.(Acceptor)
+=======
+		handler, ok := handler.(snow.Acceptor)
+>>>>>>> upstream-v1.7.5
 		if !ok {
 			continue
 		}
@@ -61,7 +65,11 @@ func (ed *EventDispatcher) Accept(ctx *snow.ConsensusContext, containerID ids.ID
 		return nil
 	}
 	for id, handler := range events {
+<<<<<<< HEAD
 		handlerFunc, ok := handler.handlerFunc.(Acceptor)
+=======
+		handlerFunc, ok := handler.handlerFunc.(snow.Acceptor)
+>>>>>>> upstream-v1.7.5
 		if !ok {
 			continue
 		}
@@ -82,7 +90,11 @@ func (ed *EventDispatcher) Reject(ctx *snow.ConsensusContext, containerID ids.ID
 	defer ed.lock.Unlock()
 
 	for id, handler := range ed.handlers {
+<<<<<<< HEAD
 		handler, ok := handler.(Rejector)
+=======
+		handler, ok := handler.(snow.Rejector)
+>>>>>>> upstream-v1.7.5
 		if !ok {
 			continue
 		}
@@ -97,7 +109,11 @@ func (ed *EventDispatcher) Reject(ctx *snow.ConsensusContext, containerID ids.ID
 		return nil
 	}
 	for id, handler := range events {
+<<<<<<< HEAD
 		handler, ok := handler.handlerFunc.(Rejector)
+=======
+		handler, ok := handler.handlerFunc.(snow.Rejector)
+>>>>>>> upstream-v1.7.5
 		if !ok {
 			continue
 		}
@@ -115,7 +131,11 @@ func (ed *EventDispatcher) Issue(ctx *snow.ConsensusContext, containerID ids.ID,
 	defer ed.lock.Unlock()
 
 	for id, handler := range ed.handlers {
+<<<<<<< HEAD
 		handler, ok := handler.(Issuer)
+=======
+		handler, ok := handler.(snow.Issuer)
+>>>>>>> upstream-v1.7.5
 		if !ok {
 			continue
 		}
@@ -130,7 +150,11 @@ func (ed *EventDispatcher) Issue(ctx *snow.ConsensusContext, containerID ids.ID,
 		return nil
 	}
 	for id, handler := range events {
+<<<<<<< HEAD
 		handler, ok := handler.handlerFunc.(Issuer)
+=======
+		handler, ok := handler.handlerFunc.(snow.Issuer)
+>>>>>>> upstream-v1.7.5
 		if !ok {
 			continue
 		}

@@ -6,26 +6,35 @@ package avalanche
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/database/memdb"
-	"github.com/ava-labs/avalanchego/snow/consensus/avalanche"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowball"
-	"github.com/ava-labs/avalanchego/snow/engine/avalanche/bootstrap"
-	"github.com/ava-labs/avalanchego/snow/engine/avalanche/vertex"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/snow/engine/common/queue"
+	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/flare-foundation/flare/snow/consensus/avalanche"
+	"github.com/flare-foundation/flare/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/snow/engine/avalanche/bootstrap"
+	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/engine/common/queue"
 )
 
-func DefaultConfig() Config {
+func DefaultConfig() (common.Config, bootstrap.Config, Config) {
 	vtxBlocked, _ := queue.NewWithMissing(memdb.New(), "", prometheus.NewRegistry())
 	txBlocked, _ := queue.New(memdb.New(), "", prometheus.NewRegistry())
-	return Config{
-		Config: bootstrap.Config{
-			Config:     common.DefaultConfigTest(),
-			VtxBlocked: vtxBlocked,
-			TxBlocked:  txBlocked,
-			Manager:    &vertex.TestManager{},
-			VM:         &vertex.TestVM{},
-		},
+
+	commonCfg := common.DefaultConfigTest()
+
+	bootstrapConfig := bootstrap.Config{
+		Config:     commonCfg,
+		VtxBlocked: vtxBlocked,
+		TxBlocked:  txBlocked,
+		Manager:    &vertex.TestManager{},
+		VM:         &vertex.TestVM{},
+	}
+
+	engineConfig := Config{
+		Ctx:        bootstrapConfig.Ctx,
+		VM:         bootstrapConfig.VM,
+		Manager:    bootstrapConfig.Manager,
+		Sender:     bootstrapConfig.Sender,
+		Validators: bootstrapConfig.Validators,
 		Params: avalanche.Parameters{
 			Parameters: snowball.Parameters{
 				K:                     1,
@@ -42,4 +51,6 @@ func DefaultConfig() Config {
 		},
 		Consensus: &avalanche.Topological{},
 	}
+
+	return commonCfg, bootstrapConfig, engineConfig
 }

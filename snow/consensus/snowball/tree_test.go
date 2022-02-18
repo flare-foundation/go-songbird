@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/sampler"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 const (

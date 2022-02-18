@@ -6,7 +6,7 @@ package snowball
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/ids"
 )
 
 // Byzantine is a naive implementation of a multi-choice snowball instance

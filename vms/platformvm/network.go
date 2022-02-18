@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/vms/platformvm/message"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/vms/platformvm/message"
 )
 
 const (
@@ -102,6 +102,12 @@ func (n *network) AppGossip(nodeID ids.ShortID, msgBytes []byte) error {
 	tx.Initialize(unsignedBytes, msg.Tx)
 
 	txID := tx.ID()
+
+	// We need to grab the context lock here to avoid racy behavior with
+	// transaction verification + mempool modifications.
+	n.vm.ctx.Lock.Lock()
+	defer n.vm.ctx.Lock.Unlock()
+
 	if n.mempool.WasDropped(txID) {
 		// If the tx is being dropped - just ignore it
 		return nil

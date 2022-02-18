@@ -6,8 +6,8 @@ package galiasreader
 import (
 	"context"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/ids/galiasreader/galiasreaderproto"
+	"github.com/flare-foundation/flare/api/proto/galiasreaderproto"
+	"github.com/flare-foundation/flare/ids"
 )
 
 var _ ids.AliaserReader = &Client{}

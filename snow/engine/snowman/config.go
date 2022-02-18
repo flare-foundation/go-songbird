@@ -4,15 +4,22 @@
 package snowman
 
 import (
-	"github.com/ava-labs/avalanchego/snow/consensus/snowball"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
-	"github.com/ava-labs/avalanchego/snow/engine/snowman/bootstrap"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/validators"
 )
 
 // Config wraps all the parameters needed for a snowman engine
 type Config struct {
-	bootstrap.Config
+	common.AllGetsServer
 
-	Params    snowball.Parameters
-	Consensus snowman.Consensus
+	Ctx        *snow.ConsensusContext
+	VM         block.ChainVM
+	Sender     common.Sender
+	Validators validators.Set
+	Params     snowball.Parameters
+	Consensus  snowman.Consensus
 }

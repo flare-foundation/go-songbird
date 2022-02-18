@@ -4,8 +4,8 @@
 package platformvm
 
 import (
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/vms/components/verify"
 )
 
 // Fx is the interface a feature extension must implement to support the

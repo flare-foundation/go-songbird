@@ -4,13 +4,14 @@
 package avalanche
 
 import (
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowstorm"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/consensus/snowstorm"
 )
 
 // Vertex is a collection of multiple transactions tied to other vertices
 type Vertex interface {
 	choices.Decidable
+	snowstorm.Whitelister
 
 	// Returns the vertices this vertex depends on
 	Parents() ([]Vertex, error)

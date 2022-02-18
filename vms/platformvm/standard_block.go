@@ -7,9 +7,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ava-labs/avalanchego/chains/atomic"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/flare-foundation/flare/chains/atomic"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/vms/platformvm/status"
 )
 
 var (
@@ -117,7 +118,7 @@ func (sb *StandardBlock) Verify() error {
 			return err
 		}
 
-		sb.onAcceptState.AddTx(tx, Committed)
+		sb.onAcceptState.AddTx(tx, status.Committed)
 		if onAccept != nil {
 			funcs = append(funcs, onAccept)
 		}

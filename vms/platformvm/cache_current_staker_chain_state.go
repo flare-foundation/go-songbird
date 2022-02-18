@@ -10,11 +10,12 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/constants"
+	
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 var (
@@ -46,6 +47,10 @@ type currentStakerChainState interface {
 
 	Apply(InternalState)
 
+<<<<<<< HEAD
+=======
+	// Return the current validator set of [subnetID].
+>>>>>>> upstream-v1.7.5
 	ValidatorSet(subnetID ids.ID) (validators.Set, error)
 }
 

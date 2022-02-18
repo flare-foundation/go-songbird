@@ -8,15 +8,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/crypto"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/components/verify"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/components/verify"
+	"github.com/flare-foundation/flare/vms/platformvm/reward"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 var (
@@ -27,7 +29,7 @@ var (
 	errStakeTooLong              = errors.New("staking period is too long")
 	errInsufficientDelegationFee = errors.New("staker charges an insufficient delegation fee")
 	errFutureStakeTime           = fmt.Errorf("staker is attempting to start staking more than %s ahead of the current chain time", maxFutureStartTime)
-	errTooManyShares             = fmt.Errorf("a staker can only require at most %d shares from delegators", PercentDenominator)
+	errTooManyShares             = fmt.Errorf("a staker can only require at most %d shares from delegators", reward.PercentDenominator)
 
 	_ UnsignedProposalTx = &UnsignedAddValidatorTx{}
 	_ TimedTx            = &UnsignedAddValidatorTx{}
@@ -82,7 +84,7 @@ func (tx *UnsignedAddValidatorTx) SyntacticVerify(ctx *snow.Context) error {
 		return errNilTx
 	case tx.syntacticallyVerified: // already passed syntactic verification
 		return nil
-	case tx.Shares > PercentDenominator: // Ensure delegators shares are in the allowed amount
+	case tx.Shares > reward.PercentDenominator: // Ensure delegators shares are in the allowed amount
 		return errTooManyShares
 	}
 

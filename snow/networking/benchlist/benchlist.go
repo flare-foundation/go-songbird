@@ -12,12 +12,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	safemath "github.com/ava-labs/avalanchego/utils/math"
-	"github.com/ava-labs/avalanchego/utils/timer"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 // If a peer consistently does not respond to queries, it will
@@ -192,7 +193,7 @@ func (b *benchlist) remove(validator *benchData) {
 	benchedStake, err := b.vdrs.SubsetWeight(b.benchlistSet)
 	if err != nil {
 		// This should never happen
-		b.log.Error("couldn't get benched stake: %w", err)
+		b.log.Error("couldn't get benched stake: %s", err)
 		return
 	}
 	b.metrics.weightBenched.Set(float64(benchedStake))
@@ -284,7 +285,7 @@ func (b *benchlist) bench(validatorID ids.ShortID) {
 	benchedStake, err := b.vdrs.SubsetWeight(b.benchlistSet)
 	if err != nil {
 		// This should never happen
-		b.log.Error("couldn't get benched stake: %w. Resetting benchlist", err)
+		b.log.Error("couldn't get benched stake: %s. Resetting benchlist", err)
 		return
 	}
 

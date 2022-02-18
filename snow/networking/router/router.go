@@ -8,12 +8,14 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/health"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/message"
-	"github.com/ava-labs/avalanchego/snow/networking/benchlist"
-	"github.com/ava-labs/avalanchego/snow/networking/timeout"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/api/health"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
+	"github.com/flare-foundation/flare/snow/networking/benchlist"
+	"github.com/flare-foundation/flare/snow/networking/handler"
+	"github.com/flare-foundation/flare/snow/networking/timeout"
+	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/flare-foundation/flare/version"
 )
 
 // Router routes consensus messages to the Handler of the consensus
@@ -27,7 +29,6 @@ type Router interface {
 		log logging.Logger,
 		msgCreator message.Creator,
 		timeouts *timeout.Manager,
-		gossipFrequency,
 		shutdownTimeout time.Duration,
 		criticalChains ids.Set,
 		onFatal func(exitCode int),
@@ -36,8 +37,8 @@ type Router interface {
 		metricsRegisterer prometheus.Registerer,
 	) error
 	Shutdown()
-	AddChain(chain *Handler)
-	health.Checkable
+	AddChain(chain handler.Handler)
+	health.Checker
 }
 
 // ExternalRouter routes messages from the network to the
@@ -57,6 +58,6 @@ type ExternalRouter interface {
 type InternalRouter interface {
 	benchlist.Benchable
 
-	Connected(nodeID ids.ShortID)
+	Connected(nodeID ids.ShortID, nodeVersion version.Application)
 	Disconnected(nodeID ids.ShortID)
 }

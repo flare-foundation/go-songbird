@@ -4,9 +4,8 @@
 package router
 
 import (
+	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 // routerMetrics about router messages

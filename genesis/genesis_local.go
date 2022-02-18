@@ -6,7 +6,7 @@ package genesis
 import (
 	"time"
 
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 var (
@@ -85,14 +85,19 @@ var (
 			CreateBlockchainTxFee: 100 * units.MilliAvax,
 		},
 		StakingConfig: StakingConfig{
-			UptimeRequirement:  .8, // 80%
-			MinValidatorStake:  2 * units.KiloAvax,
-			MaxValidatorStake:  3 * units.MegaAvax,
-			MinDelegatorStake:  25 * units.Avax,
-			MinDelegationFee:   20000, // 2%
-			MinStakeDuration:   24 * time.Hour,
-			MaxStakeDuration:   365 * 24 * time.Hour,
-			StakeMintingPeriod: 365 * 24 * time.Hour,
+			UptimeRequirement: .8, // 80%
+			MinValidatorStake: 2 * units.KiloAvax,
+			MaxValidatorStake: 3 * units.MegaAvax,
+			MinDelegatorStake: 25 * units.Avax,
+			MinDelegationFee:  20000, // 2%
+			MinStakeDuration:  24 * time.Hour,
+			MaxStakeDuration:  365 * 24 * time.Hour,
+			RewardConfig: reward.Config{
+				MaxConsumptionRate: .12 * reward.PercentDenominator,
+				MinConsumptionRate: .10 * reward.PercentDenominator,
+				MintingPeriod:      365 * 24 * time.Hour,
+				SupplyCap:          720 * units.MegaAvax,
+			},
 		},
 	}
 )

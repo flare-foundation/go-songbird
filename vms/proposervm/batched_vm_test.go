@@ -12,18 +12,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/database/manager"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow"
-	"github.com/ava-labs/avalanchego/snow/choices"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
-	"github.com/ava-labs/avalanchego/snow/engine/snowman/block"
-	"github.com/ava-labs/avalanchego/snow/validators"
-	"github.com/ava-labs/avalanchego/utils/hashing"
-	"github.com/ava-labs/avalanchego/utils/timer/mockable"
-	"github.com/ava-labs/avalanchego/version"
-	"github.com/ava-labs/avalanchego/vms/proposervm/proposer"
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/version"
+	"github.com/flare-foundation/flare/vms/proposervm/proposer"
 )
 
 func TestCoreVMNotRemote(t *testing.T) {
@@ -876,7 +876,7 @@ func initTestRemoteProposerVM(
 		}
 	}
 
-	proVM := New(coreVM, proBlkStartTime, 0)
+	proVM := New(coreVM, proBlkStartTime, 0, false)
 
 	valState := &validators.TestState{
 		T: t,
@@ -907,7 +907,7 @@ func initTestRemoteProposerVM(
 	// Initialize shouldn't be called again
 	coreVM.InitializeF = nil
 
-	if err := proVM.Bootstrapped(); err != nil {
+	if err := proVM.SetState(snow.NormalOp); err != nil {
 		t.Fatal(err)
 	}
 

@@ -15,9 +15,9 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 const (
@@ -53,6 +53,7 @@ var (
 // in binary-alphabetical order.
 type Database struct {
 	*leveldb.DB
+	closed utils.AtomicBool
 }
 
 type config struct {
@@ -110,7 +111,7 @@ func New(file string, configBytes []byte, log logging.Logger) (database.Database
 	}
 	if len(configBytes) > 0 {
 		if err := json.Unmarshal(configBytes, &parsedConfig); err != nil {
-			return nil, fmt.Errorf("failed to parse db config: %s", err)
+			return nil, fmt.Errorf("failed to parse db config: %w", err)
 		}
 	}
 	configJSON, err := json.Marshal(&parsedConfig)
@@ -171,19 +172,28 @@ func (db *Database) NewBatch() database.Batch { return &batch{db: db} }
 
 // NewIterator creates a lexicographically ordered iterator over the database
 func (db *Database) NewIterator() database.Iterator {
-	return &iter{db.DB.NewIterator(new(util.Range), nil)}
+	return &iter{
+		db:       db,
+		Iterator: db.DB.NewIterator(new(util.Range), nil),
+	}
 }
 
 // NewIteratorWithStart creates a lexicographically ordered iterator over the
 // database starting at the provided key
 func (db *Database) NewIteratorWithStart(start []byte) database.Iterator {
-	return &iter{db.DB.NewIterator(&util.Range{Start: start}, nil)}
+	return &iter{
+		db:       db,
+		Iterator: db.DB.NewIterator(&util.Range{Start: start}, nil),
+	}
 }
 
 // NewIteratorWithPrefix creates a lexicographically ordered iterator over the
 // database ignoring keys that do not start with the provided prefix
 func (db *Database) NewIteratorWithPrefix(prefix []byte) database.Iterator {
-	return &iter{db.DB.NewIterator(util.BytesPrefix(prefix), nil)}
+	return &iter{
+		db:       db,
+		Iterator: db.DB.NewIterator(util.BytesPrefix(prefix), nil),
+	}
 }
 
 // NewIteratorWithStartAndPrefix creates a lexicographically ordered iterator
@@ -194,7 +204,10 @@ func (db *Database) NewIteratorWithStartAndPrefix(start, prefix []byte) database
 	if bytes.Compare(start, prefix) == 1 {
 		iterRange.Start = start
 	}
-	return &iter{db.DB.NewIterator(iterRange, nil)}
+	return &iter{
+		db:       db,
+		Iterator: db.DB.NewIterator(iterRange, nil),
+	}
 }
 
 // Stat returns a particular internal stat of the database.
@@ -219,7 +232,10 @@ func (db *Database) Compact(start []byte, limit []byte) error {
 }
 
 // Close implements the Database interface
-func (db *Database) Close() error { return updateError(db.DB.Close()) }
+func (db *Database) Close() error {
+	db.closed.SetValue(true)
+	return updateError(db.DB.Close())
+}
 
 // batch is a wrapper around a levelDB batch to contain sizes.
 type batch struct {
@@ -257,8 +273,8 @@ func (b *batch) Reset() {
 }
 
 // Replay the batch contents.
-func (b *batch) Replay(w database.KeyValueWriter) error {
-	replay := &replayer{writer: w}
+func (b *batch) Replay(w database.KeyValueWriterDeleter) error {
+	replay := &replayer{writerDeleter: w}
 	if err := b.Batch.Replay(replay); err != nil {
 		// Never actually returns an error, because Replay just returns nil
 		return err
@@ -270,34 +286,65 @@ func (b *batch) Replay(w database.KeyValueWriter) error {
 func (b *batch) Inner() database.Batch { return b }
 
 type replayer struct {
-	writer database.KeyValueWriter
-	err    error
+	writerDeleter database.KeyValueWriterDeleter
+	err           error
 }
 
 func (r *replayer) Put(key, value []byte) {
 	if r.err != nil {
 		return
 	}
-	r.err = r.writer.Put(key, value)
+	r.err = r.writerDeleter.Put(key, value)
 }
 
 func (r *replayer) Delete(key []byte) {
 	if r.err != nil {
 		return
 	}
-	r.err = r.writer.Delete(key)
+	r.err = r.writerDeleter.Delete(key)
 }
 
-type iter struct{ iterator.Iterator }
+type iter struct {
+	db *Database
+	iterator.Iterator
+
+	key, val []byte
+	err      error
+}
+
+func (it *iter) Next() bool {
+	// Short-circuit and set an error if the underlying database has been closed.
+	if it.db.closed.GetValue() {
+		it.key = nil
+		it.val = nil
+		it.err = database.ErrClosed
+		return false
+	}
+
+	hasNext := it.Iterator.Next()
+	if hasNext {
+		it.key = utils.CopyBytes(it.Iterator.Key())
+		it.val = utils.CopyBytes(it.Iterator.Value())
+	} else {
+		it.key = nil
+		it.val = nil
+	}
+	return hasNext
+}
 
 // Error implements the Iterator interface
-func (it *iter) Error() error { return updateError(it.Iterator.Error()) }
+func (it *iter) Error() error {
+	if it.err != nil {
+		return it.err
+	}
+	return updateError(it.Iterator.Error())
+}
 
 // Key implements the Iterator interface
-func (it *iter) Key() []byte { return utils.CopyBytes(it.Iterator.Key()) }
+func (it *iter) Key() []byte { return it.key }
 
 // Value implements the Iterator interface
-func (it *iter) Value() []byte { return utils.CopyBytes(it.Iterator.Value()) }
+func (it *iter) Value() []byte { return it.val }
 
 func updateError(err error) error {
 	switch err {

@@ -3,9 +3,7 @@
 
 package utils
 
-import (
-	"crypto/x509"
-)
+import "crypto/x509"
 
 type IPCertDesc struct {
 	Cert      *x509.Certificate

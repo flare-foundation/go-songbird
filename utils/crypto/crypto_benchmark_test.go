@@ -6,8 +6,8 @@ package crypto
 import (
 	"testing"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 // NumVerifies is the number of verifications to run per operation

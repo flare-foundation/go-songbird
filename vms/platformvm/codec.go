@@ -6,11 +6,11 @@ package platformvm
 import (
 	"math"
 
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/codec/linearcodec"
-	"github.com/ava-labs/avalanchego/codec/reflectcodec"
-	"github.com/ava-labs/avalanchego/utils/wrappers"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/codec/linearcodec"
+	"github.com/flare-foundation/flare/codec/reflectcodec"
+	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 )
 
 const (
@@ -28,7 +28,7 @@ func init() {
 	c := linearcodec.NewDefault()
 	Codec = codec.NewDefaultManager()
 	gc := linearcodec.New(reflectcodec.DefaultTagName, math.MaxUint32)
-	GenesisCodec = codec.NewManager(math.MaxUint32)
+	GenesisCodec = codec.NewManager(math.MaxInt32)
 
 	errs := wrappers.Errs{}
 	for _, c := range []codec.Registry{c, gc} {

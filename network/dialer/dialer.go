@@ -9,9 +9,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/ava-labs/avalanchego/network/throttling"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/network/throttling"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 var _ Dialer = &dialer{}
@@ -68,7 +68,7 @@ func (d *dialer) Dial(ctx context.Context, ip utils.IPDesc) (net.Conn, error) {
 	dialer := net.Dialer{Timeout: d.connectionTimeout}
 	conn, err := dialer.DialContext(ctx, d.network, ip.String())
 	if err != nil {
-		return nil, fmt.Errorf("error while dialing %s: %s", ip, err)
+		return nil, fmt.Errorf("error while dialing %s: %w", ip, err)
 	}
 	return conn, nil
 }

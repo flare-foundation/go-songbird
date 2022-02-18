@@ -11,8 +11,8 @@ import (
 	health "github.com/AppsFlyer/go-sundheit"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 var _ Service = &service{}

@@ -6,8 +6,8 @@ package health
 import (
 	healthback "github.com/AppsFlyer/go-sundheit"
 
-	healthlib "github.com/ava-labs/avalanchego/health"
-	"github.com/ava-labs/avalanchego/snow/engine/common"
+	healthlib "github.com/flare-foundation/flare/health"
+	"github.com/flare-foundation/flare/snow/engine/common"
 )
 
 var _ Health = &noOp{}

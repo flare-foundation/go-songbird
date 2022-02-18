@@ -11,11 +11,12 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils"
-	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils"
+	"github.com/flare-foundation/flare/utils/units"
 )
 
 func TestCodecPackInvalidOp(t *testing.T) {
@@ -146,7 +147,7 @@ func TestCodecPackParseGzip(t *testing.T) {
 			},
 		},
 		{
-			op: MultiPut,
+			op: Ancestors,
 			fields: map[Field]interface{}{
 				ChainID:             id[:],
 				RequestID:           uint32(1337),

@@ -10,14 +10,14 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/formatting"
-	"github.com/ava-labs/avalanchego/utils/json"
-	"github.com/ava-labs/avalanchego/vms/components/avax"
-	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/flare-foundation/flare/utils/json"
+	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/secp256k1fx"
 
-	safemath "github.com/ava-labs/avalanchego/utils/math"
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 // Note that since an Avalanche network has exactly one Platform Chain,
@@ -141,7 +141,7 @@ type BuildGenesisReply struct {
 // GenesisUTXO adds messages to UTXOs
 type GenesisUTXO struct {
 	avax.UTXO `serialize:"true"`
-	Message   []byte `serialize:"true"`
+	Message   []byte `serialize:"true" json:"message"`
 }
 
 // Genesis represents a genesis state of the platform chain

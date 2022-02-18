@@ -15,12 +15,13 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ava-labs/avalanchego/chains"
-	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/consensus/avalanche"
-	"github.com/ava-labs/avalanchego/snow/consensus/snowball"
+	"github.com/flare-foundation/flare/chains"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/consensus/avalanche"
+	"github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
 func TestGetChainConfigsFromFiles(t *testing.T) {

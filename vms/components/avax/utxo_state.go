@@ -6,13 +6,13 @@ package avax
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ava-labs/avalanchego/cache"
-	"github.com/ava-labs/avalanchego/cache/metercacher"
-	"github.com/ava-labs/avalanchego/codec"
-	"github.com/ava-labs/avalanchego/database"
-	"github.com/ava-labs/avalanchego/database/linkeddb"
-	"github.com/ava-labs/avalanchego/database/prefixdb"
-	"github.com/ava-labs/avalanchego/ids"
+	"github.com/flare-foundation/flare/cache"
+	"github.com/flare-foundation/flare/cache/metercacher"
+	"github.com/flare-foundation/flare/codec"
+	"github.com/flare-foundation/flare/database"
+	"github.com/flare-foundation/flare/database/linkeddb"
+	"github.com/flare-foundation/flare/database/prefixdb"
+	"github.com/flare-foundation/flare/ids"
 )
 
 var (
@@ -28,20 +28,30 @@ const (
 // UTXOState is a thin wrapper around a database to provide, caching,
 // serialization, and de-serialization for UTXOs.
 type UTXOState interface {
+	UTXOReader
+	UTXOWriter
+}
+
+// UTXOReader is a thin wrapper around a database to provide fetching of UTXOs.
+type UTXOReader interface {
 	// GetUTXO attempts to load a utxo from storage.
 	GetUTXO(utxoID ids.ID) (*UTXO, error)
-
-	// PutUTXO saves the provided utxo to storage.
-	PutUTXO(utxoID ids.ID, utxo *UTXO) error
-
-	// DeleteUTXO deletes the provided utxo from storage.
-	DeleteUTXO(utxoID ids.ID) error
 
 	// UTXOIDs returns the slice of IDs associated with [addr], starting after
 	// [previous].
 	// If [previous] is not in the list, starts at beginning.
 	// Returns at most [limit] IDs.
 	UTXOIDs(addr []byte, previous ids.ID, limit int) ([]ids.ID, error)
+}
+
+// UTXOWriter is a thin wrapper around a database to provide storage and
+// deletion of UTXOs.
+type UTXOWriter interface {
+	// PutUTXO saves the provided utxo to storage.
+	PutUTXO(utxoID ids.ID, utxo *UTXO) error
+
+	// DeleteUTXO deletes the provided utxo from storage.
+	DeleteUTXO(utxoID ids.ID) error
 }
 
 type utxoState struct {

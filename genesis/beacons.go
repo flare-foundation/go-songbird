@@ -4,8 +4,8 @@
 package genesis
 
 import (
-	"github.com/ava-labs/avalanchego/utils/constants"
-	"github.com/ava-labs/avalanchego/utils/sampler"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/sampler"
 )
 
 // getIPs returns the beacon IPs for each network
@@ -16,10 +16,7 @@ func getIPs(networkID uint32) []string {
 	case constants.SongbirdID:
 		return []string{}
 	case constants.CostonID:
-		return []string{
-			"34.159.59.126:9651",
-			"34.159.241.96:9651",
-		}
+		return []string{}
 	}
 	return nil
 }
@@ -32,10 +29,7 @@ func getNodeIDs(networkID uint32) []string {
 	case constants.SongbirdID:
 		return []string{}
 	case constants.CostonID:
-		return []string{
-			"NodeID-577wsCQeeVmkEt1AcMd84oi8LrHpexNU2",
-			"NodeID-5ifRWcYdqF4mh5xjWv1MnRka4M6wjx3N1",
-		}
+		return []string{}
 	}
 	return nil
 }
