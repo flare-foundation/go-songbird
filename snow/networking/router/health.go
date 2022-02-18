@@ -3,9 +3,7 @@
 
 package router
 
-import (
-	"time"
-)
+import "time"
 
 // HealthConfig describes parameters for router health checks.
 type HealthConfig struct {

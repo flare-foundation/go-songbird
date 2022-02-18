@@ -1,33 +1,40 @@
-# Flare
+#Flare
 
 Node implementation for the [Flare](https://flare.network) network.
 
 ## Installation
 
 Flare uses a relatively lightweight consensus protocol, so the minimum computer requirements are modest.
-Note that as network usage increases, hardware requirements may increase beyond what is listed.
+Note that as network usage increases, hardware requirements may change.
+
+The minimum recommended hardware specification for nodes connected to Mainnet is:
 
 - CPU: Equivalent of 8 AWS vCPU
-- RAM: 16 GB
-- Storage: 200 GB
+- RAM: 16 GiB
+- Storage: 512 GiB
 - OS: Ubuntu 18.04/20.04 or macOS >= 10.15 (Catalina)
 - Network: Reliable IPv4 or IPv6 network connection, with an open public port.
-- Software Dependencies:
-  - [Go](https://golang.org/doc/install) version >= 1.16.8 and set up [`$GOPATH`](https://github.com/golang/go/wiki/SettingGOPATH).
-  - [gcc](https://gcc.gnu.org/)
-  - g++
+
+If you plan to build AvalancheGo from source, you will also need the following software:
+
+- [Go](https://golang.org/doc/install) version >= 1.16.8
+- [gcc](https://gcc.gnu.org/)
+- g++
 
 ### Native Install
 
 Clone the Flare repository:
 
 ```sh
-git clone https://github.com/flare-foundation/flare.git
+git clone git@github.com:flare-foundation/flare.git
+cd avalanchego
 ```
 
-#### Building the Flare Executable
+This will clone and checkout to `master` branch.
 
-Build Flare using the build script:
+#### Building the Avalanche Executable
+
+Build Avalanche using the build script:
 
 ```sh
 ./scripts/build.sh
@@ -102,13 +109,13 @@ To regenerate the protobuf go code, run `scripts/protobuf_codegen.sh` from the r
 
 This should only be necessary when upgrading protobuf versions or modifying .proto definition files.
 
-To use this script, you must have [protoc](https://grpc.io/docs/protoc-installation/) (v3.17.3), protoc-gen-go (v1.26.0) and protoc-gen-go-grpc (v1.1.0) installed. protoc must be on your $PATH.
+To use this script, you must have [buf](https://docs.buf.build/installation) (v1.0.0-rc12), protoc-gen-go (v1.27.1) and protoc-gen-go-grpc (v1.2.0) installed.
 
-To install the protoc dependencies:
+To install the buf dependencies:
 
 ```sh
-go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 ```
 
 If you have not already, you may need to add `$GOPATH/bin` to your `$PATH`:
@@ -117,16 +124,16 @@ If you have not already, you may need to add `$GOPATH/bin` to your `$PATH`:
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
 
-If you extract protoc to ~/software/protobuf/, the following should work:
+If you extract buf to ~/software/buf/bin, the following should work:
 
 ```sh
-export PATH=$PATH:~/software/protobuf/bin/:~/go/bin
+export PATH=$PATH:~/software/buf/bin/:~/go/bin
 go get google.golang.org/protobuf/cmd/protoc-gen-go
 go get google.golang.org/protobuf/cmd/protoc-gen-go-grpc
 scripts/protobuf_codegen.sh
 ```
 
-For more information, refer to the [GRPC Golang Quick Start Guide](https://grpc.io/docs/languages/go/quickstart/).
+For more information, refer to the [GRPC Golang Quick Start Guide](https://grpc.io/docs/languages/go/quickstart/).        |
 
 ## Security Bugs
 

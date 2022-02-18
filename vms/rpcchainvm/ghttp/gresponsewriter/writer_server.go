@@ -12,13 +12,14 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
+	"github.com/flare-foundation/flare/api/proto/gconnproto"
+	"github.com/flare-foundation/flare/api/proto/greaderproto"
+	"github.com/flare-foundation/flare/api/proto/gresponsewriterproto"
+	"github.com/flare-foundation/flare/api/proto/gwriterproto"
+	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gconn"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gconn/gconnproto"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greader"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greader/greaderproto"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gresponsewriter/gresponsewriterproto"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gwriter"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gwriter/gwriterproto"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
 )
 
@@ -99,18 +100,30 @@ func (s *Server) Hijack(ctx context.Context, req *gresponsewriterproto.HijackReq
 	closer := grpcutils.ServerCloser{}
 
 	go s.broker.AcceptAndServe(connID, func(opts []grpc.ServerOption) *grpc.Server {
+		opts = append(opts,
+			grpc.MaxRecvMsgSize(math.MaxInt),
+			grpc.MaxSendMsgSize(math.MaxInt),
+		)
 		server := grpc.NewServer(opts...)
 		closer.Add(server)
 		gconnproto.RegisterConnServer(server, gconn.NewServer(conn, &closer))
 		return server
 	})
 	go s.broker.AcceptAndServe(readerID, func(opts []grpc.ServerOption) *grpc.Server {
+		opts = append(opts,
+			grpc.MaxRecvMsgSize(math.MaxInt),
+			grpc.MaxSendMsgSize(math.MaxInt),
+		)
 		server := grpc.NewServer(opts...)
 		closer.Add(server)
 		greaderproto.RegisterReaderServer(server, greader.NewServer(readWriter))
 		return server
 	})
 	go s.broker.AcceptAndServe(writerID, func(opts []grpc.ServerOption) *grpc.Server {
+		opts = append(opts,
+			grpc.MaxRecvMsgSize(math.MaxInt),
+			grpc.MaxSendMsgSize(math.MaxInt),
+		)
 		server := grpc.NewServer(opts...)
 		closer.Add(server)
 		gwriterproto.RegisterWriterServer(server, gwriter.NewServer(readWriter))

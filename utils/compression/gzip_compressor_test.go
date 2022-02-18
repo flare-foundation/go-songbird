@@ -7,9 +7,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/utils/units"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGzipCompressDecompress(t *testing.T) {

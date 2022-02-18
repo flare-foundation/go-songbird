@@ -7,10 +7,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInterface(t *testing.T) {
@@ -53,12 +52,12 @@ func TestCorruption(t *testing.T) {
 	baseDB := memdb.New()
 	// wrap this db
 	corruptableDB := New(baseDB)
-	_ = corruptableDB.handleError(errors.New("corruption error"))
-	assert.True(t, corruptableDB.corrupted())
+	initError := errors.New("corruption error")
+	_ = corruptableDB.handleError(initError)
 	for name, testFn := range tests {
 		t.Run(name, func(tt *testing.T) {
 			err := testFn(corruptableDB)
-			assert.ErrorIsf(tt, err, database.ErrAvoidCorruption, "not received the corruption error")
+			assert.ErrorIsf(tt, err, initError, "not received the corruption error")
 		})
 	}
 }

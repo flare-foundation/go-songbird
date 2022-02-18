@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
+	"github.com/flare-foundation/flare/api/proto/gsharedmemoryproto"
 	"github.com/flare-foundation/flare/chains/atomic"
-	"github.com/flare-foundation/flare/chains/atomic/gsharedmemory/gsharedmemoryproto"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/memdb"
 	"github.com/flare-foundation/flare/database/prefixdb"

@@ -8,12 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func TestManagerFire(t *testing.T) {

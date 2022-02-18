@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
@@ -293,7 +294,7 @@ func TestBuildChits(t *testing.T) {
 	assert.Equal(t, containerIDs, parsedMsg.Get(ContainerIDs))
 }
 
-func TestBuildMultiPut(t *testing.T) {
+func TestBuildAncestors(t *testing.T) {
 	chainID := ids.Empty.Prefix(0)
 	requestID := uint32(5)
 	container := ids.Empty.Prefix(1)
@@ -302,15 +303,15 @@ func TestBuildMultiPut(t *testing.T) {
 
 	for _, compress := range []bool{false, true} {
 		builder := NewOutboundBuilder(TestCodec, compress)
-		msg, err := builder.MultiPut(chainID, requestID, containers)
+		msg, err := builder.Ancestors(chainID, requestID, containers)
 		assert.NoError(t, err)
 		assert.NotNil(t, msg)
-		assert.Equal(t, MultiPut, msg.Op())
+		assert.Equal(t, Ancestors, msg.Op())
 
 		parsedMsg, err := TestCodec.Parse(msg.Bytes(), dummyNodeID, dummyOnFinishedHandling)
 		assert.NoError(t, err)
 		assert.NotNil(t, parsedMsg)
-		assert.Equal(t, MultiPut, parsedMsg.Op())
+		assert.Equal(t, Ancestors, parsedMsg.Op())
 		assert.Equal(t, chainID[:], parsedMsg.Get(ChainID))
 		assert.Equal(t, requestID, parsedMsg.Get(RequestID))
 		assert.Equal(t, containers, parsedMsg.Get(MultiContainerBytes))

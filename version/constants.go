@@ -18,7 +18,7 @@ import (
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
-	Current                      = NewDefaultVersion(0, 5, 0)
+	Current                      = NewDefaultVersion(0, 5, 1)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
 	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
@@ -26,7 +26,7 @@ var (
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
 
 	// Legacy versioning constants.
-	Legacy                      = NewDefaultVersion(1, 7, 2)
+	Legacy                      = NewDefaultVersion(1, 7, 5)
 	LegacyApp                   = NewDefaultApplication(constants.LegacyPlatformName, Legacy.Major(), Legacy.Minor(), Legacy.Patch())
 	LegacyCompatibleVersion     = NewDefaultApplication(constants.LegacyPlatformName, 1, 7, 0)
 	PrevLegacyCompatibleVersion = NewDefaultApplication(constants.LegacyPlatformName, 1, 5, 0)

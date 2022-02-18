@@ -3,9 +3,7 @@
 
 package network
 
-import (
-	"crypto/tls"
-)
+import "crypto/tls"
 
 func TLSConfig(cert tls.Certificate) *tls.Config {
 	// #nosec G402

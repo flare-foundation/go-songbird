@@ -8,14 +8,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"golang.org/x/time/rate"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/metric"
 	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/time/rate"
 )
 
 var _ BandwidthThrottler = &bandwidthThrottler{}

@@ -88,5 +88,6 @@ func (v *application) Before(o Application) bool {
 	if v.App() != o.App() {
 		return false
 	}
+
 	return v.Compare(o) < 0
 }

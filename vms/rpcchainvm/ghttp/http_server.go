@@ -12,12 +12,12 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
+	"github.com/flare-foundation/flare/api/proto/ghttpproto"
+	"github.com/flare-foundation/flare/api/proto/greadcloserproto"
+	"github.com/flare-foundation/flare/api/proto/gresponsewriterproto"
 	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/ghttpproto"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greadcloser"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greadcloser/greadcloserproto"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gresponsewriter"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gresponsewriter/gresponsewriterproto"
 )
 
 var _ ghttpproto.HTTPServer = &Server{}
@@ -63,7 +63,7 @@ func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*ghtt
 	request, err := http.NewRequestWithContext(
 		ctx,
 		req.Request.Method,
-		req.Request.RequestURI,
+		req.Request.RequestUri,
 		reader,
 	)
 	if err != nil {
@@ -110,7 +110,7 @@ func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*ghtt
 	}
 	request.Trailer = make(http.Header)
 	request.RemoteAddr = req.Request.RemoteAddr
-	request.RequestURI = req.Request.RequestURI
+	request.RequestURI = req.Request.RequestUri
 
 	if req.Request.Tls != nil {
 		request.TLS = &tls.ConnectionState{

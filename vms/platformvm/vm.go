@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/rpc/v2"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/cache"
@@ -30,39 +31,23 @@ import (
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
-	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
-	"github.com/flare-foundation/flare/utils/units"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/flare-foundation/flare/vms/platformvm/reward"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 const (
-	// PercentDenominator is the denominator used to calculate percentages
-	PercentDenominator = 1000000
-
 	droppedTxCacheSize     = 64
 	validatorSetsCacheSize = 64
-
-	maxUTXOsToFetch = 1024
-
-	// TODO: Turn these constants into governable parameters
-
-	// MaxSubMinConsumptionRate is the % consumption that incentivizes staking
-	// longer
-	MaxSubMinConsumptionRate = 20000 // 2%
-	// MinConsumptionRate is the minimum % consumption of the remaining tokens
-	// to be minted
-	MinConsumptionRate = 100000 // 10%
 
 	// MaxValidatorWeightFactor is the maximum factor of the validator stake
 	// that is allowed to be placed on a validator.
 	MaxValidatorWeightFactor uint64 = 5
-
-	// SupplyCap is the maximum amount of AVAX that should ever exist
-	SupplyCap = 720 * units.MegaAvax
 
 	// Maximum future start time for staking/delegating
 	maxFutureStartTime = 24 * 7 * 2 * time.Hour
@@ -98,6 +83,8 @@ type VM struct {
 	blockBuilder blockBuilder
 
 	uptimeManager uptime.Manager
+
+	rewards reward.Calculator
 
 	// The context of this vm
 	ctx       *snow.Context
@@ -190,6 +177,7 @@ func (vm *VM) Initialize(
 		)
 	}
 	vm.network = newNetwork(vm.ApricotPhase4Time, appSender, vm)
+	vm.rewards = reward.NewCalculator(vm.RewardConfig)
 
 	is, err := NewMeteredInternalState(vm, vm.dbManager.Current().Database, genesisBytes, registerer)
 	if err != nil {
@@ -291,14 +279,14 @@ func (vm *VM) createChain(tx *Tx) error {
 	return nil
 }
 
-// Bootstrapping marks this VM as bootstrapping
-func (vm *VM) Bootstrapping() error {
+// onBootstrapStarted marks this VM as bootstrapping
+func (vm *VM) onBootstrapStarted() error {
 	vm.bootstrapped.SetValue(false)
 	return vm.fx.Bootstrapping()
 }
 
-// Bootstrapped marks this VM as bootstrapped
-func (vm *VM) Bootstrapped() error {
+// onNormalOperationsStarted marks this VM as bootstrapped
+func (vm *VM) onNormalOperationsStarted() error {
 	if vm.bootstrapped.GetValue() {
 		return nil
 	}
@@ -307,8 +295,18 @@ func (vm *VM) Bootstrapped() error {
 	if err := vm.fx.Bootstrapped(); err != nil {
 		return err
 	}
-
 	return vm.internalState.Commit()
+}
+
+func (vm *VM) SetState(state snow.State) error {
+	switch state {
+	case snow.Bootstrapping:
+		return vm.onBootstrapStarted()
+	case snow.NormalOp:
+		return vm.onNormalOperationsStarted()
+	default:
+		return snow.ErrUnknownState
+	}
 }
 
 // Shutdown this blockchain
@@ -454,7 +452,7 @@ func (vm *VM) CreateStaticHandlers() (map[string]*common.HTTPHandler, error) {
 }
 
 // Connected implements validators.Connector
-func (vm *VM) Connected(vdrID ids.ShortID) error {
+func (vm *VM) Connected(vdrID ids.ShortID, nodeVersion version.Application) error {
 	return vm.uptimeManager.Connect(vdrID)
 }
 

@@ -6,9 +6,9 @@ package appsender
 import (
 	"context"
 
+	"github.com/flare-foundation/flare/api/proto/appsenderproto"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/engine/common/appsender/appsenderproto"
 )
 
 var _ common.AppSender = &Client{}
@@ -33,8 +33,8 @@ func (c *Client) SendAppRequest(nodeIDs ids.ShortSet, requestID uint32, request 
 	_, err := c.client.SendAppRequest(
 		context.Background(),
 		&appsenderproto.SendAppRequestMsg{
-			NodeIDs:   nodeIDsBytes,
-			RequestID: requestID,
+			NodeIds:   nodeIDsBytes,
+			RequestId: requestID,
 			Request:   request,
 		},
 	)
@@ -45,8 +45,8 @@ func (c *Client) SendAppResponse(nodeID ids.ShortID, requestID uint32, response 
 	_, err := c.client.SendAppResponse(
 		context.Background(),
 		&appsenderproto.SendAppResponseMsg{
-			NodeID:    nodeID[:],
-			RequestID: requestID,
+			NodeId:    nodeID[:],
+			RequestId: requestID,
 			Response:  response,
 		},
 	)
@@ -74,7 +74,7 @@ func (c *Client) SendAppGossipSpecific(nodeIDs ids.ShortSet, msg []byte) error {
 	_, err := c.client.SendAppGossipSpecific(
 		context.Background(),
 		&appsenderproto.SendAppGossipSpecificMsg{
-			NodeIDs: nodeIDsBytes,
+			NodeIds: nodeIDsBytes,
 			Msg:     msg,
 		},
 	)

@@ -18,7 +18,6 @@ import (
 	"github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/vms/avm"
-	"github.com/flare-foundation/flare/vms/evm"
 	"github.com/flare-foundation/flare/vms/nftfx"
 	"github.com/flare-foundation/flare/vms/platformvm"
 	"github.com/flare-foundation/flare/vms/propertyfx"
@@ -208,7 +207,7 @@ func FromConfig(config *Config) ([]byte, ids.ID, error) {
 		{
 			GenesisData: avmReply.Bytes,
 			SubnetID:    constants.PrimaryNetworkID,
-			VMID:        avm.ID,
+			VMID:        constants.AVMID,
 			FxIDs: []ids.ID{
 				secp256k1fx.ID,
 				nftfx.ID,
@@ -219,7 +218,7 @@ func FromConfig(config *Config) ([]byte, ids.ID, error) {
 		{
 			GenesisData: genesisStr,
 			SubnetID:    constants.PrimaryNetworkID,
-			VMID:        evm.ID,
+			VMID:        constants.EVMID,
 			Name:        "C-Chain",
 		},
 	}
@@ -257,7 +256,7 @@ func VMGenesis(genesisBytes []byte, vmID ids.ID) (*platformvm.Tx, error) {
 
 func AVAXAssetID(avmGenesisBytes []byte) (ids.ID, error) {
 	c := linearcodec.New(reflectcodec.DefaultTagName, 1<<20)
-	m := codec.NewManager(math.MaxUint32)
+	m := codec.NewManager(math.MaxInt32)
 	errs := wrappers.Errs{}
 	errs.Add(
 		c.RegisterType(&avm.BaseTx{}),

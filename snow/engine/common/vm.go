@@ -4,8 +4,8 @@
 package common
 
 import (
+	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/database/manager"
-	"github.com/flare-foundation/flare/health"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/validators"
 )
@@ -16,7 +16,7 @@ type VM interface {
 
 	// Returns nil if the VM is healthy.
 	// Periodically called and reported via the node's Health API.
-	health.Checkable
+	health.Checker
 
 	// Connector represents a handler that is called on connection connect/disconnect
 	validators.Connector
@@ -50,11 +50,8 @@ type VM interface {
 		appSender AppSender,
 	) error
 
-	// Bootstrapping is called when the node is starting to bootstrap this chain.
-	Bootstrapping() error
-
-	// Bootstrapped is called when the node is done bootstrapping this chain.
-	Bootstrapped() error
+	// SetState communicates to VM its next state it starts
+	SetState(state snow.State) error
 
 	// Shutdown is called when the node is shutting down.
 	Shutdown() error

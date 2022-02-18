@@ -10,8 +10,8 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
+	"github.com/flare-foundation/flare/api/proto/pluginproto"
 	"github.com/flare-foundation/flare/app"
-	"github.com/flare-foundation/flare/app/plugin/pluginproto"
 )
 
 const (

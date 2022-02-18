@@ -6,8 +6,8 @@ package messenger
 import (
 	"context"
 
+	"github.com/flare-foundation/flare/api/proto/messengerproto"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/messenger/messengerproto"
 )
 
 // Client is an implementation of a messenger channel that talks over RPC.

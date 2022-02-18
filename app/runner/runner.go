@@ -11,9 +11,10 @@ import (
 	"github.com/hashicorp/go-plugin"
 
 	"github.com/flare-foundation/flare/app"
-	appplugin "github.com/flare-foundation/flare/app/plugin"
 	"github.com/flare-foundation/flare/app/process"
 	"github.com/flare-foundation/flare/node"
+
+	appplugin "github.com/flare-foundation/flare/app/plugin"
 )
 
 // Run an AvalancheGo node.

@@ -6,9 +6,9 @@ package gsubnetlookup
 import (
 	"context"
 
+	"github.com/flare-foundation/flare/api/proto/gsubnetlookupproto"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/gsubnetlookup/gsubnetlookupproto"
 )
 
 var _ snow.SubnetLookup = &Client{}
@@ -25,7 +25,7 @@ func NewClient(client gsubnetlookupproto.SubnetLookupClient) *Client {
 
 func (c *Client) SubnetID(chainID ids.ID) (ids.ID, error) {
 	resp, err := c.client.SubnetID(context.Background(), &gsubnetlookupproto.SubnetIDRequest{
-		ChainID: chainID[:],
+		ChainId: chainID[:],
 	})
 	if err != nil {
 		return ids.ID{}, err

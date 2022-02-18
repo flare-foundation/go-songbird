@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/logging"
@@ -227,9 +228,11 @@ func TestSetString(t *testing.T) {
 	vdrs := ids.ShortBag{}
 	vdrs.Add(vdr1)
 
-	expected := "current polls: (Size = 1)\n" +
-		"    0: waiting on Bag: (Size = 1)\n" +
-		"        ID[6HgC8KRBEhXYbF4riJyJFLSHt37UNuRt]: Count = 1"
+	expected := `current polls: (Size = 1)
+    RequestID 0:
+        waiting on Bag: (Size = 1)
+            ID[6HgC8KRBEhXYbF4riJyJFLSHt37UNuRt]: Count = 1
+        received UniqueBag: (Size = 0)`
 	if !s.Add(0, vdrs) {
 		t.Fatalf("Should have been able to add a new poll")
 	} else if str := s.String(); expected != str {

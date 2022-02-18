@@ -17,9 +17,10 @@ import (
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/database/prefixdb"
 	"github.com/flare-foundation/flare/ids"
-	jsoncodec "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/password"
+
+	jsoncodec "github.com/flare-foundation/flare/utils/json"
 )
 
 const (

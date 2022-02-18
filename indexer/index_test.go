@@ -6,8 +6,6 @@ package indexer
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/codec/linearcodec"
 	"github.com/flare-foundation/flare/database/memdb"
@@ -17,6 +15,7 @@ import (
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIndex(t *testing.T) {

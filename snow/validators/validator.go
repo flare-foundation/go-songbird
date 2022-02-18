@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/flare-foundation/flare/ids"
+
 	safemath "github.com/flare-foundation/flare/utils/math"
 )
 

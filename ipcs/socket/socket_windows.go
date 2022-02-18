@@ -10,7 +10,6 @@ import (
 	"net"
 
 	"github.com/Microsoft/go-winio"
-
 	"github.com/flare-foundation/flare/utils/constants"
 )
 

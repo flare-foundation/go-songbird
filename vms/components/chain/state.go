@@ -6,14 +6,13 @@ package chain
 import (
 	"fmt"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/cache/metercacher"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // State implements an efficient caching layer used to wrap a VM

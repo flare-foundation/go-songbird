@@ -15,13 +15,14 @@ import (
 	"github.com/flare-foundation/flare/codec/reflectcodec"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/formatting"
-	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/components/verify"
 	"github.com/flare-foundation/flare/vms/nftfx"
 	"github.com/flare-foundation/flare/vms/propertyfx"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
+
+	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 var (
@@ -183,7 +184,7 @@ func (ss *StaticService) BuildGenesis(_ *http.Request, args *BuildGenesisArgs, r
 
 	reply.Bytes, err = formatting.EncodeWithChecksum(args.Encoding, b)
 	if err != nil {
-		return fmt.Errorf("couldn't encode genesis as string: %s", err)
+		return fmt.Errorf("couldn't encode genesis as string: %w", err)
 	}
 	reply.Encoding = args.Encoding
 	return nil
@@ -191,7 +192,7 @@ func (ss *StaticService) BuildGenesis(_ *http.Request, args *BuildGenesisArgs, r
 
 func staticCodec() (codec.Manager, error) {
 	c := linearcodec.New(reflectcodec.DefaultTagName, 1<<20)
-	manager := codec.NewManager(math.MaxUint32)
+	manager := codec.NewManager(math.MaxInt32)
 
 	errs := wrappers.Errs{}
 	errs.Add(

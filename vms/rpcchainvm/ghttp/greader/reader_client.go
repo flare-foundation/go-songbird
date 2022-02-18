@@ -8,7 +8,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greader/greaderproto"
+	"github.com/flare-foundation/flare/api/proto/greaderproto"
 )
 
 var _ io.Reader = &Client{}

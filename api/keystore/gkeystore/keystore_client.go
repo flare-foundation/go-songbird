@@ -9,11 +9,11 @@ import (
 	"github.com/hashicorp/go-plugin"
 
 	"github.com/flare-foundation/flare/api/keystore"
-	"github.com/flare-foundation/flare/api/keystore/gkeystore/gkeystoreproto"
+	"github.com/flare-foundation/flare/api/proto/gkeystoreproto"
+	"github.com/flare-foundation/flare/api/proto/rpcdbproto"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/encdb"
 	"github.com/flare-foundation/flare/database/rpcdb"
-	"github.com/flare-foundation/flare/database/rpcdb/rpcdbproto"
 )
 
 var _ keystore.BlockchainKeystore = &Client{}

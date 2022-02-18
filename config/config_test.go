@@ -15,6 +15,7 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/chains"

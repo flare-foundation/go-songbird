@@ -7,14 +7,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/linkedhashmap"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/metric"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type opStart struct {

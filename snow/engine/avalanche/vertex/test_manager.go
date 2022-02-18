@@ -3,9 +3,7 @@
 
 package vertex
 
-import (
-	"testing"
-)
+import "testing"
 
 var _ Manager = &TestManager{}
 

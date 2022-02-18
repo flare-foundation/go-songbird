@@ -12,10 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/stretchr/testify/assert"
 )
 
 // Test that canceling a context passed into Dial results

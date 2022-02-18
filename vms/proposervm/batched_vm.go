@@ -12,8 +12,11 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/utils/wrappers"
+
 	statelessblock "github.com/flare-foundation/flare/vms/proposervm/block"
 )
+
+var _ block.BatchedChainVM = &VM{}
 
 func (vm *VM) GetAncestors(
 	blkID ids.ID,
