@@ -4,7 +4,7 @@
 package indexer
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Container is something that gets accepted

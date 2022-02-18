@@ -4,7 +4,7 @@
 package common
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Bootstrapable defines the functionality required to support bootstrapping

@@ -6,7 +6,7 @@ package genesis
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/utils/units"
+	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 var (

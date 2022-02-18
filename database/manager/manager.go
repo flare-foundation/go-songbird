@@ -12,17 +12,17 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/corruptabledb"
-	"github.com/flare-foundation/flare/database/leveldb"
-	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/flare-foundation/flare/database/meterdb"
-	"github.com/flare-foundation/flare/database/prefixdb"
-	"github.com/flare-foundation/flare/database/rocksdb"
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/flare-foundation/flare/version"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/corruptabledb"
+	"github.com/ava-labs/avalanchego/database/leveldb"
+	"github.com/ava-labs/avalanchego/database/memdb"
+	"github.com/ava-labs/avalanchego/database/meterdb"
+	"github.com/ava-labs/avalanchego/database/prefixdb"
+	"github.com/ava-labs/avalanchego/database/rocksdb"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/ava-labs/avalanchego/version"
 )
 
 var (

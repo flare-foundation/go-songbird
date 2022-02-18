@@ -11,7 +11,7 @@ import (
 	"io/ioutil"
 	"sync"
 
-	"github.com/flare-foundation/flare/utils"
+	"github.com/ava-labs/avalanchego/utils"
 )
 
 // gzipCompressor implements Compressor

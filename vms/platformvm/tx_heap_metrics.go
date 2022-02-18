@@ -6,7 +6,7 @@ package platformvm
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 var _ TxHeap = &txHeapWithMetrics{}

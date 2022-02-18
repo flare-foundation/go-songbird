@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/vms/types"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/vms/types"
 )
 
 // MaxMemoSize is the maximum number of bytes in the memo field

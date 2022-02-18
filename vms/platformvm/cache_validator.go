@@ -4,7 +4,7 @@
 package platformvm
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 var _ validator = &validatorImpl{}

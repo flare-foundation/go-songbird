@@ -4,7 +4,7 @@
 package atomic
 
 import (
-	"github.com/flare-foundation/flare/database"
+	"github.com/ava-labs/avalanchego/database"
 )
 
 // WriteAll assumes all batches have the same underlying database. Batches

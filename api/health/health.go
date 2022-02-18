@@ -13,10 +13,10 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	healthlib "github.com/flare-foundation/flare/health"
-	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/utils/json"
-	"github.com/flare-foundation/flare/utils/logging"
+	healthlib "github.com/ava-labs/avalanchego/health"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/ava-labs/avalanchego/utils/json"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 var _ Health = &health{}

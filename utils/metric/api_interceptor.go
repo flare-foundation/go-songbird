@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/rpc/v2"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 type APIInterceptor interface {

@@ -6,7 +6,7 @@ package platformvm
 import (
 	"fmt"
 
-	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/constants"
 )
 
 // HealthCheck implements the common.VM interface

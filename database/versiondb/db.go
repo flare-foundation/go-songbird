@@ -8,10 +8,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/flare-foundation/flare/database/nodb"
-	"github.com/flare-foundation/flare/utils"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/memdb"
+	"github.com/ava-labs/avalanchego/database/nodb"
+	"github.com/ava-labs/avalanchego/utils"
 )
 
 const (

@@ -6,7 +6,7 @@ package propertyfx
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/vms/components/verify"
+	"github.com/ava-labs/avalanchego/vms/components/verify"
 )
 
 func TestOwnedOutputState(t *testing.T) {

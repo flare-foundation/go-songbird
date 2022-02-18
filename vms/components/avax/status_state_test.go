@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/memdb"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
 )
 
 func TestStatusState(t *testing.T) {

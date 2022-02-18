@@ -8,14 +8,14 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/api/metrics"
-	"github.com/flare-foundation/flare/database/manager"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/consensus/snowman"
-	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/ava-labs/avalanchego/api/metrics"
+	"github.com/ava-labs/avalanchego/database/manager"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/ava-labs/avalanchego/snow/engine/snowman/block"
+	"github.com/ava-labs/avalanchego/utils/timer/mockable"
 )
 
 var (

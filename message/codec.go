@@ -12,12 +12,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/compression"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/metric"
-	"github.com/flare-foundation/flare/utils/timer/mockable"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/compression"
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/metric"
+	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 var (

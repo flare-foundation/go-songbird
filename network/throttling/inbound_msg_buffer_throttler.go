@@ -9,9 +9,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/metric"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/metric"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 // See inbound_msg_throttler.go

@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/api"
-	"github.com/flare-foundation/flare/utils/rpc"
+	"github.com/ava-labs/avalanchego/api"
+	"github.com/ava-labs/avalanchego/utils/rpc"
 )
 
 // SuccessResponseTest defines the expected result of an API call that returns SuccessResponse

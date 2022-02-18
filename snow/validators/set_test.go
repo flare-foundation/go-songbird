@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 func TestSetSet(t *testing.T) {

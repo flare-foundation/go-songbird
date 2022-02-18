@@ -8,7 +8,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/constants"
 )
 
 var _ Creator = &creator{}

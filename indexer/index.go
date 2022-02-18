@@ -9,16 +9,16 @@ import (
 	"io"
 	"sync"
 
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/prefixdb"
-	"github.com/flare-foundation/flare/database/versiondb"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/math"
-	"github.com/flare-foundation/flare/utils/timer/mockable"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/prefixdb"
+	"github.com/ava-labs/avalanchego/database/versiondb"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/math"
+	"github.com/ava-labs/avalanchego/utils/timer/mockable"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 const (

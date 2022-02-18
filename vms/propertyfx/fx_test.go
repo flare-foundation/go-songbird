@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/crypto"
-	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/codec/linearcodec"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 var (

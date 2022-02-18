@@ -12,13 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/flare-foundation/flare/utils/perms"
-	"github.com/flare-foundation/flare/vms/avm"
-	"github.com/flare-foundation/flare/vms/evm"
-	"github.com/flare-foundation/flare/vms/platformvm"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/ava-labs/avalanchego/utils/perms"
+	"github.com/ava-labs/avalanchego/vms/avm"
+	"github.com/ava-labs/avalanchego/vms/evm"
+	"github.com/ava-labs/avalanchego/vms/platformvm"
 )
 
 func TestValidateConfig(t *testing.T) {

@@ -6,7 +6,7 @@ package benchlist
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 type TestBenchable struct {

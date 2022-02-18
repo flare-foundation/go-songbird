@@ -9,10 +9,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/pubsub"
-	"github.com/flare-foundation/flare/vms/components/avax"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/pubsub"
+	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 type mockFilter struct {

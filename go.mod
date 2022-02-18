@@ -1,4 +1,4 @@
-module github.com/flare-foundation/flare
+module github.com/ava-labs/avalanchego
 
 // Changes to the minimum golang version must also be replicated in
 // scripts/build_flare.sh

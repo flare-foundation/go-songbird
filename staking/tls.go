@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/perms"
+	"github.com/ava-labs/avalanchego/utils/perms"
 )
 
 // InitNodeStakingKeyPair generates a self-signed TLS key/cert pair to use in

@@ -4,8 +4,8 @@
 package chains
 
 import (
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
 )
 
 // Registrant can register the existence of a chain

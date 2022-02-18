@@ -9,10 +9,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/crypto"
-	"github.com/flare-foundation/flare/vms/avm"
-	"github.com/flare-foundation/flare/vms/platformvm/message"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/ava-labs/avalanchego/vms/avm"
+	"github.com/ava-labs/avalanchego/vms/platformvm/message"
 )
 
 func getValidTx(vm *VM, t *testing.T) *Tx {

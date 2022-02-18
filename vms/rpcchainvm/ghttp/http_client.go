@@ -10,12 +10,12 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/ghttpproto"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greadcloser"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greadcloser/greadcloserproto"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gresponsewriter"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gresponsewriter/gresponsewriterproto"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/ghttpproto"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/greadcloser"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/greadcloser/greadcloserproto"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/gresponsewriter"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/ghttp/gresponsewriter/gresponsewriterproto"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/grpcutils"
 )
 
 var _ http.Handler = &Client{}

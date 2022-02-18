@@ -6,8 +6,8 @@ package common
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/snow/validators"
 )
 
 // Config wraps the common configurations that are needed by a Snow consensus

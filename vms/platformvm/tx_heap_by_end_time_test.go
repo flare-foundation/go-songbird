@@ -6,8 +6,8 @@ package platformvm
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto"
 )
 
 func TestTxHeapStop(t *testing.T) {

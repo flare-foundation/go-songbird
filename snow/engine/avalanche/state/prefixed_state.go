@@ -4,10 +4,10 @@
 package state
 
 import (
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/snow/engine/avalanche/vertex"
 )
 
 const (

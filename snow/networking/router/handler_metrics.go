@@ -8,9 +8,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/message"
-	"github.com/flare-foundation/flare/utils/metric"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/message"
+	"github.com/ava-labs/avalanchego/utils/metric"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 type handlerMetrics struct {

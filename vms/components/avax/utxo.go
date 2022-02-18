@@ -6,7 +6,7 @@ package avax
 import (
 	"errors"
 
-	"github.com/flare-foundation/flare/vms/components/verify"
+	"github.com/ava-labs/avalanchego/vms/components/verify"
 )
 
 var (

@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/engine/avalanche/vertex"
 )
 
 func TestVotingFinishesWithAbandonedDep(t *testing.T) {

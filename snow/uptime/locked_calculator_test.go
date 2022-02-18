@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/uptime/mocks"
-	"github.com/flare-foundation/flare/utils"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/uptime/mocks"
+	"github.com/ava-labs/avalanchego/utils"
 )
 
 func TestLockedCalculator(t *testing.T) {

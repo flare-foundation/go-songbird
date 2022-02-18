@@ -3,7 +3,7 @@
 package tracker
 
 import (
-	ids "github.com/flare-foundation/flare/ids"
+	ids "github.com/ava-labs/avalanchego/ids"
 	mock "github.com/stretchr/testify/mock"
 
 	time "time"

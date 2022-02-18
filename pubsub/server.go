@@ -10,8 +10,8 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/units"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 const (

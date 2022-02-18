@@ -9,10 +9,10 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/vms/components/avax"
 )
 
 const (

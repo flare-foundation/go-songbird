@@ -15,12 +15,12 @@ import (
 
 	"github.com/linxGnu/grocksdb"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/nodb"
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/perms"
-	"github.com/flare-foundation/flare/utils/units"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/nodb"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/perms"
+	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 const (

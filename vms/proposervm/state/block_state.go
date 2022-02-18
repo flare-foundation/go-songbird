@@ -9,12 +9,12 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/cache/metercacher"
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/vms/proposervm/block"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/cache/metercacher"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/vms/proposervm/block"
 )
 
 const (

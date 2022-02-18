@@ -6,7 +6,7 @@ package types
 import (
 	"encoding/json"
 
-	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/formatting"
 )
 
 // JSONByteSlice represents [[]byte] that is json marshalled to hex

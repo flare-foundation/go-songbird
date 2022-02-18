@@ -4,9 +4,9 @@
 package message
 
 import (
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 var _ Handler = NoopHandler{}

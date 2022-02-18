@@ -4,8 +4,8 @@
 package network
 
 import (
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/sampler"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/sampler"
 )
 
 // peersData encapsulate all peers known to Network.

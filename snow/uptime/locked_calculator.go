@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils"
 )
 
 var (

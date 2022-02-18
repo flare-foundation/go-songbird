@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/database/memdb"
+	"github.com/ava-labs/avalanchego/database/memdb"
 )
 
 func TestSingletonState(t *testing.T) {

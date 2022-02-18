@@ -4,7 +4,7 @@
 package validators
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Connector represents a handler that is called when a connection is marked as

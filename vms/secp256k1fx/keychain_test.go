@@ -7,9 +7,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/crypto"
-	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/ava-labs/avalanchego/utils/formatting"
 )
 
 var (

@@ -9,14 +9,14 @@ import (
 
 	"github.com/gorilla/rpc/v2"
 
-	"github.com/flare-foundation/flare/api"
-	"github.com/flare-foundation/flare/api/server"
-	"github.com/flare-foundation/flare/chains"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/ipcs"
-	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/utils/json"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/api"
+	"github.com/ava-labs/avalanchego/api/server"
+	"github.com/ava-labs/avalanchego/chains"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/ipcs"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/ava-labs/avalanchego/utils/json"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 // IPCServer maintains the IPCs

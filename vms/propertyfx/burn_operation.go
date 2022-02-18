@@ -4,9 +4,9 @@
 package propertyfx
 
 import (
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/vms/components/verify"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/vms/components/verify"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 type BurnOperation struct {

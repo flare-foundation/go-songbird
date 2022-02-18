@@ -4,10 +4,10 @@
 package vertex
 
 import (
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/codec/reflectcodec"
-	"github.com/flare-foundation/flare/utils/units"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/codec/linearcodec"
+	"github.com/ava-labs/avalanchego/codec/reflectcodec"
+	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 const (

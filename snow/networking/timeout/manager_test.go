@@ -10,10 +10,10 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/message"
-	"github.com/flare-foundation/flare/snow/networking/benchlist"
-	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/message"
+	"github.com/ava-labs/avalanchego/snow/networking/benchlist"
+	"github.com/ava-labs/avalanchego/utils/timer"
 )
 
 func TestManagerFire(t *testing.T) {

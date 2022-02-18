@@ -6,7 +6,7 @@ package sampler
 import (
 	"sort"
 
-	safemath "github.com/flare-foundation/flare/utils/math"
+	safemath "github.com/ava-labs/avalanchego/utils/math"
 )
 
 type weightedLinearElement struct {

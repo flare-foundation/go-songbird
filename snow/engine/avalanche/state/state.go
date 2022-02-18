@@ -4,14 +4,14 @@
 package state
 
 import (
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/snow/engine/avalanche/vertex"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 type state struct {

@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/flare-foundation/flare/database/prefixdb"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/database/memdb"
+	"github.com/ava-labs/avalanchego/database/prefixdb"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 func TestSharedMemory(t *testing.T) {

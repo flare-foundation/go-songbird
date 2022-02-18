@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Manager holds the validator set of each subnet

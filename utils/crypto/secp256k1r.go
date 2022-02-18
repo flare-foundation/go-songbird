@@ -12,10 +12,10 @@ import (
 	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
 
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/hashing"
 )
 
 const (

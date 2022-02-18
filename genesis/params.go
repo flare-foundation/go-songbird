@@ -6,7 +6,7 @@ package genesis
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/constants"
 )
 
 type StakingConfig struct {

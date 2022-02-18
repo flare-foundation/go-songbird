@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/rpc"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/rpc"
 )
 
 // Interface compliance

@@ -6,8 +6,8 @@ package linkeddb
 import (
 	"sync"
 
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/database"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/database"
 )
 
 const (

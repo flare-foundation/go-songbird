@@ -4,8 +4,8 @@
 package propertyfx
 
 import (
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
 )
 
 // ID that this Fx uses when labeled

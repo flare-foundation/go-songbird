@@ -6,9 +6,9 @@ package atomic
 import (
 	"bytes"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/prefixdb"
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/prefixdb"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 var (

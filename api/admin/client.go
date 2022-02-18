@@ -6,8 +6,8 @@ package admin
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/api"
-	"github.com/flare-foundation/flare/utils/rpc"
+	"github.com/ava-labs/avalanchego/api"
+	"github.com/ava-labs/avalanchego/utils/rpc"
 )
 
 // Interface compliance

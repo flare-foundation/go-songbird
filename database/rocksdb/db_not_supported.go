@@ -9,8 +9,8 @@ package rocksdb
 import (
 	"errors"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 var errUnsupportedDatabase = errors.New("database isn't suppported")

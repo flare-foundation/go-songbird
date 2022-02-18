@@ -6,7 +6,7 @@ package snowball
 import (
 	"fmt"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // nnarySnowball is a naive implementation of a multi-color snowball instance

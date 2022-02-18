@@ -6,8 +6,8 @@ package manager
 import (
 	"sort"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/version"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/version"
 )
 
 type VersionedDatabase struct {

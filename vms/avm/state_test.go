@@ -7,13 +7,13 @@ import (
 	"math"
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/utils/crypto"
-	"github.com/flare-foundation/flare/utils/units"
-	"github.com/flare-foundation/flare/vms/components/avax"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/ava-labs/avalanchego/vms/components/avax"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 func TestSetsAndGets(t *testing.T) {

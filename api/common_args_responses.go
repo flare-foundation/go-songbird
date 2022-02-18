@@ -4,9 +4,9 @@
 package api
 
 import (
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/json"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/json"
 )
 
 // This file contains structs used in arguments and responses in services

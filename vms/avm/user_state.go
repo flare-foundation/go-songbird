@@ -6,10 +6,10 @@ package avm
 import (
 	"fmt"
 
-	"github.com/flare-foundation/flare/database/encdb"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/crypto"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/database/encdb"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 var addresses = ids.Empty

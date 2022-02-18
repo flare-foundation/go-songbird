@@ -4,9 +4,9 @@
 package pubsub
 
 import (
-	"github.com/flare-foundation/flare/api"
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/json"
+	"github.com/ava-labs/avalanchego/api"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/json"
 )
 
 // NewBloom command for a new bloom filter

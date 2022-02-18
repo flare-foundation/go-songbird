@@ -22,7 +22,7 @@ Note that as network usage increases, hardware requirements may increase beyond 
 Clone the Flare repository:
 
 ```sh
-git clone https://github.com/flare-foundation/flare.git
+git clone https://github.com/ava-labs/avalanchego.git
 ```
 
 #### Building the Flare Executable

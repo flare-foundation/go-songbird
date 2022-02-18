@@ -7,7 +7,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/units"
+	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 // Const variables to be exported

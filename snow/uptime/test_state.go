@@ -6,8 +6,8 @@ package uptime
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 var _ State = &TestState{}

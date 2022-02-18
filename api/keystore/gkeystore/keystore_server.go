@@ -10,12 +10,12 @@ import (
 
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/flare-foundation/flare/api/keystore"
-	"github.com/flare-foundation/flare/api/keystore/gkeystore/gkeystoreproto"
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/rpcdb"
-	"github.com/flare-foundation/flare/database/rpcdb/rpcdbproto"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
+	"github.com/ava-labs/avalanchego/api/keystore"
+	"github.com/ava-labs/avalanchego/api/keystore/gkeystore/gkeystoreproto"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/rpcdb"
+	"github.com/ava-labs/avalanchego/database/rpcdb/rpcdbproto"
+	"github.com/ava-labs/avalanchego/vms/rpcchainvm/grpcutils"
 )
 
 var _ gkeystoreproto.KeystoreServer = &Server{}

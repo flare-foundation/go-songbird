@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/hashing"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 const (

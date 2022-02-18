@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/snow/consensus/snowman"
-	"github.com/flare-foundation/flare/vms/proposervm/block"
-	"github.com/flare-foundation/flare/vms/proposervm/proposer"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
+	"github.com/ava-labs/avalanchego/vms/proposervm/block"
+	"github.com/ava-labs/avalanchego/vms/proposervm/proposer"
 )
 
 // ProposerBlock Option interface tests section

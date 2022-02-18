@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/rpc"
+	"github.com/ava-labs/avalanchego/utils/rpc"
 )
 
 var errInvalidNumberOfChecks = errors.New("expected at least 1 check attempt")

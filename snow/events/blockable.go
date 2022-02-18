@@ -4,7 +4,7 @@
 package events
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Blockable defines what an object must implement to be able to block on events

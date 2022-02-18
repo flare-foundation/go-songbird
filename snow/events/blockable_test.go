@@ -4,7 +4,7 @@
 package events
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 var offset = uint64(0)

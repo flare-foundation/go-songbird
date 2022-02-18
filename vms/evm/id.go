@@ -4,7 +4,7 @@
 package evm
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // ID that this VM uses when labeled

@@ -6,7 +6,7 @@ package cache
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // CacherTests is a list of all Cacher tests

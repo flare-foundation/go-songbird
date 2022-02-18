@@ -6,9 +6,9 @@ package avax
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/codec/linearcodec"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 func TestAssetVerifyNil(t *testing.T) {

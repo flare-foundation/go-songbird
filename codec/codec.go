@@ -4,7 +4,7 @@
 package codec
 
 import (
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 // Codec marshals and unmarshals

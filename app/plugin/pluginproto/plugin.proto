@@ -1,6 +1,6 @@
 syntax = "proto3";
 package pluginproto;
-option go_package = "github.com/flare-foundation/flare/app/plugin/pluginproto";
+option go_package = "github.com/ava-labs/avalanchego/app/plugin/pluginproto";
 import "google/protobuf/empty.proto";
 
 // To compile: protoc --go_out=plugins=grpc:. app.proto

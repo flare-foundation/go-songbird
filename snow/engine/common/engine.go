@@ -6,9 +6,9 @@ package common
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/health"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
+	"github.com/ava-labs/avalanchego/health"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
 )
 
 // Engine describes the standard interface of a consensus engine

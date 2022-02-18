@@ -11,12 +11,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/staking"
-	"github.com/flare-foundation/flare/vms/proposervm/block"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/memdb"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/staking"
+	"github.com/ava-labs/avalanchego/vms/proposervm/block"
 )
 
 func testBlockState(a *assert.Assertions, bs BlockState) {

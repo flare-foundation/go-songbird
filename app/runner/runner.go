@@ -10,10 +10,10 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/flare-foundation/flare/app"
-	appplugin "github.com/flare-foundation/flare/app/plugin"
-	"github.com/flare-foundation/flare/app/process"
-	"github.com/flare-foundation/flare/node"
+	"github.com/ava-labs/avalanchego/app"
+	appplugin "github.com/ava-labs/avalanchego/app/plugin"
+	"github.com/ava-labs/avalanchego/app/process"
+	"github.com/ava-labs/avalanchego/node"
 )
 
 // Run an AvalancheGo node.

@@ -6,7 +6,7 @@ package poll
 import (
 	"fmt"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 type noEarlyTermFactory struct{}

@@ -7,12 +7,12 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/codec/linearcodec"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 func TestUTXOVerifyNil(t *testing.T) {

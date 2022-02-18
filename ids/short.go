@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/hashing"
 )
 
 // ShortEmpty is a useful all zero value

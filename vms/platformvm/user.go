@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flare-foundation/flare/database/encdb"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/ava-labs/avalanchego/database/encdb"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto"
 )
 
 // Key in the database whose corresponding value is the list of

@@ -7,11 +7,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/snow/consensus/snowstorm"
-	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/snow/consensus/snowstorm"
+	"github.com/ava-labs/avalanchego/vms/components/avax"
 )
 
 var (

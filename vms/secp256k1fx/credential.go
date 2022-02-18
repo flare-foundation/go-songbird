@@ -8,8 +8,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flare-foundation/flare/utils/crypto"
-	"github.com/flare-foundation/flare/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/crypto"
+	"github.com/ava-labs/avalanchego/utils/formatting"
 )
 
 var errNilCredential = errors.New("nil credential")

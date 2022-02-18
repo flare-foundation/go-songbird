@@ -6,7 +6,7 @@ package version
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/constants"
 )
 
 // NOTE: We are doing a three-phase deploy to get rid of legacy Avalanche

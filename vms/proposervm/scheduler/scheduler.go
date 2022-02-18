@@ -6,8 +6,8 @@ package scheduler
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 type Scheduler interface {

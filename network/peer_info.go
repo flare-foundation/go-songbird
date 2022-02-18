@@ -6,8 +6,8 @@ package network
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/json"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/json"
 )
 
 type PeerInfo struct {

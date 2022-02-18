@@ -10,13 +10,13 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/api/keystore"
-	"github.com/flare-foundation/flare/api/metrics"
-	"github.com/flare-foundation/flare/chains/atomic"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/api/keystore"
+	"github.com/ava-labs/avalanchego/api/metrics"
+	"github.com/ava-labs/avalanchego/chains/atomic"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/validators"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 type EventDispatcher interface {

@@ -10,8 +10,8 @@ import (
 
 	healthback "github.com/AppsFlyer/go-sundheit"
 
-	healthlib "github.com/flare-foundation/flare/health"
-	"github.com/flare-foundation/flare/utils/logging"
+	healthlib "github.com/ava-labs/avalanchego/health"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 type Service struct {

@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 var _ snow.EventDispatcher = &EventDispatcher{}

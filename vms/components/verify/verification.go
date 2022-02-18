@@ -4,7 +4,7 @@
 package verify
 
 import (
-	"github.com/flare-foundation/flare/snow"
+	"github.com/ava-labs/avalanchego/snow"
 )
 
 // Verifiable can be verified

@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	safemath "github.com/flare-foundation/flare/utils/math"
-	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	safemath "github.com/ava-labs/avalanchego/utils/math"
+	"github.com/ava-labs/avalanchego/vms/components/avax"
 )
 
 var _ UnsignedProposalTx = &UnsignedAdvanceTimeTx{}

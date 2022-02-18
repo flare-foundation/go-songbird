@@ -9,9 +9,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/flare-foundation/flare/network/throttling"
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/network/throttling"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 var _ Dialer = &dialer{}

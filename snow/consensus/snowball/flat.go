@@ -4,7 +4,7 @@
 package snowball
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // FlatFactory implements Factory by returning a flat struct

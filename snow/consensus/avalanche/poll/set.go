@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flare-foundation/flare/utils/linkedhashmap"
+	"github.com/ava-labs/avalanchego/utils/linkedhashmap"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/utils/metric"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/metric"
 )
 
 var (

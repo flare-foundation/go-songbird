@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/choices"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/choices"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 const cacheSize = 1000

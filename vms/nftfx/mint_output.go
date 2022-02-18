@@ -6,7 +6,7 @@ package nftfx
 import (
 	"encoding/json"
 
-	"github.com/flare-foundation/flare/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 )
 
 type MintOutput struct {

@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flare-foundation/flare/cache"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/vms/platformvm/message"
+	"github.com/ava-labs/avalanchego/cache"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/engine/common"
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/vms/platformvm/message"
 )
 
 const (

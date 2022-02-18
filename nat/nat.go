@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 const (

@@ -6,7 +6,7 @@ package secp256k1fx
 import (
 	"errors"
 
-	"github.com/flare-foundation/flare/snow"
+	"github.com/ava-labs/avalanchego/snow"
 )
 
 var errNoValueInput = errors.New("input has no value")

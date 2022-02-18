@@ -6,7 +6,7 @@ package memdb
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/database"
+	"github.com/ava-labs/avalanchego/database"
 )
 
 func TestInterface(t *testing.T) {

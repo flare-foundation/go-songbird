@@ -13,7 +13,7 @@ import (
 
 	"github.com/mr-tron/base58/base58"
 
-	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/ava-labs/avalanchego/utils/hashing"
 )
 
 const (

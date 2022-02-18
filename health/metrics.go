@@ -6,7 +6,7 @@ package health
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
 // metrics reports commonly used health check metrics.

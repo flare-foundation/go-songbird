@@ -6,9 +6,9 @@ package platformvm
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/vms/components/avax"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/vms/components/avax"
 )
 
 var _ VersionedState = &versionedStateImpl{}

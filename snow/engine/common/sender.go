@@ -4,7 +4,7 @@
 package common
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Sender defines how a consensus engine sends messages and requests to other

@@ -6,9 +6,9 @@ package block
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/consensus/snowman"
-	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
+	"github.com/ava-labs/avalanchego/utils/wrappers"
 )
 
 // BatchedChainVM extends the minimal functionalities exposed by ChainVM for VMs

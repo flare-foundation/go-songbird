@@ -10,12 +10,12 @@ import (
 
 	"golang.org/x/crypto/chacha20poly1305"
 
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/database"
-	"github.com/flare-foundation/flare/database/nodb"
-	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/codec/linearcodec"
+	"github.com/ava-labs/avalanchego/database"
+	"github.com/ava-labs/avalanchego/database/nodb"
+	"github.com/ava-labs/avalanchego/utils"
+	"github.com/ava-labs/avalanchego/utils/hashing"
 )
 
 const (

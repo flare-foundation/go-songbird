@@ -4,7 +4,7 @@
 package common
 
 import (
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 // Subnet describes the standard interface of a subnet description

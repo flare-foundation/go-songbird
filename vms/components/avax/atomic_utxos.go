@@ -6,9 +6,9 @@ package avax
 import (
 	"fmt"
 
-	"github.com/flare-foundation/flare/chains/atomic"
-	"github.com/flare-foundation/flare/codec"
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/chains/atomic"
+	"github.com/ava-labs/avalanchego/codec"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 const (

@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/flare-foundation/flare/api"
-	"github.com/flare-foundation/flare/database/manager"
-	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/flare-foundation/flare/utils/formatting"
-	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/flare-foundation/flare/version"
+	"github.com/ava-labs/avalanchego/api"
+	"github.com/ava-labs/avalanchego/database/manager"
+	"github.com/ava-labs/avalanchego/database/memdb"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/version"
 )
 
 type service struct {

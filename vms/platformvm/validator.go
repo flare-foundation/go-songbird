@@ -7,8 +7,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/constants"
 )
 
 var errBadSubnetID = errors.New("subnet ID can't be primary network ID")

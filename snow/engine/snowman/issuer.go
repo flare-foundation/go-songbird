@@ -4,8 +4,8 @@
 package snowman
 
 import (
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow/consensus/snowman"
 )
 
 // issuer issues [blk] into to consensus after its dependencies are met.

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
+	"github.com/ava-labs/avalanchego/ids"
 )
 
 var errWrongSize = errors.New("value has unexpected size")

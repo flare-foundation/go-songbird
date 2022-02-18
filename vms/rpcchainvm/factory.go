@@ -13,10 +13,10 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/utils/subprocess"
-	"github.com/flare-foundation/flare/vms"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/utils/subprocess"
+	"github.com/ava-labs/avalanchego/vms"
 )
 
 var errWrongVM = errors.New("wrong vm type")

@@ -6,7 +6,7 @@ package snowball
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/utils/sampler"
+	"github.com/ava-labs/avalanchego/utils/sampler"
 )
 
 func TestSnowballGovernance(t *testing.T) {

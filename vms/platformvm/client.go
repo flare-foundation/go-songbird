@@ -6,12 +6,12 @@ package platformvm
 import (
 	"time"
 
-	"github.com/flare-foundation/flare/api"
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/formatting"
-	cjson "github.com/flare-foundation/flare/utils/json"
-	"github.com/flare-foundation/flare/utils/rpc"
+	"github.com/ava-labs/avalanchego/api"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/formatting"
+	cjson "github.com/ava-labs/avalanchego/utils/json"
+	"github.com/ava-labs/avalanchego/utils/rpc"
 )
 
 // Interface compliance

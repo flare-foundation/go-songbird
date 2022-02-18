@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flare-foundation/flare/utils/units"
+	"github.com/ava-labs/avalanchego/utils/units"
 )
 
 func TestNew(t *testing.T) {

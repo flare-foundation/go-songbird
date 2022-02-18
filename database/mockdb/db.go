@@ -6,7 +6,7 @@ package mockdb
 import (
 	"errors"
 
-	"github.com/flare-foundation/flare/database"
+	"github.com/ava-labs/avalanchego/database"
 )
 
 var (

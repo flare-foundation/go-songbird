@@ -4,10 +4,10 @@
 package common
 
 import (
-	"github.com/flare-foundation/flare/database/manager"
-	"github.com/flare-foundation/flare/health"
-	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/ava-labs/avalanchego/database/manager"
+	"github.com/ava-labs/avalanchego/health"
+	"github.com/ava-labs/avalanchego/snow"
+	"github.com/ava-labs/avalanchego/snow/validators"
 )
 
 // VM describes the interface that all consensus VMs must implement
