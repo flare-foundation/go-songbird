@@ -30,12 +30,6 @@ var (
 type BlockState interface {
 	GetBlock(blkID ids.ID) (block.Block, choices.Status, error)
 	PutBlock(blk block.Block, status choices.Status) error
-<<<<<<< HEAD
-	DeleteBlock(blkID ids.ID) error
-
-	clearCache() // useful for UTs
-=======
->>>>>>> upstream-v1.7.5
 }
 
 type blockState struct {
@@ -130,15 +124,3 @@ func (s *blockState) PutBlock(blk block.Block, status choices.Status) error {
 	s.blkCache.Put(blkID, &blkWrapper)
 	return s.db.Put(blkID[:], bytes)
 }
-<<<<<<< HEAD
-
-func (s *blockState) DeleteBlock(blkID ids.ID) error {
-	s.blkCache.Put(blkID, nil)
-	return s.db.Delete(blkID[:])
-}
-
-func (s *blockState) clearCache() {
-	s.blkCache.Flush()
-}
-=======
->>>>>>> upstream-v1.7.5

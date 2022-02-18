@@ -4,11 +4,9 @@
 package genesis
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"math"
-	"sort"
 	"time"
 
 	"github.com/flare-foundation/flare/codec"

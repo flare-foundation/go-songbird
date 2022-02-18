@@ -20,21 +20,12 @@ import (
 )
 
 type EventDispatcher interface {
-<<<<<<< HEAD
-	Issue(ctx *ConsensusContext, containerID ids.ID, container []byte) error
-	// If the returned error is non-nil, the chain associated with [ctx] should shut
-	// down and not commit [container] or any other container to its database as accepted.
-	// Accept must be called before [containerID] is committed to the VM as accepted.
-	Accept(ctx *ConsensusContext, containerID ids.ID, container []byte) error
-	Reject(ctx *ConsensusContext, containerID ids.ID, container []byte) error
-=======
 	Issuer
 	// If the returned error is non-nil, the chain associated with [ctx] should shut
 	// down and not commit [container] or any other container to its database as accepted.
 	// Accept must be called before [containerID] is committed to the VM as accepted.
 	Acceptor
 	Rejector
->>>>>>> upstream-v1.7.5
 }
 
 type SubnetLookup interface {
@@ -84,11 +75,7 @@ type ConsensusContext struct {
 	ConsensusDispatcher EventDispatcher
 
 	// Non-zero iff this chain bootstrapped.
-<<<<<<< HEAD
-	bootstrapped utils.AtomicBool
-=======
 	state utils.AtomicInterface
->>>>>>> upstream-v1.7.5
 
 	// Non-zero iff this chain is executing transactions.
 	executing utils.AtomicBool
@@ -97,16 +84,6 @@ type ConsensusContext struct {
 	validatorOnly utils.AtomicBool
 }
 
-<<<<<<< HEAD
-// IsBootstrapped returns true iff this chain is done bootstrapping
-func (ctx *ConsensusContext) IsBootstrapped() bool {
-	return ctx.bootstrapped.GetValue()
-}
-
-// Bootstrapped marks this chain as done bootstrapping
-func (ctx *ConsensusContext) Bootstrapped() {
-	ctx.bootstrapped.SetValue(true)
-=======
 func (ctx *ConsensusContext) SetState(newState State) {
 	ctx.state.SetValue(newState)
 }
@@ -114,7 +91,6 @@ func (ctx *ConsensusContext) SetState(newState State) {
 func (ctx *ConsensusContext) GetState() State {
 	stateInf := ctx.state.GetValue()
 	return stateInf.(State)
->>>>>>> upstream-v1.7.5
 }
 
 // IsExecuting returns true iff this chain is still executing transactions.

@@ -192,7 +192,11 @@ func (vm *VMClient) Initialize(
 		return err
 	}
 
-}
+	timestamp := time.Time{}
+	if err := timestamp.UnmarshalBinary(resp.Timestamp); err != nil {
+		return err
+	}
+
 	lastAcceptedBlk := &BlockClient{
 		vm:       vm,
 		id:       id,

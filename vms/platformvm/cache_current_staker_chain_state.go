@@ -14,7 +14,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
-	
+
 	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
@@ -47,10 +47,7 @@ type currentStakerChainState interface {
 
 	Apply(InternalState)
 
-<<<<<<< HEAD
-=======
 	// Return the current validator set of [subnetID].
->>>>>>> upstream-v1.7.5
 	ValidatorSet(subnetID ids.ID) (validators.Set, error)
 }
 

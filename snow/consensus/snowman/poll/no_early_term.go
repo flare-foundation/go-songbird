@@ -48,16 +48,12 @@ func (p *noEarlyTermPoll) Finished() bool {
 func (p *noEarlyTermPoll) Result() ids.Bag { return p.votes }
 
 func (p *noEarlyTermPoll) PrefixedString(prefix string) string {
-<<<<<<< HEAD
-	return fmt.Sprintf("waiting on %s", p.polled.PrefixedString(prefix))
-=======
 	return fmt.Sprintf(
 		"waiting on %s\n%sreceived %s",
 		p.polled.PrefixedString(prefix),
 		prefix,
 		p.votes.PrefixedString(prefix),
 	)
->>>>>>> upstream-v1.7.5
 }
 
 func (p *noEarlyTermPoll) String() string { return p.PrefixedString("") }

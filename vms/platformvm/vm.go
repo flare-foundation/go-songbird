@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/rpc/v2"
-	
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/cache"
@@ -452,11 +452,7 @@ func (vm *VM) CreateStaticHandlers() (map[string]*common.HTTPHandler, error) {
 }
 
 // Connected implements validators.Connector
-<<<<<<< HEAD
-func (vm *VM) Connected(vdrID ids.ShortID) error {
-=======
 func (vm *VM) Connected(vdrID ids.ShortID, nodeVersion version.Application) error {
->>>>>>> upstream-v1.7.5
 	return vm.uptimeManager.Connect(vdrID)
 }
 
@@ -561,7 +557,6 @@ func (vm *VM) GetCurrentHeight() (uint64, error) {
 }
 
 func (vm *VM) updateValidators() error {
-<<<<<<< HEAD
 	localValidators := validators.FBA
 	if err := vm.Validators.Set(constants.PrimaryNetworkID, localValidators); err != nil {
 		return err
@@ -573,27 +568,6 @@ func (vm *VM) updateValidators() error {
 
 	for subnetID := range vm.WhitelistedSubnets {
 		if err := vm.Validators.Set(subnetID, localValidators); err != nil {
-=======
-	currentValidators := vm.internalState.CurrentStakerChainState()
-	primaryValidators, err := currentValidators.ValidatorSet(constants.PrimaryNetworkID)
-	if err != nil {
-		return err
-	}
-	if err := vm.Validators.Set(constants.PrimaryNetworkID, primaryValidators); err != nil {
-		return err
-	}
-
-	weight, _ := primaryValidators.GetWeight(vm.ctx.NodeID)
-	vm.localStake.Set(float64(weight))
-	vm.totalStake.Set(float64(primaryValidators.Weight()))
-
-	for subnetID := range vm.WhitelistedSubnets {
-		subnetValidators, err := currentValidators.ValidatorSet(subnetID)
-		if err != nil {
-			return err
-		}
-		if err := vm.Validators.Set(subnetID, subnetValidators); err != nil {
->>>>>>> upstream-v1.7.5
 			return err
 		}
 	}

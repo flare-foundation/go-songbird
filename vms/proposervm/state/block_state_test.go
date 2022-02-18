@@ -57,24 +57,10 @@ func testBlockState(a *assert.Assertions, bs BlockState) {
 	a.Equal(choices.Accepted, fetchedStatus)
 	a.Equal(b.Bytes(), fetchedBlock.Bytes())
 
-<<<<<<< HEAD
-	bs.clearCache()
-
-=======
->>>>>>> upstream-v1.7.5
 	fetchedBlock, fetchedStatus, err = bs.GetBlock(b.ID())
 	a.NoError(err)
 	a.Equal(choices.Accepted, fetchedStatus)
 	a.Equal(b.Bytes(), fetchedBlock.Bytes())
-<<<<<<< HEAD
-
-	err = bs.DeleteBlock(b.ID())
-	a.NoError(err)
-
-	_, _, err = bs.GetBlock(b.ID())
-	a.Equal(database.ErrNotFound, err)
-=======
->>>>>>> upstream-v1.7.5
 }
 
 func TestBlockState(t *testing.T) {

@@ -399,7 +399,7 @@ func (n *Node) initDatabase(dbManager manager.Manager) error {
 	expectedGenesisHash, err := ids.ToID(rawExpectedGenesisHash)
 	if err != nil {
 		return err
-	}>
+	}
 
 	if genesisHash != expectedGenesisHash {
 		return fmt.Errorf("db contains invalid genesis hash. DB Genesis: %s Generated Genesis: %s", genesisHash, expectedGenesisHash)

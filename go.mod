@@ -7,7 +7,6 @@ module github.com/flare-foundation/flare
 go 1.16
 
 require (
-	github.com/AppsFlyer/go-sundheit v0.2.0
 	github.com/Microsoft/go-winio v0.4.14
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/btcsuite/btcutil v1.0.2

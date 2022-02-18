@@ -192,7 +192,13 @@ type PeerListGossipConfig struct {
 	PeerListSize                 uint32        `json:"peerListSize"`
 	PeerListGossipSize           uint32        `json:"peerListGossipSize"`
 	PeerListStakerGossipFraction uint32        `json:"peerListStakerGossipFraction"`
-	PeerListGossipFreq >t time.Duration `json:"readHandshakeTimeout"`
+	PeerListGossipFreq           time.Duration `json:"peerListGossipFreq"`
+}
+
+type TimeoutConfig struct {
+	GetVersionTimeout    time.Duration `json:"getVersionTimeout"`
+	PingPongTimeout      time.Duration `json:"pingPongTimeout"`
+	ReadHandshakeTimeout time.Duration `json:"readHandshakeTimeout"`
 	// peerAliasTimeout is the age a peer alias must
 	// be before we attempt to release it (so that we
 	// attempt to dial the IP again if gossiped to us).
@@ -669,6 +675,7 @@ func (n *network) NewPeerInfo(peer *peer) PeerInfo {
 		LastReceived:   time.Unix(atomic.LoadInt64(&peer.lastReceived), 0),
 		Benched:        n.benchlistManager.GetBenched(peer.nodeID),
 		ObservedUptime: json.Uint8(peer.observedUptime),
+		TrackedSubnets: peer.trackedSubnets.List(),
 	}
 }
 

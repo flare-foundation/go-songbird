@@ -20,16 +20,11 @@ const (
 
 var (
 	_ database.Database = &Database{}
-<<<<<<< HEAD
-=======
 	_ Commitable        = &Database{}
->>>>>>> upstream-v1.7.5
 	_ database.Batch    = &batch{}
 	_ database.Iterator = &iterator{}
 )
 
-<<<<<<< HEAD
-=======
 // Commitable defines the interface that specifies that something may be
 // committed.
 type Commitable interface {
@@ -37,7 +32,6 @@ type Commitable interface {
 	Commit() error
 }
 
->>>>>>> upstream-v1.7.5
 // Database implements the Database interface by living on top of another
 // database, writing changes to the underlying database only when commit is
 // called.
@@ -159,10 +153,7 @@ func (db *Database) NewIteratorWithStartAndPrefix(start, prefix []byte) database
 	}
 
 	return &iterator{
-<<<<<<< HEAD
-=======
 		db:       db,
->>>>>>> upstream-v1.7.5
 		Iterator: db.db.NewIteratorWithStartAndPrefix(start, prefix),
 		keys:     keys,
 		values:   values,
@@ -296,8 +287,6 @@ func (db *Database) Close() error {
 	return nil
 }
 
-<<<<<<< HEAD
-=======
 func (db *Database) isClosed() bool {
 	db.lock.RLock()
 	defer db.lock.RUnlock()
@@ -305,7 +294,6 @@ func (db *Database) isClosed() bool {
 	return db.db == nil
 }
 
->>>>>>> upstream-v1.7.5
 type keyValue struct {
 	key    []byte
 	value  []byte
@@ -364,11 +352,7 @@ func (b *batch) Reset() {
 }
 
 // Replay implements the Database interface
-<<<<<<< HEAD
-func (b *batch) Replay(w database.KeyValueWriter) error {
-=======
 func (b *batch) Replay(w database.KeyValueWriterDeleter) error {
->>>>>>> upstream-v1.7.5
 	for _, kv := range b.writes {
 		if kv.delete {
 			if err := w.Delete(kv.key); err != nil {
@@ -387,17 +371,11 @@ func (b *batch) Inner() database.Batch { return b }
 // iterator walks over both the in memory database and the underlying database
 // at the same time.
 type iterator struct {
-<<<<<<< HEAD
-	database.Iterator
-
-	key, value []byte
-=======
 	db *Database
 	database.Iterator
 
 	key, value []byte
 	err        error
->>>>>>> upstream-v1.7.5
 
 	keys   []string
 	values []valueDelete
@@ -409,8 +387,6 @@ type iterator struct {
 // iterator is exhausted. We must pay careful attention to set the proper values
 // based on if the in memory db or the underlying db should be read next
 func (it *iterator) Next() bool {
-<<<<<<< HEAD
-=======
 	// Short-circuit and set an error if the underlying database has been closed.
 	if it.db.isClosed() {
 		it.key = nil
@@ -419,7 +395,6 @@ func (it *iterator) Next() bool {
 		return false
 	}
 
->>>>>>> upstream-v1.7.5
 	if !it.initialized {
 		it.exhausted = !it.Iterator.Next()
 		it.initialized = true
@@ -485,8 +460,6 @@ func (it *iterator) Next() bool {
 	}
 }
 
-<<<<<<< HEAD
-=======
 func (it *iterator) Error() error {
 	if it.err != nil {
 		return it.err
@@ -494,7 +467,6 @@ func (it *iterator) Error() error {
 	return it.Iterator.Error()
 }
 
->>>>>>> upstream-v1.7.5
 // Key implements the Iterator interface
 func (it *iterator) Key() []byte { return it.key }
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/utils/units"
+	"github.com/flare-foundation/flare/vms/platformvm/reward"
 )
 
 var (

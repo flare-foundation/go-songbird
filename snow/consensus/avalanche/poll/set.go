@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/utils/linkedhashmap"
-	
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/ids"
@@ -164,13 +164,8 @@ func (s *set) String() string {
 	iter := s.polls.NewIterator()
 	for iter.Next() {
 		requestID := iter.Key()
-<<<<<<< HEAD
-		p := iter.Value().(Poll)
-		sb.WriteString(fmt.Sprintf("\n    %d: %s", requestID, p.PrefixedString("    ")))
-=======
 		poll := iter.Value().(Poll)
 		sb.WriteString(fmt.Sprintf("\n    RequestID %d:\n        %s", requestID, poll.PrefixedString("        ")))
->>>>>>> upstream-v1.7.5
 	}
 	return sb.String()
 }

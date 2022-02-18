@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/utils/units"
+	"github.com/flare-foundation/flare/vms/platformvm/reward"
 )
 
 var (
@@ -109,14 +110,19 @@ var (
 			CreateBlockchainTxFee: 1 * units.Avax,
 		},
 		StakingConfig: StakingConfig{
-			UptimeRequirement:  .8, // 80%
-			MinValidatorStake:  2 * units.KiloAvax,
-			MaxValidatorStake:  3 * units.MegaAvax,
-			MinDelegatorStake:  25 * units.Avax,
-			MinDelegationFee:   20000, // 2%
-			MinStakeDuration:   2 * 7 * 24 * time.Hour,
-			MaxStakeDuration:   365 * 24 * time.Hour,
-			StakeMintingPeriod: 365 * 24 * time.Hour,
+			UptimeRequirement: .8, // 80%
+			MinValidatorStake: 2 * units.KiloAvax,
+			MaxValidatorStake: 3 * units.MegaAvax,
+			MinDelegatorStake: 25 * units.Avax,
+			MinDelegationFee:  20000, // 2%
+			MinStakeDuration:  2 * 7 * 24 * time.Hour,
+			MaxStakeDuration:  365 * 24 * time.Hour,
+			RewardConfig: reward.Config{
+				MaxConsumptionRate: .12 * reward.PercentDenominator,
+				MinConsumptionRate: .10 * reward.PercentDenominator,
+				MintingPeriod:      365 * 24 * time.Hour,
+				SupplyCap:          720 * units.MegaAvax,
+			},
 		},
 	}
 )

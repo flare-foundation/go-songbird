@@ -135,7 +135,6 @@ func GetCompatibility(networkID uint32) Compatibility {
 		PrevMinimumUnmaskedVersion,
 	)
 }
-<<<<<<< HEAD
 
 func GetLegacyCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
@@ -148,5 +147,3 @@ func GetLegacyCompatibility(networkID uint32) Compatibility {
 		PrevLegacyUnmaskedVersion,
 	)
 }
-=======
->>>>>>> upstream-v1.7.5
