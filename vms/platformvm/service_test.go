@@ -50,7 +50,7 @@ var (
 
 	// 3cb7d3842e8cee6a0ebd09f1fe884f6861e1b29c
 	// Platform address resulting from the above private key
-	testAddress = "P-testing18jma8ppw3nhx5r4ap8clazz0dps7rv5umpc36y"
+	testAddress = "P-staging18jma8ppw3nhx5r4ap8clazz0dps7rv5uvzsl80"
 )
 
 func defaultService(t *testing.T) *Service {

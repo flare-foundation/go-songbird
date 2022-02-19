@@ -153,8 +153,8 @@ github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5Kwzbycv
 github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5 h1:FtmdgXiUlNeRsoNMFlKLDt+S+6hbjVMEW6RGQ7aUf7c=
 github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5/go.mod h1:VvhXpOYNQvB+uIk2RvXzuaQtkQJzzIx6lSBe1xv7hi0=
 github.com/flare-foundation/coreth v0.3.1-0.20220218223804-98a5d57ce49b/go.mod h1:1A5k39u5B5qS69RyXuSGXoUjg9CJft2VNHeu5hTqfiU=
-github.com/flare-foundation/coreth v0.3.1-0.20220218224100-77fedf97d14b h1:E7cSbxdbQZPTBvk7jIw+9kQ+rI+OBlzqscn8IBoX7MU=
-github.com/flare-foundation/coreth v0.3.1-0.20220218224100-77fedf97d14b/go.mod h1:I7dsakCdBEsPc4uKfs2DJhY6oMYlFqGXYJefk4i7R8M=
+github.com/flare-foundation/coreth v0.3.1-0.20220219015829-9d244fc3b9cd h1:8AhFSmVRRFCeoYLDf8ccf2PJnKliPV9SRRdFaCrkftQ=
+github.com/flare-foundation/coreth v0.3.1-0.20220219015829-9d244fc3b9cd/go.mod h1:I7dsakCdBEsPc4uKfs2DJhY6oMYlFqGXYJefk4i7R8M=
 github.com/flare-foundation/flare v0.5.0/go.mod h1:ai++PWjLrLOZYheY7qutUJbReWsJSe5XO47QcIQQW0U=
 github.com/flare-foundation/flare v0.5.1-0.20220218223919-053cf219b47c/go.mod h1:s7Pdz389BY8S4R59VEO43qfO59NGVOANIjbqGm99FcE=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=

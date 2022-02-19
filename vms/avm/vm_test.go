@@ -1228,7 +1228,7 @@ func TestVMFormat(t *testing.T) {
 		in       ids.ShortID
 		expected string
 	}{
-		{ids.ShortEmpty, "X-testing1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtu2yas"},
+		{ids.ShortEmpty, "X-staging1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqulz2qm"},
 	}
 	for _, test := range tests {
 		t.Run(test.in.String(), func(t *testing.T) {
