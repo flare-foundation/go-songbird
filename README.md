@@ -1,4 +1,4 @@
-#Flare
+# Flare
 
 Node implementation for the [Flare](https://flare.network) network.
 
@@ -15,7 +15,7 @@ The minimum recommended hardware specification for nodes connected to Mainnet is
 - OS: Ubuntu 18.04/20.04 or macOS >= 10.15 (Catalina)
 - Network: Reliable IPv4 or IPv6 network connection, with an open public port.
 
-If you plan to build AvalancheGo from source, you will also need the following software:
+If you plan to build Flare from source, you will also need the following software:
 
 - [Go](https://golang.org/doc/install) version >= 1.16.8
 - [gcc](https://gcc.gnu.org/)
@@ -27,14 +27,14 @@ Clone the Flare repository:
 
 ```sh
 git clone git@github.com:flare-foundation/flare.git
-cd avalanchego
+cd flare
 ```
 
 This will clone and checkout to `master` branch.
 
-#### Building the Avalanche Executable
+#### Building the Flare Executable
 
-Build Avalanche using the build script:
+Build Flare using the build script:
 
 ```sh
 ./scripts/build.sh
