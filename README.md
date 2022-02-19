@@ -103,7 +103,9 @@ The various node APIs can also be enabled and disabled by setting the respective
 
 In order to run a local network, the validator set needs to be defined locally.
 This can be done by setting the path to a validator set in a environment variable.
-Please check out `./scripts/launch.localnet.sh` for more information.
+
+You can use `./scripts/launch_localnet.sh` as an easy way to spin up a 5-node local network.
+All funds are controlled by the private key under `/.scripts/keys/6b0dd034a2fd67b932f10e3dba1d2bbd39348695.json`.
 
 ## Generating Code
 

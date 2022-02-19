@@ -7,8 +7,12 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-func flare() Set {
-	weight := uint64(50000)
+const (
+	flareValidatorWeight = 50_000
+)
+
+func loadFlareValidators() Set {
+	weight := uint64(flareValidatorWeight)
 	nodeIDs := []string{}
 	set := NewSet()
 	for _, nodeID := range nodeIDs {

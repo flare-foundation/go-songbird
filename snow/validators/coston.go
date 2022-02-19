@@ -7,8 +7,12 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-func coston() Set {
-	weight := uint64(200000)
+const (
+	costonValidatorWeight = 200_000
+)
+
+func loadCostonValidators() Set {
+	weight := uint64(costonValidatorWeight)
 	nodeIDs := []string{
 		"NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc",
 		"NodeID-EkH8wyEshzEQBToAdR7Fexxcj9rrmEEHZ",

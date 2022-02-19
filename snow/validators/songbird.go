@@ -7,8 +7,12 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-func songbird() Set {
-	weight := uint64(50000)
+const (
+	songbirdValidatorWeight = 50_000
+)
+
+func loadSongbirdValidators() Set {
+	weight := uint64(songbirdValidatorWeight)
 	nodeIDs := []string{
 		"NodeID-3M9KVT6ixi4gVMisbm5TnPXYXgFN5LHuv",
 		"NodeID-NnX4fajAmyvpL9RLfheNdc47FKKDuQW8i",

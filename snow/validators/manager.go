@@ -37,13 +37,13 @@ func NewManager(networkID uint32) Manager {
 	var validators Set
 	switch networkID {
 	case constants.CostonID:
-		validators = coston()
+		validators = loadCostonValidators()
 	case constants.SongbirdID:
-		validators = songbird()
+		validators = loadSongbirdValidators()
 	case constants.FlareID:
-		validators = flare()
+		validators = loadFlareValidators()
 	default:
-		validators = custom()
+		validators = loadCustomValidators()
 	}
 	return &manager{
 		networkID:  networkID,

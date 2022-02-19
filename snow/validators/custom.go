@@ -1,31 +1,27 @@
 package validators
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-func custom() Set {
-	weight := uint64(200000)
-	path := os.Getenv("VALIDATORS")
-	if path == "" {
-		panic("custom validator file path not defined")
-	}
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		panic(fmt.Sprintf("could not read custom validator data (path: %s): %s", path, err))
-	}
-	var nodeIDs []string
-	err = json.Unmarshal(data, &nodeIDs)
-	if err != nil {
-		panic(fmt.Sprintf("could not decode custom validator datas: %s", err))
-	}
+const (
+	customValidatorWeight = 200_000
+	customValidatorEnv    = "CUSTOM_VALIDATORS"
+)
+
+func loadCustomValidators() Set {
 	set := NewSet()
+	weight := uint64(customValidatorWeight)
+	customValidatorList := os.Getenv(customValidatorEnv)
+	if customValidatorList == "" {
+		panic("environment variable for custom validators empty")
+	}
+	nodeIDs := strings.Split(customValidatorList, ",")
 	for _, nodeID := range nodeIDs {
 		shortID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
 		if err != nil {
