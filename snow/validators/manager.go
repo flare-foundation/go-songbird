@@ -30,10 +30,22 @@ type Manager interface {
 	// Contains returns true if there is a validator with the specified ID
 	// currently in the set.
 	Contains(vdrID ids.ShortID) bool
+
+	// Mutate will mutate the validator set by copying it and adding the given
+	// validators.
+	Mutate(withs ...With) Manager
+}
+
+type With func(Set)
+
+func WithValidator(vdr ids.ShortID, weight uint64) With {
+	return func(set Set) {
+		_ = set.AddWeight(vdr, weight)
+	}
 }
 
 // NewManager returns a new, empty manager
-func NewManager(networkID uint32) Manager {
+func NewManager(networkID uint32, withs ...With) Manager {
 	var validators Set
 	switch networkID {
 	case constants.CostonID:
@@ -44,6 +56,9 @@ func NewManager(networkID uint32) Manager {
 		validators = loadFlareValidators()
 	default:
 		validators = loadCustomValidators()
+	}
+	for _, with := range withs {
+		with(validators)
 	}
 	return &manager{
 		networkID:  networkID,
@@ -107,6 +122,20 @@ func (m *manager) Contains(vdrID ids.ShortID) bool {
 	defer m.lock.Unlock()
 
 	return m.validators.Contains(vdrID)
+}
+
+// Mutate will copy the underyling validator set and add the given validators.
+func (m *manager) Mutate(withs ...With) Manager {
+	list := m.validators.List()
+	validators := NewSet()
+	_ = validators.Set(list)
+	for _, with := range withs {
+		with(validators)
+	}
+	return &manager{
+		networkID:  m.networkID,
+		validators: validators,
+	}
 }
 
 func (m *manager) String() string {

@@ -70,11 +70,6 @@ type testListener struct {
 	closed  chan struct{}
 }
 
-func getDefaultManager() validators.Manager {
-	defaultValidators := validators.NewManager()
-	return defaultValidators
-}
-
 func (l *testListener) Accept() (net.Conn, error) {
 	select {
 	case c := <-l.inbound:
@@ -352,7 +347,7 @@ func TestNewDefaultNetwork(t *testing.T) {
 		closed:  make(chan struct{}),
 	}
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0, validators.WithValidator(id, math.MaxUint64))
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -431,7 +426,10 @@ func TestEstablishConnection(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -568,7 +566,10 @@ func TestDoubleTrack(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -706,7 +707,10 @@ func TestDoubleClose(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -849,7 +853,10 @@ func TestTrackConnected(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -988,7 +995,10 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -1162,7 +1172,11 @@ func TestPeerAliasesTicker(t *testing.T) {
 		},
 	}
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+		validators.WithValidator(id2, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -1437,9 +1451,6 @@ func TestPeerAliasesTicker(t *testing.T) {
 func TestPeerAliasesDisconnect(t *testing.T) {
 	initCerts(t)
 
-	vdrs := getDefaultManager()
-	beacons := validators.NewSet()
-
 	ip0 := utils.NewDynamicIPDesc(
 		net.IPv6loopback,
 		0,
@@ -1455,6 +1466,13 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 		2,
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
+
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+		validators.WithValidator(id2, 1),
+	)
+	beacons := validators.NewSet()
 
 	listener0 := &testListener{
 		addr: &net.TCPAddr{
@@ -1899,11 +1917,11 @@ func TestPeerSignature(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+	)
 	beacons := validators.NewSet()
-	// id2 is a validator
-	err := vdrs.AddWeight(constants.PrimaryNetworkID, id2, math.MaxUint64)
-	assert.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2119,9 +2137,9 @@ func TestValidatorIPs(t *testing.T) {
 	thirdValidatorPeer := createPeer(ids.ShortID{0x03}, thirdValidatorIPDesc, appVersion)
 	addPeerToNetwork(&dummyNetwork, thirdValidatorPeer, true)
 
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, firstValidatorPeer.nodeID))
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, secondValidatorPeer.nodeID))
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, thirdValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(firstValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(secondValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(thirdValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err := dummyNetwork.validatorIPs()
@@ -2154,7 +2172,7 @@ func TestValidatorIPs(t *testing.T) {
 	disconnectedValidatorPeer := createPeer(ids.ShortID{0x01}, disconnectedValidatorIPDesc, appVersion)
 	disconnectedValidatorPeer.finishedHandshake.SetValue(false)
 	addPeerToNetwork(&dummyNetwork, disconnectedValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, disconnectedValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(disconnectedValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2172,7 +2190,7 @@ func TestValidatorIPs(t *testing.T) {
 	}
 	zeroValidatorPeer := createPeer(ids.ShortID{0x01}, zeroIPValidatorIPDesc, appVersion)
 	addPeerToNetwork(&dummyNetwork, zeroValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, zeroValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(zeroValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2191,7 +2209,7 @@ func TestValidatorIPs(t *testing.T) {
 
 	nonValidatorPeer := createPeer(ids.ShortID{0x04}, nonValidatorIPDesc, appVersion)
 	addPeerToNetwork(&dummyNetwork, nonValidatorPeer, false)
-	assert.False(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, nonValidatorPeer.nodeID))
+	assert.False(t, dummyNetwork.config.Validators.Contains(nonValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2211,7 +2229,7 @@ func TestValidatorIPs(t *testing.T) {
 	}
 	maskedValidatorPeer := createPeer(ids.ShortID{0x01}, maskedValidatorIPDesc, maskedVersion)
 	addPeerToNetwork(&dummyNetwork, maskedValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, maskedValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(maskedValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2237,7 +2255,7 @@ func TestValidatorIPs(t *testing.T) {
 		time: uint64(0),
 	})
 	addPeerToNetwork(&dummyNetwork, wrongCertValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, wrongCertValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(wrongCertValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2259,7 +2277,7 @@ func TestValidatorIPs(t *testing.T) {
 		}
 		peer := createPeer(ids.ShortID{byte(i)}, ipDesc, appVersion)
 		addPeerToNetwork(&dummyNetwork, peer, true)
-		assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, peer.nodeID))
+		assert.True(t, dummyNetwork.config.Validators.Contains(peer.nodeID))
 	}
 
 	// test
@@ -2329,10 +2347,12 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id1, 1),
+		validators.WithValidator(id0, 1),
+	)
 	beacons := validators.NewSet()
-	assert.NoError(t, vdrs.AddWeight(constants.PrimaryNetworkID, id1, 1))
-	assert.NoError(t, vdrs.AddWeight(constants.PrimaryNetworkID, id0, 1))
 
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -2471,7 +2491,10 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -2644,11 +2667,11 @@ func TestPeerGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+	)
 	beacons := validators.NewSet()
-	// id2 is a validator
-	err := vdrs.AddWeight(constants.PrimaryNetworkID, id2, math.MaxUint64)
-	assert.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2882,11 +2905,10 @@ func TestAppGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := getDefaultManager()
-	primaryVdrs := validators.NewSet()
-	_ = primaryVdrs.Set([]validators.Validator{validators.NewValidator(id2, math.MaxUint64)})
-	// id2 is a validator
-	_ = vdrs.Set(constants.PrimaryNetworkID, primaryVdrs)
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+	)
 
 	beacons := validators.NewSet()
 
@@ -3083,13 +3105,13 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 	targetNetwork.peers.add(peerToAdd)
 
 	if isValidator {
-		_ = targetNetwork.config.Validators.AddWeight(constants.PrimaryNetworkID, peerToAdd.nodeID, 10)
+		targetNetwork.config.Validators = targetNetwork.config.Validators.Mutate(validators.WithValidator(peerToAdd.nodeID, 10))
 	}
 }
 
 func clearPeersData(targetNetwork *network) {
 	targetNetwork.peers.reset()
-	targetNetwork.config.Validators = getDefaultManager()
+	targetNetwork.config.Validators = validators.NewManager(0)
 }
 
 func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {

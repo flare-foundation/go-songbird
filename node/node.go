@@ -190,8 +190,8 @@ func (n *Node) initNetworking() error {
 	tlsConfig := network.TLSConfig(n.Config.StakingTLSCert)
 
 	// Initialize validator manager and primary network's validator set
-	networkValidators := validators.NewSet()
 	n.vdrs = validators.NewManager(n.Config.NetworkID)
+	networkValidators, _ := n.vdrs.GetValidators()
 
 	// Configure benchlist
 	n.Config.BenchlistConfig.Validators = n.vdrs

@@ -18,11 +18,11 @@ func loadCustomValidators() Set {
 	set := NewSet()
 	weight := uint64(customValidatorWeight)
 	customValidatorList := os.Getenv(customValidatorEnv)
-	if customValidatorList == "" {
-		panic("environment variable for custom validators empty")
-	}
 	nodeIDs := strings.Split(customValidatorList, ",")
 	for _, nodeID := range nodeIDs {
+		if nodeID == "" {
+			continue
+		}
 		shortID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
 		if err != nil {
 			panic(fmt.Sprintf("invalid custom validator node ID: %s", nodeID))
