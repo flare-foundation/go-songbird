@@ -154,11 +154,13 @@ github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5 h1:FtmdgXiUlNeRsoNMFlK
 github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5/go.mod h1:VvhXpOYNQvB+uIk2RvXzuaQtkQJzzIx6lSBe1xv7hi0=
 github.com/flare-foundation/coreth v0.3.1-0.20220218223804-98a5d57ce49b/go.mod h1:1A5k39u5B5qS69RyXuSGXoUjg9CJft2VNHeu5hTqfiU=
 github.com/flare-foundation/coreth v0.3.1-0.20220219015829-9d244fc3b9cd/go.mod h1:I7dsakCdBEsPc4uKfs2DJhY6oMYlFqGXYJefk4i7R8M=
-github.com/flare-foundation/coreth v0.3.1-0.20220219134233-0c0a76526e9d h1:yT0z135DSULRUC8ZAkfrv0sWSzUxapE56wknyBF17rw=
 github.com/flare-foundation/coreth v0.3.1-0.20220219134233-0c0a76526e9d/go.mod h1:61k1pJMYUn33jA0zwPIDWbEV++FkMxoIz24pdklD3+A=
+github.com/flare-foundation/coreth v0.3.1 h1:HrQWvoTaXJ5IC8N9xKdlgo7xNYNBs3SCgk11y+Awrwg=
+github.com/flare-foundation/coreth v0.3.1/go.mod h1:EBvV826hD+GX9AX1k/PpLrenCAPzEJk9yct8CDIcGQo=
 github.com/flare-foundation/flare v0.5.0/go.mod h1:ai++PWjLrLOZYheY7qutUJbReWsJSe5XO47QcIQQW0U=
 github.com/flare-foundation/flare v0.5.1-0.20220218223919-053cf219b47c/go.mod h1:s7Pdz389BY8S4R59VEO43qfO59NGVOANIjbqGm99FcE=
 github.com/flare-foundation/flare v0.5.1-0.20220219122715-d2993195fa0a/go.mod h1:9xMiQ+VgZQdBPxJoNAiwfrkFHFKreBn17yKMZiUbXx0=
+github.com/flare-foundation/flare v0.5.1-0.20220219193849-77148a5607bd/go.mod h1:9YWA/n6TVkmRE4DrjXpumNcQJ8dp0miSbAYKw4sJ26Q=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fogleman/gg v1.3.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
