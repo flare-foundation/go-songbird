@@ -10,41 +10,31 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-type FlareSet struct {
-	Validators []FlareValidator `json:"validators"`
-}
-
-type FlareValidator struct {
-	NodeID string `json:"nodeID"`
-	Weight uint64 `json:"weight"`
-}
-
-var custom Set
-
-func init() {
-	custom = NewSet()
-	validatorPath := os.Getenv("VALIDATORS")
-	if validatorPath == "" {
-		return
+func custom() Set {
+	weight := uint64(200000)
+	path := os.Getenv("VALIDATORS")
+	if path == "" {
+		panic("custom validator file path not defined")
 	}
-	validatorData, err := ioutil.ReadFile(validatorPath)
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic(fmt.Sprintf("could not read quorum data (path: %s): %s", validatorPath, err))
+		panic(fmt.Sprintf("could not read custom validator data (path: %s): %s", path, err))
 	}
-	var set FlareSet
-	err = json.Unmarshal(validatorData, &set)
+	var nodeIDs []string
+	err = json.Unmarshal(data, &nodeIDs)
 	if err != nil {
-		panic(fmt.Sprintf("could not decode quorum: %s", err))
+		panic(fmt.Sprintf("could not decode custom validator datas: %s", err))
 	}
-	for _, validator := range set.Validators {
-		nodeID, err := ids.ShortFromPrefixedString(validator.NodeID, constants.NodeIDPrefix)
+	set := NewSet()
+	for _, nodeID := range nodeIDs {
+		shortID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			panic(fmt.Sprintf("invalid custom validator node ID: %s", nodeID))
 		}
-		err = custom.AddWeight(nodeID, validator.Weight)
+		err = set.AddWeight(shortID, weight)
 		if err != nil {
-			panic(fmt.Sprintf("could not add weight for validator (node: %x, weight: %d): %s", nodeID, validator.Weight, err))
+			panic(fmt.Sprintf("could not add weight for validator (node: %x, weight: %d): %s", shortID, weight, err))
 		}
 	}
+	return set
 }

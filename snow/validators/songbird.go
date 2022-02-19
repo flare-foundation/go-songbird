@@ -7,9 +7,7 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-var songbird Set
-
-func init() {
+func songbird() Set {
 	weight := uint64(50000)
 	nodeIDs := []string{
 		"NodeID-3M9KVT6ixi4gVMisbm5TnPXYXgFN5LHuv",
@@ -33,16 +31,16 @@ func init() {
 		"NodeID-Fdwp9Wtjh5rxzuTCF9z4zrSM31y7ZzBQS",
 		"NodeID-JdEBRLS98PansyFKQUzFKqk4xqrVZ41nC",
 	}
-	songbird = NewSet()
+	set := NewSet()
 	for _, nodeID := range nodeIDs {
-		nodeID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
+		shortID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			panic(fmt.Sprintf("invalid songbird validator node ID: %s", nodeID))
 		}
-		err = songbird.AddWeight(nodeID, weight)
+		err = set.AddWeight(shortID, weight)
 		if err != nil {
-			panic(fmt.Sprintf("could not add weight for validator (node: %x, weight: %d): %s", nodeID, weight, err))
+			panic(fmt.Sprintf("could not add weight for validator (node: %s, weight: %d): %s", nodeID, weight, err))
 		}
 	}
+	return set
 }
