@@ -102,7 +102,7 @@ func (p *peersData) sample(subnetID ids.ID, validatorOnly bool, n int) ([]*peer,
 			return peers, nil
 		}
 		peer := p.peersList[idx]
-		if !peer.finishedHandshake.GetValue() || !peer.trackedSubnets.Contains(subnetID) || (validatorOnly && !peer.net.config.Validators.Contains(subnetID, peer.nodeID)) {
+		if !peer.finishedHandshake.GetValue() || !peer.trackedSubnets.Contains(subnetID) || (validatorOnly && !peer.net.config.Validators.Contains(peer.nodeID)) {
 			continue
 		}
 		peers = append(peers, peer)

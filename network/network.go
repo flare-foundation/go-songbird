@@ -306,7 +306,7 @@ func NewNetwork(
 	netw.clientUpgrader = NewTLSClientUpgrader(config.TLSConfig)
 
 	netw.dialer = dialer.NewDialer(constants.NetworkType, config.DialerConfig, log)
-	primaryNetworkValidators, ok := config.Validators.GetValidators(constants.PrimaryNetworkID)
+	validators, ok := config.Validators.GetValidators()
 	if !ok {
 		return nil, errNoPrimaryValidators
 	}
@@ -315,7 +315,7 @@ func NewNetwork(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		primaryNetworkValidators,
+		validators,
 		config.ThrottlerConfig.InboundMsgThrottlerConfig,
 	)
 	if err != nil {
@@ -327,7 +327,7 @@ func NewNetwork(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		primaryNetworkValidators,
+		validators,
 		config.ThrottlerConfig.OutboundMsgThrottlerConfig,
 	)
 	if err != nil {
@@ -548,8 +548,8 @@ func (n *network) shouldUpgradeIncoming(ip utils.IPDesc) bool {
 // the peer is a validator/beacon.
 func (n *network) shouldHoldConnection(peerID ids.ShortID) bool {
 	return !n.config.RequireValidatorToConnect ||
-		n.config.Validators.Contains(constants.PrimaryNetworkID, n.config.MyNodeID) ||
-		n.config.Validators.Contains(constants.PrimaryNetworkID, peerID) ||
+		n.config.Validators.Contains(n.config.MyNodeID) ||
+		n.config.Validators.Contains(peerID) ||
 		n.config.Beacons.Contains(peerID)
 }
 
@@ -736,23 +736,23 @@ func (n *network) IP() utils.IPDesc {
 func (n *network) NodeUptime() (UptimeResult, bool) {
 	n.stateLock.RLock()
 	defer n.stateLock.RUnlock()
-	primaryValidators, ok := n.config.Validators.GetValidators(constants.PrimaryNetworkID)
+	validators, ok := n.config.Validators.GetValidators()
 	if !ok {
 		return UptimeResult{}, false
 	}
 
-	myStake, isValidator := primaryValidators.GetWeight(n.config.MyNodeID)
+	myStake, isValidator := validators.GetWeight(n.config.MyNodeID)
 	if !isValidator {
 		return UptimeResult{}, false
 	}
 
 	var (
-		totalWeight          = float64(primaryValidators.Weight())
+		totalWeight          = float64(validators.Weight())
 		totalWeightedPercent = 100 * float64(myStake)
 		rewardingStake       = float64(myStake)
 	)
 	for _, peer := range n.peers.peersList {
-		weight, ok := primaryValidators.GetWeight(peer.nodeID)
+		weight, ok := validators.GetWeight(peer.nodeID)
 		if !ok {
 			// this is not a validator skip it.
 			continue
@@ -1123,7 +1123,7 @@ func (n *network) validatorIPs() ([]utils.IPCertDesc, error) {
 			continue
 		case peerIP.IsZero():
 			continue
-		case !n.config.Validators.Contains(constants.PrimaryNetworkID, peer.nodeID):
+		case !n.config.Validators.Contains(peer.nodeID):
 			continue
 		}
 
@@ -1218,7 +1218,7 @@ func (n *network) disconnected(p *peer) {
 		delete(n.disconnectedIPs, str)
 		delete(n.connectedIPs, str)
 
-		if n.config.Validators.Contains(constants.PrimaryNetworkID, p.nodeID) {
+		if n.config.Validators.Contains(p.nodeID) {
 			n.track(ip, p.nodeID)
 		}
 	}
@@ -1273,7 +1273,7 @@ func (n *network) getPeers(nodeIDs ids.ShortSet, subnetID ids.ID, validatorOnly 
 		if ok &&
 			peer.finishedHandshake.GetValue() &&
 			(subnetID == constants.PrimaryNetworkID || peer.trackedSubnets.Contains(subnetID)) &&
-			(!validatorOnly || n.config.Validators.Contains(subnetID, nodeID)) {
+			(!validatorOnly || n.config.Validators.Contains(nodeID)) {
 			peers[index] = peer
 		}
 		index++

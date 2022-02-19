@@ -11,7 +11,6 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/validators"
-	"github.com/flare-foundation/flare/utils/constants"
 )
 
 var errUnknownValidators = errors.New("unknown validator set for provided chain")
@@ -112,16 +111,7 @@ func (m *manager) RegisterChain(ctx *snow.ConsensusContext) error {
 		return nil
 	}
 
-	var (
-		vdrs validators.Set
-		ok   bool
-	)
-	if m.config.StakingEnabled {
-		vdrs, ok = m.config.Validators.GetValidators(ctx.SubnetID)
-	} else {
-		// If staking is disabled, everyone validates every chain
-		vdrs, ok = m.config.Validators.GetValidators(constants.PrimaryNetworkID)
-	}
+	validators, ok := m.config.Validators.GetValidators()
 	if !ok {
 		return errUnknownValidators
 	}
@@ -130,7 +120,7 @@ func (m *manager) RegisterChain(ctx *snow.ConsensusContext) error {
 		ctx.ChainID,
 		ctx.Log,
 		m.config.Benchable,
-		vdrs,
+		validators,
 		m.config.Threshold,
 		m.config.MinimumFailingDuration,
 		m.config.Duration,

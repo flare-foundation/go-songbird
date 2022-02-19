@@ -757,7 +757,7 @@ func (p *peer) trackSignedPeer(peer utils.IPCertDesc) {
 	}
 
 	nodeID := certToID(peer.Cert)
-	if !p.net.config.Validators.Contains(constants.PrimaryNetworkID, nodeID) && !p.net.config.Beacons.Contains(nodeID) {
+	if !p.net.config.Validators.Contains(nodeID) && !p.net.config.Beacons.Contains(nodeID) {
 		p.net.log.Verbo(
 			"not peering to %s at %s because they are not a validator or beacon",
 			nodeID.PrefixedString(constants.NodeIDPrefix), peer.IPDesc,
@@ -837,8 +837,8 @@ func (p *peer) handlePong(msg message.InboundMessage) {
 	}
 
 	// if the peer or this node is not a validator, we don't need their uptime.
-	if p.net.config.Validators.Contains(constants.PrimaryNetworkID, p.nodeID) &&
-		p.net.config.Validators.Contains(constants.PrimaryNetworkID, p.net.config.MyNodeID) {
+	if p.net.config.Validators.Contains(p.nodeID) &&
+		p.net.config.Validators.Contains(p.net.config.MyNodeID) {
 		uptime := msg.Get(message.Uptime).(uint8)
 		if uptime <= 100 {
 			p.observedUptime = uptime // [0, 100] percentage

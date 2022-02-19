@@ -190,11 +190,8 @@ func (n *Node) initNetworking() error {
 	tlsConfig := network.TLSConfig(n.Config.StakingTLSCert)
 
 	// Initialize validator manager and primary network's validator set
-	primaryNetworkValidators := validators.NewSet()
-	n.vdrs = validators.NewManager()
-	if err := n.vdrs.Set(constants.PrimaryNetworkID, primaryNetworkValidators); err != nil {
-		return err
-	}
+	networkValidators := validators.NewSet()
+	n.vdrs = validators.NewManager(n.Config.NetworkID)
 
 	// Configure benchlist
 	n.Config.BenchlistConfig.Validators = n.vdrs
@@ -206,12 +203,12 @@ func (n *Node) initNetworking() error {
 
 	consensusRouter := n.Config.ConsensusRouter
 	if !n.Config.EnableStaking {
-		if err := primaryNetworkValidators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
+		if err := networkValidators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
 			return err
 		}
 		consensusRouter = &insecureValidatorManager{
 			Router: consensusRouter,
-			vdrs:   primaryNetworkValidators,
+			vdrs:   networkValidators,
 			weight: n.Config.DisabledStakingWeight,
 		}
 	}
@@ -650,7 +647,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 	// Instead of updating node's validator manager, platform chain makes changes
 	// to its own local validator manager (which isn't used for sampling)
 	if !n.Config.EnableStaking {
-		vdrs = validators.NewManager()
+		vdrs = validators.NewManager(n.Config.NetworkID)
 	}
 
 	// Register the VMs that Avalanche supports
@@ -891,7 +888,7 @@ func (n *Node) initInfoAPI() error {
 
 	n.Log.Info("initializing info API")
 
-	primaryValidators, _ := n.vdrs.GetValidators(constants.PrimaryNetworkID)
+	validators, _ := n.vdrs.GetValidators()
 	service, err := info.NewService(
 		info.Parameters{
 			Version:               version.CurrentApp,
@@ -907,7 +904,7 @@ func (n *Node) initInfoAPI() error {
 		n.Config.VMManager,
 		n.Net,
 		version.NewDefaultApplicationParser(),
-		primaryValidators,
+		validators,
 	)
 	if err != nil {
 		return err

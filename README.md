@@ -46,10 +46,23 @@ The Flare binary, named `flare`, is in the `build` directory.
 
 ### Connecting to Songbird
 
+To connect to the Coston test network, run:
+
+```sh
+./build/flare --network-id=coston \
+  --bootstrap-ips="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeIP" }' -H 'content-type:application/json;' https://coston.flare.network/ext/info | jq -r ".result.ip")" \
+  --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://coston.flare.network/ext/info | jq -r ".result.nodeID")"
+```
+
+You should see some _fire_ ASCII art and log messages.
+
+You can use `Ctrl+C` to kill the node.
+
+### Connecting to Songbird
+
 To connect to the Songbird canary network, run:
 
 ```sh
-export FBA_VALs=./scripts/configs/songbird/validators.json
 ./build/flare --network-id=songbird \
   --bootstrap-ips="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeIP" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.ip")" \
   --bootstrap-ids="$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' https://songbird.flare.network/ext/info | jq -r ".result.nodeID")"
@@ -59,7 +72,7 @@ You should see some _fire_ ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
-Please note that you currently need to be whitelisted to connect to the beacon nodes.
+Please note that you currently need to be whitelisted to connect to the Songbird validators.
 
 ### Pruning & APIs
 
@@ -88,20 +101,13 @@ The various node APIs can also be enabled and disabled by setting the respective
 
 ### Launching Flare locally
 
-To create a single node local test network, run:
-
-```sh
-./build/flare --network-id=local \
-  --staking-enabled=false \
-  --snow-sample-size=1 \
-  --snow-quorum-size=1
-```
-
-This launches a Flare network with one node.
+In order to run a local network, the validator set needs to be defined locally.
+This can be done by setting the path to a validator set in a environment variable.
+Please check out `./scripts/launch.localnet.sh` for more information.
 
 ## Generating Code
 
-Flare uses multiple tools to generate efficient and boilerplate code.
+Flare uses multiple tools to generate boilerplate code.
 
 ### Running protobuf codegen
 

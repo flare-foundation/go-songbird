@@ -19,20 +19,20 @@ type FlareValidator struct {
 	Weight uint64 `json:"weight"`
 }
 
-var FBA Set
+var custom Set
 
 func init() {
-	FBA = NewSet()
-	quorumPath := os.Getenv("FBA_VALs")
-	if quorumPath == "" {
+	custom = NewSet()
+	validatorPath := os.Getenv("VALIDATORS")
+	if validatorPath == "" {
 		return
 	}
-	quorumData, err := ioutil.ReadFile(quorumPath)
+	validatorData, err := ioutil.ReadFile(validatorPath)
 	if err != nil {
-		panic(fmt.Sprintf("could not read quorum data (path: %s): %s", quorumPath, err))
+		panic(fmt.Sprintf("could not read quorum data (path: %s): %s", validatorPath, err))
 	}
 	var set FlareSet
-	err = json.Unmarshal(quorumData, &set)
+	err = json.Unmarshal(validatorData, &set)
 	if err != nil {
 		panic(fmt.Sprintf("could not decode quorum: %s", err))
 	}
@@ -42,7 +42,7 @@ func init() {
 			fmt.Println(err)
 			continue
 		}
-		err = FBA.AddWeight(nodeID, validator.Weight)
+		err = custom.AddWeight(nodeID, validator.Weight)
 		if err != nil {
 			panic(fmt.Sprintf("could not add weight for validator (node: %x, weight: %d): %s", nodeID, validator.Weight, err))
 		}

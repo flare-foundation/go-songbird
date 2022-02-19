@@ -429,18 +429,12 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	}
 
 	// The validators of this blockchain
-	var vdrs validators.Set // Validators validating this blockchain
-	var ok bool
-	if m.StakingEnabled {
-		vdrs, ok = m.Validators.GetValidators(chainParams.SubnetID)
-	} else { // Staking is disabled. Every peer validates every subnet.
-		vdrs, ok = m.Validators.GetValidators(constants.PrimaryNetworkID)
-	}
+	validators, ok := m.Validators.GetValidators()
 	if !ok {
-		return nil, fmt.Errorf("couldn't get validator set of subnet with ID %s. The subnet may not exist", chainParams.SubnetID)
+		return nil, fmt.Errorf("couldn't get validator set of network with ID %d. The network may not exist", m.NetworkID)
 	}
 
-	beacons := vdrs
+	beacons := validators
 	if chainParams.CustomBeacons != nil {
 		beacons = chainParams.CustomBeacons
 	}
@@ -453,7 +447,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 		chain, err = m.createAvalancheChain(
 			ctx,
 			chainParams.GenesisData,
-			vdrs,
+			validators,
 			beacons,
 			vm,
 			fxs,
@@ -468,7 +462,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 		chain, err = m.createSnowmanChain(
 			ctx,
 			chainParams.GenesisData,
-			vdrs,
+			validators,
 			beacons,
 			vm,
 			fxs,

@@ -1018,18 +1018,6 @@ func (st *internalStateImpl) writeCurrentStakers() error {
 				continue
 			}
 
-			if subnetID == constants.PrimaryNetworkID || st.vm.WhitelistedSubnets.Contains(subnetID) {
-				var err error
-				if nodeDiff.Decrease {
-					err = st.vm.Validators.RemoveWeight(subnetID, nodeID, nodeDiff.Amount)
-				} else {
-					err = st.vm.Validators.AddWeight(subnetID, nodeID, nodeDiff.Amount)
-				}
-				if err != nil {
-					return err
-				}
-			}
-
 			nodeDiffBytes, err := GenesisCodec.Marshal(CodecVersion, nodeDiff)
 			if err != nil {
 				return err
@@ -1045,13 +1033,13 @@ func (st *internalStateImpl) writeCurrentStakers() error {
 	}
 
 	// Attempt to update the stake metrics
-	primaryValidators, ok := st.vm.Validators.GetValidators(constants.PrimaryNetworkID)
+	validators, ok := st.vm.Validators.GetValidators()
 	if !ok {
 		return nil
 	}
-	weight, _ := primaryValidators.GetWeight(st.vm.ctx.NodeID)
+	weight, _ := validators.GetWeight(st.vm.ctx.NodeID)
 	st.vm.localStake.Set(float64(weight))
-	st.vm.totalStake.Set(float64(primaryValidators.Weight()))
+	st.vm.totalStake.Set(float64(validators.Weight()))
 	return nil
 }
 

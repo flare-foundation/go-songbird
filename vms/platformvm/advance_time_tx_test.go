@@ -150,7 +150,7 @@ func TestAdvanceTimeTxUpdatePrimaryNetworkStakers(t *testing.T) {
 	// Test VM validators
 	onCommit.Apply(vm.internalState)
 	assert.NoError(t, vm.internalState.Commit())
-	assert.True(t, vm.Validators.Contains(constants.PrimaryNetworkID, nodeID))
+	assert.True(t, vm.Validators.Contains(nodeID))
 }
 
 // Ensure semantic verification updates the current and pending staker sets correctly.

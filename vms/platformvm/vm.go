@@ -189,13 +189,6 @@ func (vm *VM) Initialize(
 	vm.uptimeManager = uptime.NewManager(is)
 	vm.UptimeLockedCalculator.SetCalculator(&vm.bootstrapped, &ctx.Lock, vm.uptimeManager)
 
-	if err := vm.updateValidators(); err != nil {
-		return fmt.Errorf(
-			"failed to initialize validator sets: %w",
-			err,
-		)
-	}
-
 	// Create all of the chains that the database says exist
 	if err := vm.initBlockchains(); err != nil {
 		return fmt.Errorf(
@@ -318,14 +311,14 @@ func (vm *VM) Shutdown() error {
 	vm.blockBuilder.Shutdown()
 
 	if vm.bootstrapped.GetValue() {
-		primaryValidatorSet, exist := vm.Validators.GetValidators(constants.PrimaryNetworkID)
+		validators, exist := vm.Validators.GetValidators()
 		if !exist {
 			return errNoPrimaryValidators
 		}
-		primaryValidators := primaryValidatorSet.List()
+		validatorList := validators.List()
 
-		validatorIDs := make([]ids.ShortID, len(primaryValidators))
-		for i, vdr := range primaryValidators {
+		validatorIDs := make([]ids.ShortID, len(validatorList))
+		for i, vdr := range validatorList {
 			validatorIDs[i] = vdr.ID()
 		}
 
@@ -496,15 +489,15 @@ func (vm *VM) GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]u
 	// get the start time to track metrics
 	startTime := vm.Clock().Time()
 
-	currentValidators, ok := vm.Validators.GetValidators(subnetID)
+	validators, ok := vm.Validators.GetValidators()
 	if !ok {
 		return nil, errNotEnoughValidators
 	}
-	currentValidatorList := currentValidators.List()
+	validatorList := validators.List()
 
-	vdrSet := make(map[ids.ShortID]uint64, len(currentValidatorList))
-	for _, vdr := range currentValidatorList {
-		vdrSet[vdr.ID()] = vdr.Weight()
+	validatorSet := make(map[ids.ShortID]uint64, len(validatorList))
+	for _, vdr := range validatorList {
+		validatorSet[vdr.ID()] = vdr.Weight()
 	}
 
 	for i := lastAcceptedHeight; i > height; i-- {
@@ -525,26 +518,26 @@ func (vm *VM) GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]u
 				op = safemath.Sub64
 			}
 
-			newWeight, err := op(vdrSet[nodeID], diff.Amount)
+			newWeight, err := op(validatorSet[nodeID], diff.Amount)
 			if err != nil {
 				return nil, err
 			}
 			if newWeight == 0 {
-				delete(vdrSet, nodeID)
+				delete(validatorSet, nodeID)
 			} else {
-				vdrSet[nodeID] = newWeight
+				validatorSet[nodeID] = newWeight
 			}
 		}
 	}
 
 	// cache the validator set
-	validatorSetsCache.Put(height, vdrSet)
+	validatorSetsCache.Put(height, validatorSet)
 
 	endTime := vm.Clock().Time()
 	vm.metrics.validatorSetsCreated.Inc()
 	vm.metrics.validatorSetsDuration.Add(float64(endTime.Sub(startTime)))
 	vm.metrics.validatorSetsHeightDiff.Add(float64(lastAcceptedHeight - height))
-	return vdrSet, nil
+	return validatorSet, nil
 }
 
 // GetCurrentHeight returns the height of the last accepted block
@@ -554,24 +547,6 @@ func (vm *VM) GetCurrentHeight() (uint64, error) {
 		return 0, err
 	}
 	return lastAccepted.Height(), nil
-}
-
-func (vm *VM) updateValidators() error {
-	localValidators := validators.FBA
-	if err := vm.Validators.Set(constants.PrimaryNetworkID, localValidators); err != nil {
-		return err
-	}
-
-	weight, _ := localValidators.GetWeight(vm.ctx.NodeID)
-	vm.localStake.Set(float64(weight))
-	vm.totalStake.Set(float64(localValidators.Weight()))
-
-	for subnetID := range vm.WhitelistedSubnets {
-		if err := vm.Validators.Set(subnetID, localValidators); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // Returns the time when the next staker of any subnet starts/stops staking
@@ -615,18 +590,18 @@ func (vm *VM) Logger() logging.Logger { return vm.ctx.Log }
 // Returns the percentage of the total stake on the Primary Network of nodes
 // connected to this node.
 func (vm *VM) getPercentConnected() (float64, error) {
-	vdrSet, exists := vm.Validators.GetValidators(constants.PrimaryNetworkID)
+	validators, exists := vm.Validators.GetValidators()
 	if !exists {
 		return 0, errNoPrimaryValidators
 	}
 
-	vdrs := vdrSet.List()
+	validatorList := validators.List()
 
 	var (
 		connectedStake uint64
 		err            error
 	)
-	for _, vdr := range vdrs {
+	for _, vdr := range validatorList {
 		if !vm.uptimeManager.IsConnected(vdr.ID()) {
 			continue // not connected to us --> don't include
 		}
@@ -635,5 +610,5 @@ func (vm *VM) getPercentConnected() (float64, error) {
 			return 0, err
 		}
 	}
-	return float64(connectedStake) / float64(vdrSet.Weight()), nil
+	return float64(connectedStake) / float64(validators.Weight()), nil
 }

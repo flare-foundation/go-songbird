@@ -72,10 +72,6 @@ type testListener struct {
 
 func getDefaultManager() validators.Manager {
 	defaultValidators := validators.NewManager()
-	err := defaultValidators.Set(constants.PrimaryNetworkID, validators.NewSet())
-	if err != nil {
-		panic(err)
-	}
 	return defaultValidators
 }
 
@@ -1459,21 +1455,6 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 		2,
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
-
-	err := vdrs.AddWeight(constants.PrimaryNetworkID, id0, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = vdrs.AddWeight(constants.PrimaryNetworkID, id1, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = vdrs.AddWeight(constants.PrimaryNetworkID, id2, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	listener0 := &testListener{
 		addr: &net.TCPAddr{
