@@ -14,6 +14,7 @@ import (
 )
 
 func TestBaseTxMarshalJSON(t *testing.T) {
+	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {

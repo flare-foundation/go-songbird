@@ -15,6 +15,7 @@ import (
 )
 
 func TestCreateSubnetTxAP3FeeChange(t *testing.T) {
+	t.Skip()
 	ap3Time := defaultGenesisTime.Add(time.Hour)
 	tests := []struct {
 		name         string

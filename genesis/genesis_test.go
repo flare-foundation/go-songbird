@@ -379,7 +379,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       constants.EVMID,
-					expectedID: "2dyKVCb16j5wjDDBkd6bXv5XDHq68zKimdELvMVetMf5NqfpzK",
+					expectedID: "2K181beJgGqi3z1N8gQC6Tq1ffejTiH3HZRGRYukKjyFDXspwp",
 				},
 			},
 		},
@@ -418,7 +418,7 @@ func TestVMGenesis(t *testing.T) {
 				},
 				{
 					vmID:       constants.EVMID,
-					expectedID: "3xenVMuh6xopEyTd6Mep83BbvRpBVzoWdPTyvAxXgDTWtWchU",
+					expectedID: "qNigBiF2gjcLWf8Zguzi1ztr2nJ87Z7bWwbDzWBJvuwuhvBkX",
 				},
 			},
 		},
