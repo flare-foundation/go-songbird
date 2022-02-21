@@ -124,10 +124,10 @@ These are the default settings:
   "metrics-enabled": false,
   "metrics-expensive-enabled": false,
   "local-txs-enabled": false,
-  "api-max-duration": 0, // Default to no maximum
+  "api-max-duration": 0,
   "ws-cpu-refill-rate": 0,
   "ws-cpu-max-stored": 0,
-  "api-max-blocks-per-request": 0, // Default to no maximum
+  "api-max-blocks-per-request": 0,
   "allow-unfinalized-queries": false,
   "allow-unprotected-txs": false,
   "keystore-directory": "",
@@ -138,7 +138,7 @@ These are the default settings:
   "tx-regossip-max-size": 15,
   "log-level": "debug",
   "offline-pruning-enabled": false,
-  "offline-pruning-bloom-filter-size": 512, // MB
+  "offline-pruning-bloom-filter-size": 512,
   "offline-pruning-data-directory": ""
 }
 ```
@@ -154,7 +154,7 @@ The various node APIs can also be enabled and disabled by setting the respective
 ### Launching Flare locally
 
 In order to run a local network, the validator set needs to be defined locally.
-This can be done by setting the path to a validator set in a environment variable.
+This can be done by setting the validator set in a environment variable.
 
 You can use `./scripts/launch_localnet.sh` as an easy way to spin up a 5-node local network.
 All funds are controlled by the private key under `/.scripts/keys/6b0dd034a2fd67b932f10e3dba1d2bbd39348695.json`.
