@@ -26,7 +26,7 @@ If you plan to build Flare from source, you will also need the following softwar
 Clone the Flare repository:
 
 ```sh
-git clone git@github.com:flare-foundation/flare.git
+git clone https://github.com/flare-foundation/flare.git
 cd flare
 ```
 
@@ -44,7 +44,7 @@ The Flare binary, named `flare`, is in the `build` directory.
 
 ## Running Flare
 
-### Connecting to Songbird
+### Connecting to Coston
 
 To connect to the Coston test network, run:
 
