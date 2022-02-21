@@ -95,13 +95,12 @@ Please note that you currently need to be whitelisted in order to connect to the
 
 The configuration for the chain is loaded from a configuration file, located at `{chain-config-dir}/C/config.json`.
 
-These are the default settings:
+Here are the most relevant default settings:
 
 ```json
 {
   "snowman-api-enabled": false,
   "coreth-admin-api-enabled": false,
-  "coreth-admin-api-dir": "",
   "eth-apis": [
     "public-eth",
     "public-eth-filter",
@@ -112,38 +111,20 @@ These are the default settings:
     "internal-public-transaction-pool",
     "internal-public-account"
   ],
-  "continuous-profiler-dir": "",
-  "continuous-profiler-frequency": 900000000000,
-  "continuous-profiler-max-files": 5,
   "rpc-gas-cap": 50000000,
   "rpc-tx-fee-cap": 100,
-  "preimages-enabled": false,
   "pruning-enabled": true,
-  "snapshot-async": true,
-  "snapshot-verification-enabled": false,
-  "metrics-enabled": false,
-  "metrics-expensive-enabled": false,
   "local-txs-enabled": false,
   "api-max-duration": 0,
-  "ws-cpu-refill-rate": 0,
-  "ws-cpu-max-stored": 0,
   "api-max-blocks-per-request": 0,
   "allow-unfinalized-queries": false,
   "allow-unprotected-txs": false,
-  "keystore-directory": "",
-  "keystore-external-signer": "",
-  "keystore-insecure-unlock-allowed": false,
   "remote-tx-gossip-only-enabled": false,
-  "tx-regossip-frequency": 60000000000,
-  "tx-regossip-max-size": 15,
   "log-level": "debug",
-  "offline-pruning-enabled": false,
-  "offline-pruning-bloom-filter-size": 512,
-  "offline-pruning-data-directory": ""
 }
 ```
 
-You can refer to the original [Avalanche documentation](https://docs.avax.network/build/references/avalanchego-config-flags/#c-chain-configs) for a description of the settings.
+You can refer to the original [Avalanche documentation](https://docs.avax.network/build/references/avalanchego-config-flags/#c-chain-configs) for a full list of all settings and a detailed description.
 
 The directory for configuration files defaults to `HOME/.flare/configs` and can be changed using the `--chain-config-dir` flag.
 
