@@ -48,14 +48,15 @@ The Flare binary, named `flare`, is in the `build` directory.
 
 **If your node was previously running on the legacy version from the Gitlab repository, some directories need to be renamed/moved.**
 
-- The default directory changed from `$HOME/.avalanchego` to `$HOME/.flare`.
-- The name of the database sub-directory changed from `db/fuji` to `db/songbird` / `db/coston` respectively, to reflect the actual name of the network.
+- The default root directory changed from `$HOME/.avalanchego` to `$HOME/.flare`.
+- The name of the database sub-directory changed from `db/fuji` to `db/songbird` / `db/coston` respectively.
 
-However, if you are running on the legacy version with default parameters, you are probably using RocksDB as the database engine.
+If you don't properly move the relevant directories _before_ starting the node, it will not pick up the previous database and it will start synchronizing from scratch.
 
-**We highly recommend node operators to resynchronize their nodes using LevelDB as database engine.**
+That being said, if you are running on the legacy version with default parameters, you are probably using RocksDB as the database engine. The RocksDB library used by the Avalanche code base is flawed and the database itself is a lot less reliable, thus being more liable to corruption.
 
-The RocksDB library used by the Avalanche code base is flawed and the database itself is a lot less reliable, thus being more liable to corruption.
+**We thus highly recommend node operators running on RocksDB to resynchronize their nodes using LevelDB as database engine.**
+
 
 ### Connecting to Coston
 
