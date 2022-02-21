@@ -58,6 +58,8 @@ You should see some _fire_ ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
+If you want your node's API to be reachable, you have to add the `--http-host=<ip_address>` flag to the command line.
+
 ### Connecting to Songbird
 
 To connect to the Songbird canary network, run:
@@ -72,7 +74,9 @@ You should see some _fire_ ASCII art and log messages.
 
 You can use `Ctrl+C` to kill the node.
 
-Please note that you currently need to be whitelisted to connect to the Songbird validators.
+If you want your node's API to be reachable, you have to add the `--http-host=<ip_address>` flag to the command line.
+
+Please note that you currently need to be whitelisted in order to connect to the Songbird network.
 
 ### Pruning & APIs
 
