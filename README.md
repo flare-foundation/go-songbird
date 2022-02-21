@@ -76,22 +76,57 @@ Please note that you currently need to be whitelisted to connect to the Songbird
 
 ### Pruning & APIs
 
-The configuration for the chain is loaded from a configuration file, located at `{chain-config-dir}/C/config.json`:
+The configuration for the chain is loaded from a configuration file, located at `{chain-config-dir}/C/config.json`.
+
+These are the default settings:
 
 ```json
 {
   "snowman-api-enabled": false,
   "coreth-admin-api-enabled": false,
-  "net-api-enabled": true,
-  "eth-api-enabled": true,
-  "personal-api-enabled": false,
-  "tx-pool-api-enabled": true,
-  "debug-api-enabled": true,
-  "web3-api-enabled": true,
-  "local-txs-enabled": true,
-  "pruning-enabled": false
+  "coreth-admin-api-dir": "",
+  "eth-apis": [
+    "public-eth",
+    "public-eth-filter",
+    "net",
+    "web3",
+    "internal-public-eth",
+    "internal-public-blockchain",
+    "internal-public-transaction-pool",
+    "internal-public-account"
+  ],
+  "continuous-profiler-dir": "",
+  "continuous-profiler-frequency": 900000000000,
+  "continuous-profiler-max-files": 5,
+  "rpc-gas-cap": 50000000,
+  "rpc-tx-fee-cap": 100,
+  "preimages-enabled": false,
+  "pruning-enabled": true,
+  "snapshot-async": true,
+  "snapshot-verification-enabled": false,
+  "metrics-enabled": false,
+  "metrics-expensive-enabled": false,
+  "local-txs-enabled": false,
+  "api-max-duration": 0, // Default to no maximum
+  "ws-cpu-refill-rate": 0,
+  "ws-cpu-max-stored": 0,
+  "api-max-blocks-per-request": 0, // Default to no maximum
+  "allow-unfinalized-queries": false,
+  "allow-unprotected-txs": false,
+  "keystore-directory": "",
+  "keystore-external-signer": "",
+  "keystore-insecure-unlock-allowed": false,
+  "remote-tx-gossip-only-enabled": false,
+  "tx-regossip-frequency": 60000000000,
+  "tx-regossip-max-size": 15,
+  "log-level": "debug",
+  "offline-pruning-enabled": false,
+  "offline-pruning-bloom-filter-size": 512, // MB
+  "offline-pruning-data-directory": ""
 }
 ```
+
+You can refer to the original [Avalanche documentation](https://docs.avax.network/build/references/avalanchego-config-flags/#c-chain-configs) for a description of the settings.
 
 The directory for configuration files defaults to `HOME/.flare/configs` and can be changed using the `--chain-config-dir` flag.
 
