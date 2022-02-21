@@ -32,7 +32,7 @@ cd flare
 
 This will clone and checkout to `master` branch.
 
-#### Building the Flare Executable
+### Building the Flare Executable
 
 Build Flare using the build script:
 
@@ -43,6 +43,19 @@ Build Flare using the build script:
 The Flare binary, named `flare`, is in the `build` directory.
 
 ## Running Flare
+
+### Legacy Version Upgrade
+
+**If your node was previously running on the legacy version from the Gitlab repository, some directories need to be renamed/moved.**
+
+- The default directory changed from `$HOME/.avalanchego` to `$HOME/.flare`.
+- The name of the database sub-directory changed from `db/fuji` to `db/songbird` / `db/coston` respectively, to reflect the actual name of the network.
+
+However, if you are running on the legacy version with default parameters, you are probably using RocksDB as the database engine.
+
+**We highly recommend node operators to resynchronize their nodes using LevelDB as database engine.**
+
+The RocksDB library used by the Avalanche code base is flawed and the database itself is a lot less reliable, thus being more liable to corruption.
 
 ### Connecting to Coston
 
