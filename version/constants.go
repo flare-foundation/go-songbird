@@ -17,15 +17,23 @@ import (
 
 // These are globals that describe network upgrades and node versions
 var (
-	// TODO: Change to Flare versions after all nodes on Songbird have hard-coded
-	// Flare versioning support.
-	Current                      = NewDefaultVersion(1, 7, 2)
+	// Flare versioning constants.
+	Current                      = NewDefaultVersion(0, 5, 1)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 1, 7, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 1, 5, 0)
-	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 1, 1, 0)
-	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 1, 0, 0)
-	VersionParser                = NewDefaultApplicationParser()
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
+	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 2, 0)
+	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
+
+	// Legacy versioning constants.
+	Legacy                      = NewDefaultVersion(1, 7, 5)
+	LegacyApp                   = NewDefaultApplication(constants.LegacyPlatformName, Legacy.Major(), Legacy.Minor(), Legacy.Patch())
+	LegacyCompatibleVersion     = NewDefaultApplication(constants.LegacyPlatformName, 1, 7, 0)
+	PrevLegacyCompatibleVersion = NewDefaultApplication(constants.LegacyPlatformName, 1, 5, 0)
+	LegacyUnmaskedVersion       = NewDefaultApplication(constants.LegacyPlatformName, 1, 1, 0)
+	PrevLegacyUnmaskedVersion   = NewDefaultApplication(constants.LegacyPlatformName, 1, 0, 0)
+
+	VersionParser = NewDefaultApplicationParser()
 
 	CurrentDatabase = DatabaseVersion1_4_5
 	PrevDatabase    = DatabaseVersion1_0_0
@@ -43,25 +51,22 @@ var (
 	ApricotPhase2DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase3Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
-		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.February, 25, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 7, 14, 0, 0, 0, time.UTC),
 	}
-	ApricotPhase3DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+	ApricotPhase3DefaultTime = time.Date(2022, time.February, 9, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase4Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
-		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.February, 25, 15, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 7, 15, 0, 0, 0, time.UTC),
 	}
-	ApricotPhase4DefaultTime = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+	ApricotPhase4DefaultTime = time.Date(2022, time.February, 10, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase5Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
-		constants.FlareID:    time.Date(2100, time.January, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.February, 25, 16, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 7, 16, 0, 0, 0, time.UTC),
 	}
-	ApricotPhase5DefaultTime = time.Date(2000, time.December, 5, 5, 0, 0, 0, time.UTC)
+	ApricotPhase5DefaultTime = time.Date(2022, time.February, 11, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
@@ -125,5 +130,17 @@ func GetCompatibility(networkID uint32) Compatibility {
 		MinimumUnmaskedVersion,
 		GetApricotPhase0Time(networkID),
 		PrevMinimumUnmaskedVersion,
+	)
+}
+
+func GetLegacyCompatibility(networkID uint32) Compatibility {
+	return NewCompatibility(
+		LegacyApp,
+		LegacyCompatibleVersion,
+		GetApricotPhase5Time(networkID),
+		PrevLegacyCompatibleVersion,
+		LegacyUnmaskedVersion,
+		GetApricotPhase0Time(networkID),
+		PrevLegacyUnmaskedVersion,
 	)
 }

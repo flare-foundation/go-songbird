@@ -9,8 +9,9 @@ import (
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/vms/components/avax"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 var _ UnsignedProposalTx = &UnsignedAdvanceTimeTx{}
@@ -119,11 +120,10 @@ pendingStakerLoop:
 				break pendingStakerLoop
 			}
 
-			r := reward(
+			r := vm.rewards.Calculate(
 				staker.Validator.Duration(),
 				staker.Validator.Wght,
 				currentSupply,
-				vm.StakeMintingPeriod,
 			)
 			currentSupply, err = safemath.Add64(currentSupply, r)
 			if err != nil {
@@ -140,11 +140,10 @@ pendingStakerLoop:
 				break pendingStakerLoop
 			}
 
-			r := reward(
+			r := vm.rewards.Calculate(
 				staker.Validator.Duration(),
 				staker.Validator.Wght,
 				currentSupply,
-				vm.StakeMintingPeriod,
 			)
 			currentSupply, err = safemath.Add64(currentSupply, r)
 			if err != nil {

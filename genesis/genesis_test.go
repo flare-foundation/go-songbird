@@ -16,8 +16,6 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/perms"
-	"github.com/flare-foundation/flare/vms/avm"
-	"github.com/flare-foundation/flare/vms/evm"
 	"github.com/flare-foundation/flare/vms/platformvm"
 )
 
@@ -376,12 +374,12 @@ func TestVMGenesis(t *testing.T) {
 			networkID: constants.FlareID,
 			vmTest: []vmTest{
 				{
-					vmID:       avm.ID,
+					vmID:       constants.AVMID,
 					expectedID: "kuZe3hRrShPqeGbHag3ffGVNUTeca2TgFmbDhKgB9gPyCuvaq",
 				},
 				{
-					vmID:       evm.ID,
-					expectedID: "6ZZhw9q1giWQrdCpJqpa3dx8y5kidGvTwk1eZohPuZsYFdkr1",
+					vmID:       constants.EVMID,
+					expectedID: "2K181beJgGqi3z1N8gQC6Tq1ffejTiH3HZRGRYukKjyFDXspwp",
 				},
 			},
 		},
@@ -389,11 +387,11 @@ func TestVMGenesis(t *testing.T) {
 			networkID: constants.SongbirdID,
 			vmTest: []vmTest{
 				{
-					vmID:       avm.ID,
+					vmID:       constants.AVMID,
 					expectedID: "7xKYhEvYuUekwDxozgEiMPufzJ3jJPypKbGE8ny6KL84z4RKB",
 				},
 				{
-					vmID:       evm.ID,
+					vmID:       constants.EVMID,
 					expectedID: "erCt5pSo5d4bM8fMrsB2dRM54PGssDAVqRg1jHedQzr6ayLiq",
 				},
 			},
@@ -402,12 +400,12 @@ func TestVMGenesis(t *testing.T) {
 			networkID: constants.CostonID,
 			vmTest: []vmTest{
 				{
-					vmID:       avm.ID,
+					vmID:       constants.AVMID,
 					expectedID: "8S5vg8ycMqULMMq2CzrRh3qqbFWjs6a35H8UwNAaS83v9Ynxa",
 				},
 				{
-					vmID:       evm.ID,
-					expectedID: "TWbLQ1bXwJCy4c2jCiBGXBz5RDsHygfBXwUeuk6gn7pz3vdx7",
+					vmID:       constants.EVMID,
+					expectedID: "2wcJd3HZL4EAoQDfGhyeHGJU55wizganSzD9EvdDLJX3B5u5Be",
 				},
 			},
 		},
@@ -415,12 +413,12 @@ func TestVMGenesis(t *testing.T) {
 			networkID: constants.LocalID,
 			vmTest: []vmTest{
 				{
-					vmID:       avm.ID,
+					vmID:       constants.AVMID,
 					expectedID: "ALRkp1tuy7ErVkWuEWFLVd657JAULWDDyQkQBkLKVE94jCaNu",
 				},
 				{
-					vmID:       evm.ID,
-					expectedID: "86fvHfcmB1PrLA4AH4ZikG1nbct7NfmUKSg1HmZg5EQLkJtdz",
+					vmID:       constants.EVMID,
+					expectedID: "qNigBiF2gjcLWf8Zguzi1ztr2nJ87Z7bWwbDzWBJvuwuhvBkX",
 				},
 			},
 		},

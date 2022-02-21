@@ -8,7 +8,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gconn/gconnproto"
+	"github.com/flare-foundation/flare/api/proto/gconnproto"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
 )
 

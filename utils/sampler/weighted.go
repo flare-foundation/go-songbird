@@ -3,9 +3,7 @@
 
 package sampler
 
-import (
-	"errors"
-)
+import "errors"
 
 var errOutOfRange = errors.New("out of range")
 

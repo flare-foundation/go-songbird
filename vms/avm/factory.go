@@ -4,13 +4,7 @@
 package avm
 
 import (
-	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-)
-
-// ID that this VM uses when labeled
-var (
-	ID = ids.ID{'a', 'v', 'm'}
 )
 
 type Factory struct {

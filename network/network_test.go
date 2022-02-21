@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
@@ -67,15 +68,6 @@ type testListener struct {
 	inbound chan net.Conn
 	once    sync.Once
 	closed  chan struct{}
-}
-
-func getDefaultManager() validators.Manager {
-	defaultValidators := validators.NewManager()
-	err := defaultValidators.Set(constants.PrimaryNetworkID, validators.NewSet())
-	if err != nil {
-		panic(err)
-	}
-	return defaultValidators
 }
 
 func (l *testListener) Accept() (net.Conn, error) {
@@ -219,8 +211,8 @@ func (c *testConn) SetWriteDeadline(time.Time) error { return nil }
 
 type testHandler struct {
 	router.Router
-	ConnectedF    func(ids.ShortID)
-	DisconnectedF func(ids.ShortID)
+	ConnectedF    func(nodeID ids.ShortID, nodeVersion version.Application)
+	DisconnectedF func(nodeID ids.ShortID)
 	PutF          func(
 		validatorID ids.ShortID,
 		chainID ids.ID,
@@ -229,15 +221,17 @@ type testHandler struct {
 		container []byte,
 		onFinishedHandling func(),
 	)
-	AppGossipF func(nodeID ids.ShortID,
+	AppGossipF func(
+		nodeID ids.ShortID,
 		chainID ids.ID,
 		appGossipBytes []byte,
-		onFinishedHandling func())
+		onFinishedHandling func(),
+	)
 }
 
-func (h *testHandler) Connected(id ids.ShortID) {
+func (h *testHandler) Connected(id ids.ShortID, nodeVersion version.Application) {
 	if h.ConnectedF != nil {
-		h.ConnectedF(id)
+		h.ConnectedF(id, nodeVersion)
 	}
 }
 
@@ -256,12 +250,14 @@ func (h *testHandler) HandleInbound(msg message.InboundMessage) {
 		container, _ := msg.Get(message.ContainerBytes).([]byte)
 
 		if h.PutF != nil {
-			h.PutF(msg.NodeID(),
+			h.PutF(
+				msg.NodeID(),
 				chainID,
 				requestID,
 				containerID,
 				container,
-				msg.OnFinishedHandling)
+				msg.OnFinishedHandling,
+			)
 		}
 	case message.AppGossip:
 		chainID, _ := ids.ToID(msg.Get(message.ChainID).([]byte))
@@ -351,7 +347,7 @@ func TestNewDefaultNetwork(t *testing.T) {
 		closed:  make(chan struct{}),
 	}
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0, validators.WithValidator(id, math.MaxUint64))
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -430,7 +426,10 @@ func TestEstablishConnection(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -444,7 +443,7 @@ func TestEstablishConnection(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -455,7 +454,7 @@ func TestEstablishConnection(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -567,7 +566,10 @@ func TestDoubleTrack(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -581,7 +583,7 @@ func TestDoubleTrack(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -592,7 +594,7 @@ func TestDoubleTrack(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -705,7 +707,10 @@ func TestDoubleClose(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -719,7 +724,7 @@ func TestDoubleClose(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -730,7 +735,7 @@ func TestDoubleClose(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -848,7 +853,10 @@ func TestTrackConnected(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -862,7 +870,7 @@ func TestTrackConnected(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				wg0.Done()
 			}
@@ -873,7 +881,7 @@ func TestTrackConnected(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				wg1.Done()
 			}
@@ -987,7 +995,10 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -1161,7 +1172,11 @@ func TestPeerAliasesTicker(t *testing.T) {
 		},
 	}
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+		validators.WithValidator(id2, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -1180,7 +1195,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id1 {
 				wg0.Done()
 				return
@@ -1201,7 +1216,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg0.Done()
 				return
@@ -1218,7 +1233,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if cleanup {
 				return
 			}
@@ -1231,7 +1246,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 	msgCreator3, err := message.NewCreator(metrics3, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler3 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg2.Done()
 				return
@@ -1436,9 +1451,6 @@ func TestPeerAliasesTicker(t *testing.T) {
 func TestPeerAliasesDisconnect(t *testing.T) {
 	initCerts(t)
 
-	vdrs := getDefaultManager()
-	beacons := validators.NewSet()
-
 	ip0 := utils.NewDynamicIPDesc(
 		net.IPv6loopback,
 		0,
@@ -1455,20 +1467,12 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
-	err := vdrs.AddWeight(constants.PrimaryNetworkID, id0, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = vdrs.AddWeight(constants.PrimaryNetworkID, id1, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = vdrs.AddWeight(constants.PrimaryNetworkID, id2, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+		validators.WithValidator(id2, 1),
+	)
+	beacons := validators.NewSet()
 
 	listener0 := &testListener{
 		addr: &net.TCPAddr{
@@ -1569,7 +1573,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id1 {
 				wg0.Done()
 				return
@@ -1601,7 +1605,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg0.Done()
 				return
@@ -1618,7 +1622,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if cleanup {
 				return
 			}
@@ -1631,7 +1635,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	msgCreator3, err := message.NewCreator(metrics3, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler3 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id == id0 {
 				wg3.Done()
 				return
@@ -1913,11 +1917,11 @@ func TestPeerSignature(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+	)
 	beacons := validators.NewSet()
-	// id2 is a validator
-	err := vdrs.AddWeight(constants.PrimaryNetworkID, id2, math.MaxUint64)
-	assert.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -1938,7 +1942,7 @@ func TestPeerSignature(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id0 {
 				handledLock.Lock()
 				handled[id0.String()+":"+id.String()] = struct{}{}
@@ -1952,7 +1956,7 @@ func TestPeerSignature(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id1 {
 				handledLock.Lock()
 				handled[id1.String()+":"+id.String()] = struct{}{}
@@ -1966,7 +1970,7 @@ func TestPeerSignature(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			if id != id2 {
 				handledLock.Lock()
 				handled[id2.String()+":"+id.String()] = struct{}{}
@@ -2133,9 +2137,9 @@ func TestValidatorIPs(t *testing.T) {
 	thirdValidatorPeer := createPeer(ids.ShortID{0x03}, thirdValidatorIPDesc, appVersion)
 	addPeerToNetwork(&dummyNetwork, thirdValidatorPeer, true)
 
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, firstValidatorPeer.nodeID))
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, secondValidatorPeer.nodeID))
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, thirdValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(firstValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(secondValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(thirdValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err := dummyNetwork.validatorIPs()
@@ -2168,7 +2172,7 @@ func TestValidatorIPs(t *testing.T) {
 	disconnectedValidatorPeer := createPeer(ids.ShortID{0x01}, disconnectedValidatorIPDesc, appVersion)
 	disconnectedValidatorPeer.finishedHandshake.SetValue(false)
 	addPeerToNetwork(&dummyNetwork, disconnectedValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, disconnectedValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(disconnectedValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2186,7 +2190,7 @@ func TestValidatorIPs(t *testing.T) {
 	}
 	zeroValidatorPeer := createPeer(ids.ShortID{0x01}, zeroIPValidatorIPDesc, appVersion)
 	addPeerToNetwork(&dummyNetwork, zeroValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, zeroValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(zeroValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2205,7 +2209,7 @@ func TestValidatorIPs(t *testing.T) {
 
 	nonValidatorPeer := createPeer(ids.ShortID{0x04}, nonValidatorIPDesc, appVersion)
 	addPeerToNetwork(&dummyNetwork, nonValidatorPeer, false)
-	assert.False(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, nonValidatorPeer.nodeID))
+	assert.False(t, dummyNetwork.config.Validators.Contains(nonValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2225,7 +2229,7 @@ func TestValidatorIPs(t *testing.T) {
 	}
 	maskedValidatorPeer := createPeer(ids.ShortID{0x01}, maskedValidatorIPDesc, maskedVersion)
 	addPeerToNetwork(&dummyNetwork, maskedValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, maskedValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(maskedValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2251,7 +2255,7 @@ func TestValidatorIPs(t *testing.T) {
 		time: uint64(0),
 	})
 	addPeerToNetwork(&dummyNetwork, wrongCertValidatorPeer, true)
-	assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, wrongCertValidatorPeer.nodeID))
+	assert.True(t, dummyNetwork.config.Validators.Contains(wrongCertValidatorPeer.nodeID))
 
 	// test
 	validatorIPs, err = dummyNetwork.validatorIPs()
@@ -2273,7 +2277,7 @@ func TestValidatorIPs(t *testing.T) {
 		}
 		peer := createPeer(ids.ShortID{byte(i)}, ipDesc, appVersion)
 		addPeerToNetwork(&dummyNetwork, peer, true)
-		assert.True(t, dummyNetwork.config.Validators.Contains(constants.PrimaryNetworkID, peer.nodeID))
+		assert.True(t, dummyNetwork.config.Validators.Contains(peer.nodeID))
 	}
 
 	// test
@@ -2343,10 +2347,12 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id1, 1),
+		validators.WithValidator(id0, 1),
+	)
 	beacons := validators.NewSet()
-	assert.NoError(t, vdrs.AddWeight(constants.PrimaryNetworkID, id1, 1))
-	assert.NoError(t, vdrs.AddWeight(constants.PrimaryNetworkID, id0, 1))
 
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -2485,7 +2491,10 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(0,
+		validators.WithValidator(id0, 1),
+		validators.WithValidator(id1, 1),
+	)
 	beacons := validators.NewSet()
 
 	var (
@@ -2499,7 +2508,7 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id0, id)
 			wg0.Done()
 		},
@@ -2509,7 +2518,7 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id1, id)
 			wg1.Done()
 		},
@@ -2658,11 +2667,11 @@ func TestPeerGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := getDefaultManager()
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+	)
 	beacons := validators.NewSet()
-	// id2 is a validator
-	err := vdrs.AddWeight(constants.PrimaryNetworkID, id2, math.MaxUint64)
-	assert.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2688,7 +2697,7 @@ func TestPeerGossip(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id0, id)
 			wg0.Done()
 		},
@@ -2701,7 +2710,7 @@ func TestPeerGossip(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id1, id)
 			wg1.Done()
 		},
@@ -2715,7 +2724,7 @@ func TestPeerGossip(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id2, id)
 			wg2.Done()
 		},
@@ -2896,11 +2905,10 @@ func TestAppGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := getDefaultManager()
-	primaryVdrs := validators.NewSet()
-	_ = primaryVdrs.Set([]validators.Validator{validators.NewValidator(id2, math.MaxUint64)})
-	// id2 is a validator
-	_ = vdrs.Set(constants.PrimaryNetworkID, primaryVdrs)
+	vdrs := validators.NewManager(
+		0,
+		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+	)
 
 	beacons := validators.NewSet()
 
@@ -2926,14 +2934,16 @@ func TestAppGossip(t *testing.T) {
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler0 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id0, id)
 			wg0.Done()
 		},
-		AppGossipF: func(nodeID ids.ShortID,
+		AppGossipF: func(
+			nodeID ids.ShortID,
 			chainID ids.ID,
 			appGossipBytes []byte,
-			onFinishedHandling func()) {
+			onFinishedHandling func(),
+		) {
 			assert.Fail(t, "this should not receive any App Gossips")
 		},
 	}
@@ -2942,14 +2952,16 @@ func TestAppGossip(t *testing.T) {
 	msgCreator1, err := message.NewCreator(metrics1, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler1 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id1, id)
 			wg1.Done()
 		},
-		AppGossipF: func(nodeID ids.ShortID,
+		AppGossipF: func(
+			nodeID ids.ShortID,
 			chainID ids.ID,
 			appGossipBytes []byte,
-			onFinishedHandling func()) {
+			onFinishedHandling func(),
+		) {
 			assert.Equal(t, testAppGossipBytes, appGossipBytes)
 			wg1P.Done()
 		},
@@ -2959,14 +2971,16 @@ func TestAppGossip(t *testing.T) {
 	msgCreator2, err := message.NewCreator(metrics2, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
 	handler2 := &testHandler{
-		ConnectedF: func(id ids.ShortID) {
+		ConnectedF: func(id ids.ShortID, nodeVersion version.Application) {
 			assert.NotEqual(t, id2, id)
 			wg2.Done()
 		},
-		AppGossipF: func(nodeID ids.ShortID,
+		AppGossipF: func(
+			nodeID ids.ShortID,
 			chainID ids.ID,
 			appGossipBytes []byte,
-			onFinishedHandling func()) {
+			onFinishedHandling func(),
+		) {
 			assert.Contains(t, [][]byte{testAppGossipBytes, testAppGossipSpecificBytes}, appGossipBytes)
 			wg2P.Done()
 		},
@@ -3091,13 +3105,13 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 	targetNetwork.peers.add(peerToAdd)
 
 	if isValidator {
-		_ = targetNetwork.config.Validators.AddWeight(constants.PrimaryNetworkID, peerToAdd.nodeID, 10)
+		targetNetwork.config.Validators = targetNetwork.config.Validators.Mutate(validators.WithValidator(peerToAdd.nodeID, 10))
 	}
 }
 
 func clearPeersData(targetNetwork *network) {
 	targetNetwork.peers.reset()
-	targetNetwork.config.Validators = getDefaultManager()
+	targetNetwork.config.Validators = validators.NewManager(0)
 }
 
 func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {

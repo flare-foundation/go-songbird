@@ -7,8 +7,9 @@ import (
 	"bytes"
 	"testing"
 
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
 	"github.com/stretchr/testify/assert"
+
+	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
 
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/utils/formatting"

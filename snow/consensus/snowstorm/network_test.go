@@ -7,8 +7,9 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/choices"
-	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
 	"github.com/flare-foundation/flare/utils/sampler"
+
+	sbcon "github.com/flare-foundation/flare/snow/consensus/snowball"
 )
 
 type Network struct {

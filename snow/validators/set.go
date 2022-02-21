@@ -10,8 +10,9 @@ import (
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/formatting"
-	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/sampler"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 const (

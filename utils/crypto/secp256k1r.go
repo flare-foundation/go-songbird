@@ -5,12 +5,14 @@ package crypto
 
 import (
 	"bytes"
-	stdecdsa "crypto/ecdsa"
 	"errors"
 	"sort"
 
-	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
+	stdecdsa "crypto/ecdsa"
+
 	"github.com/decred/dcrd/dcrec/secp256k1/v3/ecdsa"
+
+	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v3"
 
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/ids"

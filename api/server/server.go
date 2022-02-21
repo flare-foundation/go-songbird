@@ -16,7 +16,9 @@ import (
 	"time"
 
 	"github.com/NYTimes/gziphandler"
+
 	"github.com/gorilla/handlers"
+
 	"github.com/rs/cors"
 
 	"github.com/flare-foundation/flare/ids"
@@ -151,16 +153,17 @@ func (s *Server) DispatchTLS(certBytes, keyBytes []byte) error {
 // creating a new chain and holds the P-Chain's lock when this function is held,
 // and at the same time the server's lock is held due to an API call and is trying
 // to grab the P-Chain's lock.
-func (s *Server) RegisterChain(chainName string, ctx *snow.ConsensusContext, engine common.Engine) {
-	go s.registerChain(chainName, ctx, engine)
+func (s *Server) RegisterChain(chainName string, engine common.Engine) {
+	go s.registerChain(chainName, engine)
 }
 
-func (s *Server) registerChain(chainName string, ctx *snow.ConsensusContext, engine common.Engine) {
+func (s *Server) registerChain(chainName string, engine common.Engine) {
 	var (
 		handlers map[string]*common.HTTPHandler
 		err      error
 	)
 
+	ctx := engine.Context()
 	ctx.Lock.Lock()
 	handlers, err = engine.GetVM().CreateHandlers()
 	ctx.Lock.Unlock()
@@ -250,7 +253,7 @@ func lockMiddleware(handler http.Handler, lockOption common.LockOption, lock *sy
 // not done bootstrapping, writes back an error.
 func rejectMiddleware(handler http.Handler, ctx *snow.ConsensusContext) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { // If chain isn't done bootstrapping, ignore API calls
-		if !ctx.IsBootstrapped() {
+		if ctx.GetState() != snow.NormalOp {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			// Doesn't matter if there's an error while writing. They'll get the StatusServiceUnavailable code.
 			_, _ = w.Write([]byte("API call rejected because chain is not done bootstrapping"))

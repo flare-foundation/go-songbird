@@ -3,9 +3,7 @@
 
 package indexer
 
-import (
-	"github.com/flare-foundation/flare/ids"
-)
+import "github.com/flare-foundation/flare/ids"
 
 // Container is something that gets accepted
 // (a block, transaction or vertex)

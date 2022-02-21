@@ -7,8 +7,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/flare-foundation/flare/api/proto/gsharedmemoryproto"
 	"github.com/flare-foundation/flare/chains/atomic"
-	"github.com/flare-foundation/flare/chains/atomic/gsharedmemory/gsharedmemoryproto"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
 )
@@ -59,7 +59,7 @@ func (s *Server) Get(
 
 	get, exists := s.gets[req.Id]
 	if !exists {
-		peerChainID, err := ids.ToID(req.PeerChainID)
+		peerChainID, err := ids.ToID(req.PeerChainId)
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +133,7 @@ func (s *Server) Indexed(
 
 	indexed, exists := s.indexed[req.Id]
 	if !exists {
-		peerChainID, err := ids.ToID(req.PeerChainID)
+		peerChainID, err := ids.ToID(req.PeerChainId)
 		if err != nil {
 			return nil, err
 		}
@@ -253,7 +253,7 @@ func (s *Server) parseRequests(
 	rawRequests []*gsharedmemoryproto.AtomicRequest,
 ) error {
 	for _, value := range rawRequests {
-		peerChainID, err := ids.ToID(value.PeerChainID)
+		peerChainID, err := ids.ToID(value.PeerChainId)
 		if err != nil {
 			return err
 		}

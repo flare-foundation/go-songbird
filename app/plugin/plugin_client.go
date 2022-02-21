@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/flare-foundation/flare/app/plugin/pluginproto"
+	"github.com/flare-foundation/flare/api/proto/pluginproto"
 )
 
 type Client struct {

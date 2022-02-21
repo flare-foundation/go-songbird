@@ -15,10 +15,11 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/utils/constants"
-	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/perms"
 	"github.com/flare-foundation/flare/utils/profiler"
+
+	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 const (

@@ -6,9 +6,8 @@ package message
 import (
 	"fmt"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var _ Creator = &creator{}

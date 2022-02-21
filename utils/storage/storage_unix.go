@@ -6,9 +6,7 @@
 
 package storage
 
-import (
-	"syscall"
-)
+import "syscall"
 
 func OsDiskStat(storagePath string) (uint64, error) {
 	var stat syscall.Statfs_t

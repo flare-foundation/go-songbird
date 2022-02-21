@@ -5,15 +5,16 @@ package queue
 
 import (
 	"fmt"
-
-	"github.com/prometheus/client_golang/prometheus"
+	"time"
 
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/versiondb"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -39,7 +40,7 @@ func New(
 	vdb := versiondb.New(db)
 	state, err := newState(vdb, metricsNamespace, metricsRegisterer)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create new jobs state: %s", err)
+		return nil, fmt.Errorf("couldn't create new jobs state: %w", err)
 	}
 
 	return &Jobs{
@@ -52,6 +53,9 @@ func New(
 func (j *Jobs) SetParser(parser Parser) error { j.state.parser = parser; return nil }
 
 func (j *Jobs) Has(jobID ids.ID) (bool, error) { return j.state.HasJob(jobID) }
+
+// Returns how many pending jobs are waiting in the queue.
+func (j *Jobs) PendingJobs() uint64 { return j.state.numJobs }
 
 // Push adds a new job to the queue. Returns true if [job] was added to the queue and false
 // if [job] was already in the queue.
@@ -94,6 +98,8 @@ func (j *Jobs) ExecuteAll(ctx *snow.ConsensusContext, halter common.Haltable, re
 	defer ctx.Executing(false)
 
 	numExecuted := 0
+	numToExecute := j.state.numJobs
+	startTime := time.Now()
 
 	// Disable and clear state caches to prevent us from attempting to execute
 	// a vertex that was previously parsed, but not saved to the VM. Some VMs
@@ -157,10 +163,16 @@ func (j *Jobs) ExecuteAll(ctx *snow.ConsensusContext, halter common.Haltable, re
 
 		numExecuted++
 		if numExecuted%StatusUpdateFrequency == 0 { // Periodically print progress
+			eta := timer.EstimateETA(
+				startTime,
+				uint64(numExecuted),
+				numToExecute,
+			)
+
 			if !restarted {
-				ctx.Log.Info("executed %d operations", numExecuted)
+				ctx.Log.Info("executed %d of %d operations. ETA = %s", numExecuted, numToExecute, eta)
 			} else {
-				ctx.Log.Debug("executed %d operations", numExecuted)
+				ctx.Log.Debug("executed %d of %d  operations. ETA = %s", numExecuted, numToExecute, eta)
 			}
 		}
 	}
@@ -171,6 +183,10 @@ func (j *Jobs) ExecuteAll(ctx *snow.ConsensusContext, halter common.Haltable, re
 		ctx.Log.Debug("executed %d operations", numExecuted)
 	}
 	return numExecuted, nil
+}
+
+func (j *Jobs) Clear() error {
+	return j.state.Clear()
 }
 
 // Commit the versionDB to the underlying database.
@@ -210,6 +226,18 @@ func NewWithMissing(
 func (jm *JobsWithMissing) SetParser(parser Parser) error {
 	jm.state.parser = parser
 	return jm.cleanRunnableStack()
+}
+
+func (jm *JobsWithMissing) Clear() error {
+	if err := jm.state.RemoveMissingJobIDs(jm.missingIDs); err != nil {
+		return err
+	}
+
+	jm.missingIDs.Clear()
+	jm.addToMissingIDs.Clear()
+	jm.removeFromMissingIDs.Clear()
+
+	return jm.Jobs.Clear()
 }
 
 func (jm *JobsWithMissing) Has(jobID ids.ID) (bool, error) {

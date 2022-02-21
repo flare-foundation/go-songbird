@@ -509,6 +509,7 @@ func (p *peer) sendGetVersion() {
 func (p *peer) sendVersion() {
 	p.net.stateLock.RLock()
 	myIP := p.net.currentIP.IP()
+	compatibility := p.net.compatibility()
 	myVersionTime, myVersionSig, err := p.net.getVersion(myIP)
 	if err != nil {
 		p.net.stateLock.RUnlock()
@@ -520,7 +521,7 @@ func (p *peer) sendVersion() {
 		p.net.dummyNodeID,
 		p.net.clock.Unix(),
 		myIP,
-		p.net.versionCompatibility.Version().String(),
+		compatibility.Version().String(),
 		myVersionTime,
 		myVersionSig,
 		whitelistedSubnets.List(),
@@ -624,6 +625,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		return
 	}
 
+	compatibilities := p.net.compatibilities()
 	peerVersionStr := msg.Get(message.VersionStr).(string)
 	peerVersion, err := p.net.parser.Parse(peerVersionStr)
 	if err != nil {
@@ -633,7 +635,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		return
 	}
 
-	if p.net.versionCompatibility.Version().Before(peerVersion) {
+	if version.Before(compatibilities, peerVersion) {
 		if p.net.config.Beacons.Contains(p.nodeID) {
 			p.net.log.Info(
 				"beacon %s%s at %s attempting to connect with newer version %s. You may want to update your client",
@@ -647,7 +649,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		}
 	}
 
-	if err := p.net.versionCompatibility.Compatible(peerVersion); err != nil {
+	if err := version.Compatible(compatibilities, (peerVersion)); err != nil {
 		p.net.log.Verbo("peer %s%s at %s version (%s) not compatible: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), peerVersion, err)
 		p.discardIP()
 		return
@@ -755,7 +757,7 @@ func (p *peer) trackSignedPeer(peer utils.IPCertDesc) {
 	}
 
 	nodeID := certToID(peer.Cert)
-	if !p.net.config.Validators.Contains(constants.PrimaryNetworkID, nodeID) && !p.net.config.Beacons.Contains(nodeID) {
+	if !p.net.config.Validators.Contains(nodeID) && !p.net.config.Beacons.Contains(nodeID) {
 		p.net.log.Verbo(
 			"not peering to %s at %s because they are not a validator or beacon",
 			nodeID.PrefixedString(constants.NodeIDPrefix), peer.IPDesc,
@@ -827,15 +829,16 @@ func (p *peer) handlePong(msg message.InboundMessage) {
 		return
 	}
 
+	compatibilities := p.net.compatibilities()
 	peerVersion := p.versionStruct.GetValue().(version.Application)
-	if err := p.net.versionCompatibility.Compatible(peerVersion); err != nil {
+	if err := version.Compatible(compatibilities, peerVersion); err != nil {
 		p.net.log.Debug("disconnecting from peer %s%s at %s version (%s) not compatible: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), peerVersion, err)
 		p.discardIP()
 	}
 
 	// if the peer or this node is not a validator, we don't need their uptime.
-	if p.net.config.Validators.Contains(constants.PrimaryNetworkID, p.nodeID) &&
-		p.net.config.Validators.Contains(constants.PrimaryNetworkID, p.net.config.MyNodeID) {
+	if p.net.config.Validators.Contains(p.nodeID) &&
+		p.net.config.Validators.Contains(p.net.config.MyNodeID) {
 		uptime := msg.Get(message.Uptime).(uint8)
 		if uptime <= 100 {
 			p.observedUptime = uptime // [0, 100] percentage

@@ -6,8 +6,6 @@ package throttling
 import (
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
@@ -16,6 +14,7 @@ import (
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/metric"
 	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // See inbound_msg_throttler.go

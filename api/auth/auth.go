@@ -18,10 +18,11 @@ import (
 
 	"github.com/gorilla/rpc/v2"
 
-	cjson "github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/password"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
+
+	cjson "github.com/flare-foundation/flare/utils/json"
 )
 
 const (

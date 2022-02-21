@@ -11,10 +11,11 @@ import (
 	"github.com/hashicorp/go-plugin"
 
 	"github.com/flare-foundation/flare/api/keystore"
-	"github.com/flare-foundation/flare/api/keystore/gkeystore/gkeystoreproto"
+	"github.com/flare-foundation/flare/api/proto/gkeystoreproto"
+	"github.com/flare-foundation/flare/api/proto/rpcdbproto"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/rpcdb"
-	"github.com/flare-foundation/flare/database/rpcdb/rpcdbproto"
+	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
 )
 
@@ -49,6 +50,10 @@ func (s *Server) GetDatabase(
 	// start the db server
 	dbBrokerID := s.broker.NextId()
 	go s.broker.AcceptAndServe(dbBrokerID, func(opts []grpc.ServerOption) *grpc.Server {
+		opts = append(opts,
+			grpc.MaxRecvMsgSize(math.MaxInt),
+			grpc.MaxSendMsgSize(math.MaxInt),
+		)
 		server := grpc.NewServer(opts...)
 		closer.closer.Add(server)
 		db := rpcdb.NewServer(&closer)

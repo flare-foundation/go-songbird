@@ -6,9 +6,8 @@ package vertex
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/ids"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseInvalid(t *testing.T) {

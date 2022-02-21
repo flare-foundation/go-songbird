@@ -14,8 +14,9 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/formatting"
-	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/wrappers"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
 type LockedAmount struct {

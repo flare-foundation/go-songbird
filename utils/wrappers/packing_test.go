@@ -10,10 +10,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/staking"
+
 	"github.com/flare-foundation/flare/utils"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (

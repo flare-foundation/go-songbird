@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
@@ -146,7 +147,7 @@ func TestCodecPackParseGzip(t *testing.T) {
 			},
 		},
 		{
-			op: MultiPut,
+			op: Ancestors,
 			fields: map[Field]interface{}{
 				ChainID:             id[:],
 				RequestID:           uint32(1337),

@@ -7,7 +7,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gwriter/gwriterproto"
+	"github.com/flare-foundation/flare/api/proto/gwriterproto"
 )
 
 var _ gwriterproto.WriterServer = &Server{}

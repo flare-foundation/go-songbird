@@ -4,9 +4,8 @@
 package metrics
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/utils/wrappers"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Polls reports commonly used consensus poll metrics.

@@ -6,11 +6,10 @@ package tree
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/stretchr/testify/assert"
 )
 
 var (

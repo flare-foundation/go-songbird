@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/utils/timer"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Manager registers and fires timeouts for the snow API.
@@ -86,7 +85,7 @@ func (m *Manager) RegisterResponse(
 	op message.Op,
 	latency time.Duration,
 ) {
-	m.metrics.Observe(chainID, op, latency)
+	m.metrics.Observe(validatorID, chainID, op, latency)
 	m.benchlistMgr.RegisterResponse(chainID, validatorID)
 	m.tm.Remove(uniqueRequestID)
 }

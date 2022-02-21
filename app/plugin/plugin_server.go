@@ -8,8 +8,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/flare-foundation/flare/api/proto/pluginproto"
 	"github.com/flare-foundation/flare/app"
-	"github.com/flare-foundation/flare/app/plugin/pluginproto"
 )
 
 // Server wraps a node so it can be served with the hashicorp plugin harness

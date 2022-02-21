@@ -13,6 +13,7 @@ import (
 // shows that a locally generated CreateChainTx can be added to mempool and then
 // removed by inclusion in a block
 func TestBlockBuilderAddLocalTx(t *testing.T) {
+	t.Skip()
 	assert := assert.New(t)
 
 	vm, _, _ := defaultVM()
@@ -51,6 +52,7 @@ func TestBlockBuilderAddLocalTx(t *testing.T) {
 // shows that valid tx is not added to mempool if this would exceed its maximum
 // size
 func TestBlockBuilderMaxMempoolSizeHandling(t *testing.T) {
+	t.Skip()
 	assert := assert.New(t)
 
 	vm, _, _ := defaultVM()
@@ -81,6 +83,7 @@ func TestBlockBuilderMaxMempoolSizeHandling(t *testing.T) {
 }
 
 func TestPreviouslyDroppedTxsCanBeReAddedToMempool(t *testing.T) {
+	t.Skip()
 	assert := assert.New(t)
 
 	vm, _, _ := defaultVM()

@@ -6,11 +6,9 @@ package network
 import (
 	"context"
 	"crypto"
-	cryptorand "crypto/rand"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	gomath "math"
 	"math/rand"
 	"net"
 	"strings"
@@ -18,9 +16,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	cryptorand "crypto/rand"
+	gomath "math"
+
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/health"
+	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/network/dialer"
@@ -29,7 +30,6 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/networking/sender"
-	"github.com/flare-foundation/flare/snow/triggers"
 	"github.com/flare-foundation/flare/snow/uptime"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
@@ -61,7 +61,7 @@ type Network interface {
 
 	// The network must be able to broadcast accepted decisions to random peers.
 	// Thread safety must be managed internally in the network.
-	triggers.Acceptor
+	snow.Acceptor
 
 	// Should only be called once, will run until either a fatal error occurs,
 	// or the network is closed. Returns a non-nil error.
@@ -92,7 +92,7 @@ type Network interface {
 	NodeUptime() (UptimeResult, bool)
 
 	// Has a health check
-	health.Checkable
+	health.Checker
 }
 
 type UptimeResult struct {
@@ -115,6 +115,7 @@ type network struct {
 	log                    logging.Logger
 	currentIP              utils.DynamicIPDesc
 	versionCompatibility   version.Compatibility
+	legacyCompatibility    version.Compatibility
 	parser                 version.ApplicationParser
 	listener               net.Listener
 	dialer                 dialer.Dialer
@@ -296,6 +297,7 @@ func NewNetwork(
 		benchlistManager:            benchlistManager,
 		latestPeerIP:                make(map[ids.ShortID]signedPeerIP),
 		versionCompatibility:        version.GetCompatibility(config.NetworkID),
+		legacyCompatibility:         version.GetLegacyCompatibility(config.NetworkID),
 		config:                      config,
 		mc:                          msgCreator,
 	}
@@ -304,7 +306,7 @@ func NewNetwork(
 	netw.clientUpgrader = NewTLSClientUpgrader(config.TLSConfig)
 
 	netw.dialer = dialer.NewDialer(constants.NetworkType, config.DialerConfig, log)
-	primaryNetworkValidators, ok := config.Validators.GetValidators(constants.PrimaryNetworkID)
+	validators, ok := config.Validators.GetValidators()
 	if !ok {
 		return nil, errNoPrimaryValidators
 	}
@@ -313,11 +315,11 @@ func NewNetwork(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		primaryNetworkValidators,
+		validators,
 		config.ThrottlerConfig.InboundMsgThrottlerConfig,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("initializing inbound message throttler failed with: %s", err)
+		return nil, fmt.Errorf("initializing inbound message throttler failed with: %w", err)
 	}
 	netw.inboundMsgThrottler = inboundMsgThrottler
 
@@ -325,20 +327,51 @@ func NewNetwork(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		primaryNetworkValidators,
+		validators,
 		config.ThrottlerConfig.OutboundMsgThrottlerConfig,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("initializing outbound message throttler failed with: %s", err)
+		return nil, fmt.Errorf("initializing outbound message throttler failed with: %w", err)
 	}
 	netw.outboundMsgThrottler = outboundMsgThrottler
 
 	netw.peers.initialize()
 	netw.sendFailRateCalculator = math.NewSyncAverager(math.NewAverager(0, config.MaxSendFailRateHalflife, netw.clock.Time()))
 	if err := netw.metrics.initialize(config.Namespace, metricsRegisterer); err != nil {
-		return nil, fmt.Errorf("initializing network failed with: %s", err)
+		return nil, fmt.Errorf("initializing network failed with: %w", err)
 	}
 	return netw, nil
+}
+
+func (n *network) compatibility() version.Compatibility {
+	// => AP3-: send legacy version
+	// => AP4+: send Flare version
+	now := time.Now().UTC()
+	ap4 := version.GetApricotPhase3Time(n.config.NetworkID)
+	if now.Before(ap4) {
+		return n.legacyCompatibility
+	} else {
+		return n.versionCompatibility
+	}
+}
+
+func (n *network) compatibilities() []version.Compatibility {
+	// => AP2-: accept legacy version only
+	// => AP3/AP4: accept legacy & Flare version
+	// => AP5+: accept Flare version only
+	now := time.Now().UTC()
+	ap3 := version.GetApricotPhase3Time(n.config.NetworkID)
+	ap5 := version.GetApricotPhase5Time(n.config.NetworkID)
+	var compatibilities []version.Compatibility
+	if now.Before(ap3) {
+		compatibilities = append(compatibilities, n.legacyCompatibility)
+	} else if now.Before(ap5) {
+		compatibilities = append(compatibilities, n.legacyCompatibility)
+		compatibilities = append(compatibilities, n.versionCompatibility)
+	} else {
+		compatibilities = append(compatibilities, n.versionCompatibility)
+	}
+	return compatibilities
 }
 
 // Assumes [n.stateLock] is not held.
@@ -372,7 +405,7 @@ func (n *network) Gossip(
 // Accept is called after every consensus decision
 // Assumes [n.stateLock] is not held.
 func (n *network) Accept(ctx *snow.ConsensusContext, containerID ids.ID, container []byte) error {
-	if !ctx.IsBootstrapped() {
+	if ctx.GetState() != snow.NormalOp {
 		// don't gossip during bootstrapping
 		return nil
 	}
@@ -515,8 +548,8 @@ func (n *network) shouldUpgradeIncoming(ip utils.IPDesc) bool {
 // the peer is a validator/beacon.
 func (n *network) shouldHoldConnection(peerID ids.ShortID) bool {
 	return !n.config.RequireValidatorToConnect ||
-		n.config.Validators.Contains(constants.PrimaryNetworkID, n.config.MyNodeID) ||
-		n.config.Validators.Contains(constants.PrimaryNetworkID, peerID) ||
+		n.config.Validators.Contains(n.config.MyNodeID) ||
+		n.config.Validators.Contains(peerID) ||
 		n.config.Beacons.Contains(peerID)
 }
 
@@ -529,7 +562,8 @@ func (n *network) Dispatch() error {
 	go n.inboundConnUpgradeThrottler.Dispatch()
 	defer n.inboundConnUpgradeThrottler.Stop()
 	go func() {
-		duration := time.Until(n.versionCompatibility.MaskTime())
+		compatibility := n.compatibility()
+		duration := time.Until(compatibility.MaskTime())
 		time.Sleep(duration)
 
 		n.stateLock.Lock()
@@ -641,6 +675,7 @@ func (n *network) NewPeerInfo(peer *peer) PeerInfo {
 		LastReceived:   time.Unix(atomic.LoadInt64(&peer.lastReceived), 0),
 		Benched:        n.benchlistManager.GetBenched(peer.nodeID),
 		ObservedUptime: json.Uint8(peer.observedUptime),
+		TrackedSubnets: peer.trackedSubnets.List(),
 	}
 }
 
@@ -701,23 +736,23 @@ func (n *network) IP() utils.IPDesc {
 func (n *network) NodeUptime() (UptimeResult, bool) {
 	n.stateLock.RLock()
 	defer n.stateLock.RUnlock()
-	primaryValidators, ok := n.config.Validators.GetValidators(constants.PrimaryNetworkID)
+	validators, ok := n.config.Validators.GetValidators()
 	if !ok {
 		return UptimeResult{}, false
 	}
 
-	myStake, isValidator := primaryValidators.GetWeight(n.config.MyNodeID)
+	myStake, isValidator := validators.GetWeight(n.config.MyNodeID)
 	if !isValidator {
 		return UptimeResult{}, false
 	}
 
 	var (
-		totalWeight          = float64(primaryValidators.Weight())
+		totalWeight          = float64(validators.Weight())
 		totalWeightedPercent = 100 * float64(myStake)
 		rewardingStake       = float64(myStake)
 	)
 	for _, peer := range n.peers.peersList {
-		weight, ok := primaryValidators.GetWeight(peer.nodeID)
+		weight, ok := validators.GetWeight(peer.nodeID)
 		if !ok {
 			// this is not a validator skip it.
 			continue
@@ -1088,12 +1123,13 @@ func (n *network) validatorIPs() ([]utils.IPCertDesc, error) {
 			continue
 		case peerIP.IsZero():
 			continue
-		case !n.config.Validators.Contains(constants.PrimaryNetworkID, peer.nodeID):
+		case !n.config.Validators.Contains(peer.nodeID):
 			continue
 		}
 
+		compatibilities := n.compatibilities()
 		peerVersion := peer.versionStruct.GetValue().(version.Application)
-		if n.versionCompatibility.Unmaskable(peerVersion) != nil {
+		if version.Unmaskable(compatibilities, peerVersion) != nil {
 			continue
 		}
 
@@ -1122,10 +1158,11 @@ func (n *network) connected(p *peer) {
 
 	p.finishedHandshake.SetValue(true)
 
+	compatibilities := n.compatibilities()
 	peerVersion := p.versionStruct.GetValue().(version.Application)
 
 	if n.hasMasked {
-		if n.versionCompatibility.Unmaskable(peerVersion) != nil {
+		if version.Unmaskable(compatibilities, peerVersion) != nil {
 			if err := n.config.Validators.MaskValidator(p.nodeID); err != nil {
 				n.log.Error("failed to mask validator %s due to %s", p.nodeID, err)
 			}
@@ -1136,7 +1173,7 @@ func (n *network) connected(p *peer) {
 		}
 		n.log.Verbo("The new staking set is:\n%s", n.config.Validators)
 	} else {
-		if n.versionCompatibility.WontMask(peerVersion) != nil {
+		if version.WontMask(compatibilities, peerVersion) != nil {
 			n.maskedValidators.Add(p.nodeID)
 		} else {
 			n.maskedValidators.Remove(p.nodeID)
@@ -1157,7 +1194,7 @@ func (n *network) connected(p *peer) {
 		n.connectedIPs[str] = struct{}{}
 	}
 
-	n.router.Connected(p.nodeID)
+	n.router.Connected(p.nodeID, peerVersion)
 	n.metrics.connected.Inc()
 }
 
@@ -1181,7 +1218,7 @@ func (n *network) disconnected(p *peer) {
 		delete(n.disconnectedIPs, str)
 		delete(n.connectedIPs, str)
 
-		if n.config.Validators.Contains(constants.PrimaryNetworkID, p.nodeID) {
+		if n.config.Validators.Contains(p.nodeID) {
 			n.track(ip, p.nodeID)
 		}
 	}
@@ -1236,7 +1273,7 @@ func (n *network) getPeers(nodeIDs ids.ShortSet, subnetID ids.ID, validatorOnly 
 		if ok &&
 			peer.finishedHandshake.GetValue() &&
 			(subnetID == constants.PrimaryNetworkID || peer.trackedSubnets.Contains(subnetID)) &&
-			(!validatorOnly || n.config.Validators.Contains(subnetID, nodeID)) {
+			(!validatorOnly || n.config.Validators.Contains(nodeID)) {
 			peers[index] = peer
 		}
 		index++

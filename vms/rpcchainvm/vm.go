@@ -4,17 +4,19 @@
 package rpcchainvm
 
 import (
-	"github.com/hashicorp/go-plugin"
 	"golang.org/x/net/context"
+
 	"google.golang.org/grpc"
 
+	"github.com/hashicorp/go-plugin"
+
+	"github.com/flare-foundation/flare/api/proto/vmproto"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/vmproto"
 )
 
 // Handshake is a common handshake that is shared by plugin and host.
 var Handshake = plugin.HandshakeConfig{
-	ProtocolVersion:  9,
+	ProtocolVersion:  10,
 	MagicCookieKey:   "VM_PLUGIN",
 	MagicCookieValue: "dynamic",
 }
