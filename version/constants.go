@@ -18,7 +18,7 @@ import (
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
-	Current                      = NewDefaultVersion(0, 5, 1)
+	Current                      = NewDefaultVersion(0, 5, 2)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
 	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
