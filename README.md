@@ -40,7 +40,14 @@ Build Flare using the build script:
 ./scripts/build.sh
 ```
 
+If you want to build the binary with RocksDB support, you need to export the corresponding environment variable _before_ building:
+
+```sh
+export ROCKSDBALLOWED=1
+```
+
 The Flare binary, named `flare`, is in the `build` directory.
+
 
 ## Running Flare
 
@@ -48,20 +55,16 @@ The Flare binary, named `flare`, is in the `build` directory.
 
 **Please note that the default database engine has changed from RocksDB to LevelDB.**
 
-We recommend that you explicitly specify the database type you previously used if you want to avoid rebuilding from genesis.
-This can be done by using `--db-type=rocksdb` or `--db-type=leveldb` as command line flag respectively.
+The RocksDB library used by the upstream Avalanche code base is flawed and the database itself is liable to data corruption.
+LevelDB is a more mature and stable choice, and should provide a more reliable experience, while using less storage space.
 
-**You probably also need to move or rename some directories if your node was previously using the legacy version from the Gitlab repository.**
+**If you still want to use your previous database, there are a number of changes you need to be aware of:**
 
-- The default root directory changed from `$HOME/.avalanchego` to `$HOME/.flare`.
-- The name of the database sub-directory changed from `db/fuji` to `db/songbird` / `db/coston` respectively.
+1. The default parent directory for logs, databases and configuration files changed from `$HOME/.avalanchego` to `$HOME/.flare`.
+2. The name of the sub-directories in the database directory changed from `db/fuji` to `db/songbird` and `db/coston` respectively.
+3. The node needs to be built with the `ROCKSDBALLOWED=1` environment variable and launched with the `--db-type=rocksdb` flag.
 
-If you don't properly move the relevant directories _before_ starting the node, it will not pick up the previous database and it will start synchronizing from scratch.
-
-That being said, if you are running on the legacy version with default parameters, you are probably using RocksDB as the database engine. The RocksDB library used by the Avalanche code base is flawed and the database itself is a lot less reliable, thus being more liable to corruption.
-
-**We thus highly recommend node operators running on RocksDB to resynchronize their nodes using LevelDB as database engine.**
-
+**However, we recommend that all node operators resync their nodes from scratch using LevelDB.**
 
 ### Connecting to Coston
 
