@@ -46,10 +46,12 @@ The Flare binary, named `flare`, is in the `build` directory.
 
 ### Legacy Version Upgrade
 
-Please note that the default database engine has changed from RocksDB to LevelDB.
-We recommend that you explicitly specify the database type you previously used if you want to avoid rebuilding from genesis.
+**Please note that the default database engine has changed from RocksDB to LevelDB.**
 
-**If your node was previously running on the legacy version from the Gitlab repository, some directories need to be renamed/moved.**
+We recommend that you explicitly specify the database type you previously used if you want to avoid rebuilding from genesis.
+This can be done by using `--db-type=rocksdb` or `--db-type=leveldb` as command line flag respectively.
+
+**You probably also need to move or rename some directories if your node was previously using the legacy version from the Gitlab repository.**
 
 - The default root directory changed from `$HOME/.avalanchego` to `$HOME/.flare`.
 - The name of the database sub-directory changed from `db/fuji` to `db/songbird` / `db/coston` respectively.
