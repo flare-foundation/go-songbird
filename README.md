@@ -117,8 +117,7 @@ Here are the most relevant default settings:
     "web3",
     "internal-public-eth",
     "internal-public-blockchain",
-    "internal-public-transaction-pool",
-    "internal-public-account"
+    "internal-public-transaction-pool"
   ],
   "rpc-gas-cap": 50000000,
   "rpc-tx-fee-cap": 100,
@@ -129,13 +128,13 @@ Here are the most relevant default settings:
   "allow-unfinalized-queries": false,
   "allow-unprotected-txs": false,
   "remote-tx-gossip-only-enabled": false,
-  "log-level": "debug",
+  "log-level": "info"
 }
 ```
 
 You can refer to the original [Avalanche documentation](https://docs.avax.network/build/references/avalanchego-config-flags/#c-chain-configs) for a full list of all settings and a detailed description.
 
-The directory for configuration files defaults to `HOME/.flare/configs` and can be changed using the `--chain-config-dir` flag.
+The directory for configuration files defaults to `$HOME/.flare/configs/chains` and can be changed using the `--chain-config-dir` flag.
 
 In order to disable pruning and run a full archival node, `pruning-enabled` should be set to `false`.
 
