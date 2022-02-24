@@ -75,6 +75,7 @@ var (
 	errCNotCreated     = errors.New("C-Chain not created")
 	errNotBootstrapped = errors.New("primary subnet has not finished bootstrapping")
 	errShuttingDown    = errors.New("server shutting down")
+	errNoValidators    = errors.New("no validators defined for network")
 )
 
 // Node is an instance of an Avalanche node.
@@ -191,7 +192,10 @@ func (n *Node) initNetworking() error {
 
 	// Initialize validator manager and primary network's validator set
 	n.vdrs = validators.NewManager(n.Config.NetworkID)
-	networkValidators, _ := n.vdrs.GetValidators()
+	networkValidators, ok := n.vdrs.GetValidators()
+	if !ok {
+		return errNoValidators
+	}
 
 	// Configure benchlist
 	n.Config.BenchlistConfig.Validators = n.vdrs
