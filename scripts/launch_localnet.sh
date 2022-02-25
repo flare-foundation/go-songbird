@@ -7,6 +7,8 @@ export CUSTOM_VALIDATORS="NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc,NodeID-EkH8wy
 
 printf "Launching node 1 at 127.0.0.1:9650\n"
 ./build/flare --network-id=local \
+    --genesis=scdev.json \
+    --bootstrap-retry-enabled=false \
     --public-ip=127.0.0.1 \
     --http-port=9650 \
     --staking-port=9651 \
@@ -23,6 +25,8 @@ sleep 3
 
 printf "Launching node 2 at 127.0.0.1:9660\n"
 ./build/flare --network-id=local \
+    --genesis=scdev.json \
+    --bootstrap-retry-enabled=false \
     --public-ip=127.0.0.1 \
     --http-port=9660 \
     --staking-port=9661 \
@@ -39,6 +43,8 @@ sleep 3
 
 printf "Launching node 3 at 127.0.0.1:9670\n"
 ./build/flare --network-id=local \
+    --genesis=scdev.json \
+    --bootstrap-retry-enabled=false \
     --public-ip=127.0.0.1 \
     --http-port=9670 \
     --staking-port=9671 \
@@ -55,6 +61,8 @@ sleep 3
 
 printf "Launching node 4 at 127.0.0.1:9680\n"
 ./build/flare --network-id=local \
+    --genesis=scdev.json \
+    --bootstrap-retry-enabled=false \
     --public-ip=127.0.0.1 \
     --http-port=9680 \
     --staking-port=9681 \
@@ -71,6 +79,8 @@ sleep 3
 
 printf "Launching node 5 at 127.0.0.1:9690\n"
 ./build/flare --network-id=local \
+    --genesis=scdev.json \
+    --bootstrap-retry-enabled=false \
     --public-ip=127.0.0.1 \
     --http-port=9690 \
     --staking-port=9691 \

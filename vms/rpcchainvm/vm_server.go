@@ -6,6 +6,7 @@ package rpcchainvm
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -587,4 +588,25 @@ func (vm *VMServer) BlockReject(_ context.Context, req *vmproto.BlockRejectReque
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (v *VMServer) GetValidators(_ context.Context, req *vmproto.ValidatorsRequest) (*vmproto.ValidatorsResponse, error) {
+	bytesID, err := ids.ToID(req.Hash)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Calling GetValidators() in validators_server.go")
+
+	validators, err := v.vm.GetValidators(bytesID)
+	return &vmproto.ValidatorsResponse{
+		Validators: convertMapIDstoMapStringKey(validators), //todo get the map types consistent, maybe just string for now?
+	}, err
+}
+
+func convertMapIDstoMapStringKey(m map[ids.ShortID]float64) map[string]float64 {
+	stringMap := make(map[string]float64)
+	for key, value := range m {
+		stringMap[key.String()] = value
+	}
+	return stringMap
 }

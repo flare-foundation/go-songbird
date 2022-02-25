@@ -78,6 +78,7 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 
 	rpcClient, err := client.Client()
 	if err != nil {
+
 		client.Kill()
 		return nil, err
 	}
@@ -96,6 +97,8 @@ func (f *Factory) New(ctx *snow.Context) (interface{}, error) {
 
 	vm.SetProcess(client)
 	vm.ctx = ctx
+	GlobalVMClient = vm
+	fmt.Println("GlobalVMClient and vm", GlobalVMClient, vm)
 	return vm, nil
 }
 

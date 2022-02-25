@@ -26,6 +26,8 @@ var PluginMap = map[string]plugin.Plugin{
 	"vm": &Plugin{},
 }
 
+var GlobalVMClient *VMClient
+
 // Plugin is the implementation of plugin.Plugin so we can serve/consume this.
 // We also implement GRPCPlugin so that this plugin can be served over gRPC.
 type Plugin struct {

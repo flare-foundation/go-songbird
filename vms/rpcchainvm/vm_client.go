@@ -702,3 +702,41 @@ func (b *BlockClient) Verify() error {
 func (b *BlockClient) Bytes() []byte        { return b.bytes }
 func (b *BlockClient) Height() uint64       { return b.height }
 func (b *BlockClient) Timestamp() time.Time { return b.time }
+
+func (vm *VMClient) GetValidators(id ids.ID) (map[ids.ShortID]float64, error) {
+	idInput := id[:]
+	resp, err := vm.client.GetValidators(context.Background(), &vmproto.ValidatorsRequest{
+		Hash: idInput,
+	})
+	if err != nil {
+		fmt.Println("Error in GetValidators of VMClient", err.Error())
+	}
+	fmt.Println("resp: ", resp)
+	return convertStringMaptoShortIDMap(resp.Validators), err
+}
+
+func (b *BlockClient) GetValidators(ids.ID) (map[ids.ShortID]float64, error) {
+	return nil, nil
+}
+
+func convertShortIdmapToStringMap(m map[ids.ShortID]float64) map[string]float64 {
+	retM := make(map[string]float64)
+	for key, val := range m {
+		retM[key.String()] = val
+	}
+	return retM
+}
+
+func convertStringMaptoShortIDMap(m map[string]float64) map[ids.ShortID]float64 {
+	retM := make(map[ids.ShortID]float64)
+	for key, val := range m {
+		retM[stringToShortID(key)] = val
+	}
+	return retM
+}
+
+func stringToShortID(s string) ids.ShortID {
+	var shortId [20]byte
+	copy(shortId[:], s)
+	return shortId
+}
