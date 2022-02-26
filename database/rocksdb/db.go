@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/linxGnu/grocksdb"
+	"github.com/xrpdevs/grocksdb"
 
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/nodb"
