@@ -9,7 +9,7 @@ FLARE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )"; cd .. && pwd ) # Directory 
 # Set the PATHS
 coreth_path="$FLARE_PATH/coreth"
 
-# Where AvalancheGo binary goes
+# Where Flare binary goes
 build_dir="$FLARE_PATH/build"
 flare_path="$build_dir/flare"
 plugin_dir="$build_dir/plugins"
@@ -18,7 +18,7 @@ evm_path="$plugin_dir/evm"
 # Current branch
 current_branch=$(git symbolic-ref -q --short HEAD || git describe --tags --exact-match)
 
-git_commit=${AVALANCHEGO_COMMIT:-$( git rev-list -1 HEAD )}
+git_commit=${FLARE_COMMIT:-$( git rev-list -1 HEAD )}
 
 # Static compilation
 static_ld_flags=''
