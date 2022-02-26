@@ -52,6 +52,10 @@ type peer struct {
 	// Only modified on the connection's reader routine.
 	gotVersion utils.AtomicBool
 
+	// True if this peer has sent us a second valid Version message and
+	// is running a compatible version.
+	regotVersion utils.AtomicBool
+
 	// True if this peer has sent us a valid PeerList message.
 	// Only modified on the connection's reader routine.
 	gotPeerList utils.AtomicBool
@@ -582,6 +586,13 @@ func (p *peer) sendPong() {
 
 // assumes the [stateLock] is not held
 func (p *peer) handleGetVersion(_ message.InboundMessage) {
+	// NOTE: In theory, we should have some code here that allows us to resend the
+	// version once after the AP5 hard fork, after phasing out the legacy Avalanche
+	// versioning. However, it seems like the original code never actually sets the
+	// `versionSent` flag, and will resend the version every time a `GetVersion` is
+	// received. This is never triggered in the original code, because the code to
+	// send the `GetVersion` is properly guarded. In our case, it's useful, because
+	// we don't need to modify this logic to resend the version once.
 	if !p.versionSent.GetValue() {
 		p.sendVersion()
 	}
@@ -589,8 +600,36 @@ func (p *peer) handleGetVersion(_ message.InboundMessage) {
 
 // assumes the [stateLock] is not held
 func (p *peer) handleVersion(msg message.InboundMessage) {
+
+	// When we receive a version, in general we can check a bunch of things that
+	// avoid decoding of the peer version, for example if it has been send multiple
+	// times. However, with the introduction of the version resending after phasing
+	// out the legacy Avalanche versioning, we need to add some code that allows
+	// processing of the version message a second time, only if the current peer
+	// version is a legacy version. That means we need to parse the peer version
+	// first, in order to know whether we should process a second time. This is why
+	// this code block had to be moved up.
+	peerVersionStr := msg.Get(message.VersionStr).(string)
+	peerVersion, err := p.net.parser.Parse(peerVersionStr)
+	if err != nil {
+		p.net.log.Debug("version of %s%s at %s could not be parsed: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), err)
+		p.discardIP()
+		p.net.metrics.failedToParse.Inc()
+		return
+	}
+
+	// The original code discards a version message if it has been received once before.
+	// The new code discard a version message if:
+	// - it has been received twice before; or
+	// - it has been receive once before, and the peer is _not_ on the last legacy Avalanche version.
+	// This means that it allows processing of a version message twice if the peer _is_ on the last
+	// legacy Avalanche version.
+	validLegacyVersion := p.net.legacyCompatibility.Compatible(peerVersion) != nil
 	switch {
-	case p.gotVersion.GetValue():
+	case p.gotVersion.GetValue() && p.regotVersion.GetValue():
+		p.net.log.Verbo("dropping superfluous version message from %s%s at %s", constants.NodeIDPrefix, p.nodeID, p.getIP())
+		return
+	case p.gotVersion.GetValue() && !validLegacyVersion:
 		p.net.log.Verbo("dropping duplicated version message from %s%s at %s", constants.NodeIDPrefix, p.nodeID, p.getIP())
 		return
 	case msg.Get(message.NodeID).(uint32) == p.net.dummyNodeID:
@@ -626,15 +665,6 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 	}
 
 	compatibilities := p.net.compatibilities()
-	peerVersionStr := msg.Get(message.VersionStr).(string)
-	peerVersion, err := p.net.parser.Parse(peerVersionStr)
-	if err != nil {
-		p.net.log.Debug("version of %s%s at %s could not be parsed: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), err)
-		p.discardIP()
-		p.net.metrics.failedToParse.Inc()
-		return
-	}
-
 	if version.Before(compatibilities, peerVersion) {
 		if p.net.config.Beacons.Contains(p.nodeID) {
 			p.net.log.Info(
@@ -726,9 +756,20 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 
 	p.versionStruct.SetValue(peerVersion)
 	p.versionStr.SetValue(peerVersion.String())
-	p.gotVersion.SetValue(true)
 
-	p.tryMarkFinishedHandshake()
+	// A simple check to see whether we are processing the version for the first or
+	// the second time is to simply check `gotVersion`. If it's not set, we processed
+	// a version message for this peer for the first time, and we should set it. If
+	// it is already set, we are processing a version message for this peer for the
+	// second time, and we should set `regotVersion`. For the second case, the handshake
+	// was already finished previously, so we don't need to do so again.
+	if !p.gotVersion.GetValue() {
+		p.gotVersion.SetValue(true)
+		p.tryMarkFinishedHandshake()
+	} else {
+		p.regotVersion.SetValue(true)
+	}
+
 }
 
 // assumes the [stateLock] is not held
@@ -829,9 +870,33 @@ func (p *peer) handlePong(msg message.InboundMessage) {
 		return
 	}
 
+	// When the AP5 hard fork activates, we start rejecting legacy Avalanche versions
+	// during the initial handshake. However, the node also double-checks the version
+	// from the original handshake whenever it receives a pong message. The below
+	// code enables us to do a one time only re-request of the peer's version if
+	// his version is at the legacy Avalanche version, so that peers don't get
+	// disconnected after the hard fork. Otherwise, ever node would have to reconnect
+	// once to be registered with the correct version information after the change.
+
 	compatibilities := p.net.compatibilities()
 	peerVersion := p.versionStruct.GetValue().(version.Application)
 	if err := version.Compatible(compatibilities, peerVersion); err != nil {
+
+		// If the peer is on the legacy Avalanche version, we send a second `GetVersion`
+		// request one time only. The `regotVersion` variable serves as a guard to
+		// make sure we only re-request once. After the first re-request, or if the
+		// peer is not on the legacy Avalanche version, we proceed to the normal
+		// disconnection of peers on an incompatible version.
+		if peerVersion.App() == "avalanche" &&
+			peerVersion.Major() == 1 &&
+			peerVersion.Minor() == 7 &&
+			peerVersion.Patch() == 5 &&
+			!p.regotVersion.GetValue() {
+			p.sendGetVersion()
+			p.regotVersion.SetValue(true)
+			return
+		}
+
 		p.net.log.Debug("disconnecting from peer %s%s at %s version (%s) not compatible: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), peerVersion, err)
 		p.discardIP()
 	}
