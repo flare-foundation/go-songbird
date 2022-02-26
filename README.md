@@ -11,8 +11,8 @@ The minimum recommended hardware specification for nodes connected to Mainnet is
 
 - CPU: Equivalent of 8 AWS vCPU
 - RAM: 16 GiB
-- Storage: 512 GiB
-- OS: Ubuntu 18.04/20.04 or macOS >= 10.15 (Catalina)
+- Storage: 2 TiB
+- OS: Ubuntu 18.04/20.04, Debian 11 or macOS >= 10.15 (Catalina)
 - Network: Reliable IPv4 or IPv6 network connection, with an open public port.
 
 If you plan to build Flare from source, you will also need the following software:
