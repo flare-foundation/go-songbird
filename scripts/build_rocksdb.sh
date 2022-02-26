@@ -3,6 +3,10 @@ DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 INSTALL_PREFIX=$1
 
+if [ $(uname) = "Darwin" ]; then
+  INSTALL_PREFIX="~/Library/"
+fi
+
 export CFLAGS='-fPIC -O2 -pipe'
 export CXXFLAGS='-fPIC -O2 -pipe'
 
