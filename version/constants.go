@@ -76,12 +76,22 @@ func GetApricotPhase0Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase0Times[networkID]; exists {
 		return upgradeTime
 	}
+	customTime, ok := customApricotPhaseTime(0)
+	if ok {
+		return customTime
+
+	}
 	return ApricotPhase0DefaultTime
 }
 
 func GetApricotPhase1Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase1Times[networkID]; exists {
 		return upgradeTime
+	}
+	customTime, ok := customApricotPhaseTime(1)
+	if ok {
+		return customTime
+
 	}
 	return ApricotPhase1DefaultTime
 }
@@ -90,6 +100,11 @@ func GetApricotPhase2Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase2Times[networkID]; exists {
 		return upgradeTime
 	}
+	customTime, ok := customApricotPhaseTime(2)
+	if ok {
+		return customTime
+
+	}
 	return ApricotPhase2DefaultTime
 }
 
@@ -97,12 +112,22 @@ func GetApricotPhase3Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase3Times[networkID]; exists {
 		return upgradeTime
 	}
+	customTime, ok := customApricotPhaseTime(3)
+	if ok {
+		return customTime
+
+	}
 	return ApricotPhase3DefaultTime
 }
 
 func GetApricotPhase4Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase4Times[networkID]; exists {
 		return upgradeTime
+	}
+	customTime, ok := customApricotPhaseTime(4)
+	if ok {
+		return customTime
+
 	}
 	return ApricotPhase4DefaultTime
 }
@@ -117,6 +142,11 @@ func GetApricotPhase4MinPChainHeight(networkID uint32) uint64 {
 func GetApricotPhase5Time(networkID uint32) time.Time {
 	if upgradeTime, exists := ApricotPhase5Times[networkID]; exists {
 		return upgradeTime
+	}
+	customTime, ok := customApricotPhaseTime(5)
+	if ok {
+		return customTime
+
 	}
 	return ApricotPhase5DefaultTime
 }
