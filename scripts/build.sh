@@ -23,9 +23,10 @@ GROCKS_DIR=$(ls $HOME/go/pkg/mod/github.com/xrpdevs/)
 
 cd "$HOME/go/pkg/mod/github.com/xrpdevs/$GROCKS_DIR/"
 
-echo "Building rocksdb from source, this could take some time"
-
-sh "$FLARE_PATH/scripts/build_rocksdb.sh"
+if [ -z ${ROCKSDBALLOWED+x} ]; then
+  echo "Building rocksdb from source, this could take some time. You must be able to use sudo to install rocksdb."
+  sh "$FLARE_PATH/scripts/build_rocksdb.sh"
+fi
 
 cd "$FLARE_PATH"
 
@@ -36,7 +37,7 @@ cd "$FLARE_PATH"
 "$FLARE_PATH"/scripts/build_coreth.sh
 
 # Exit build successfully if the binaries are created
-if [[ -f "$flare_path" && -f "$evm_path" ]]; t
+if [[ -f "$flare_path" && -f "$evm_path" ]]; then
         echo "Build Successful"
         exit 0
 else
