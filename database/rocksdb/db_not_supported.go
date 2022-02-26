@@ -1,7 +1,7 @@
-//go:build !linux || !amd64 || !rocksdballowed
-// +build !linux !amd64 !rocksdballowed
+//go:build  !rocksdballowed
+// +build !rocksdballowed
 
-// ^ Only build this file if this computer is not Linux OR it's not AMD64 OR rocksdb is not allowed
+// Package rocksdb ^ Only build this file if this computer is not Linux OR it's not AMD64 OR rocksdb is not allowed
 // Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 package rocksdb

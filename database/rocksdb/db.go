@@ -1,5 +1,5 @@
-//go:build linux && amd64 && rocksdballowed
-// +build linux,amd64,rocksdballowed
+//go:build rocksdballowed
+//
 
 // ^ Only build this file if this computer linux AND it's AMD64 AND rocksdb is allowed
 // Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.

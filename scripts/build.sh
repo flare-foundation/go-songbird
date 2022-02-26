@@ -36,7 +36,7 @@ cd "$FLARE_PATH"
 "$FLARE_PATH"/scripts/build_coreth.sh
 
 # Exit build successfully if the binaries are created
-if [[ -f "$flare_path" && -f "$evm_path" ]]; then
+if [[ -f "$flare_path" && -f "$evm_path" ]]; t
         echo "Build Successful"
         exit 0
 else
