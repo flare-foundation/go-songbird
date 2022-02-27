@@ -4,7 +4,7 @@ DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 INSTALL_PREFIX=$1
 
 if [ $(uname) = "Darwin" ]; then
-  INSTALL_PREFIX="~/Library/"
+  INSTALL_PREFIX="/usr/local/"
 fi
 
 export CFLAGS='-fPIC -O2 -pipe'
