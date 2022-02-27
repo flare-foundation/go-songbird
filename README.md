@@ -12,15 +12,18 @@ The minimum recommended hardware specification for nodes connected to Mainnet is
 - CPU: Equivalent of 8 AWS vCPU
 - RAM: 16 GiB
 - Storage: 2 TiB
-- OS: Ubuntu 18.04/20.04, Debianls -la
+- OS: Ubuntu 18.04/20.04, Debian 11
 - or macOS >= 10.15 (Catalina)
 - Network: Reliable IPv4 or IPv6 network connection, with an open public port.
 
 If you plan to build Flare from source, you will also need the following software:
 
-- [Go](https://golang.org/doc/install) version >= 1.16.8
+- [Go](https://golang.org/doc/install) version >= 1.17
 - [gcc](https://gcc.gnu.org/)
 - g++
+
+If you want to use RocksDB, you will need sudo and cmake (and be permitted to use sudo) the sudo requirement is because
+the rocksdb libraries are installed in /lib/ or /usr/local/lib depending on platform.
 
 ### Native Install
 
