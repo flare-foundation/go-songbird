@@ -12,12 +12,12 @@ import (
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
-	Current                      = NewDefaultVersion(0, 5, 2)
+	Current                      = NewDefaultVersion(0, 6, 0)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
-	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 2, 0)
-	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 
 	VersionParser = NewDefaultApplicationParser()
 
@@ -124,10 +124,10 @@ func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetApricotPhase5Time(networkID),
+		GetPotatoPhase1Time(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
-		GetApricotPhase0Time(networkID),
+		GetApricotPhase2Time(networkID),
 		PrevMinimumUnmaskedVersion,
 	)
 }
