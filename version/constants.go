@@ -9,12 +9,6 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-// NOTE: We are doing a three-phase deploy to get rid of legacy Avalanche
-// versioning and to transition to Flare versioning.
-// 1. Roll out upgrade with hard-coded Flare versioning support.
-// 2. Roll out upgrade sending Flare application name and version numbers.
-// 3. Roll out upgrade removing hard-coded Flare versioning support.
-
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
@@ -24,14 +18,6 @@ var (
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 2, 0)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
-
-	// Legacy versioning constants.
-	Legacy                      = NewDefaultVersion(1, 7, 5)
-	LegacyApp                   = NewDefaultApplication(constants.LegacyPlatformName, Legacy.Major(), Legacy.Minor(), Legacy.Patch())
-	LegacyCompatibleVersion     = NewDefaultApplication(constants.LegacyPlatformName, 1, 7, 0)
-	PrevLegacyCompatibleVersion = NewDefaultApplication(constants.LegacyPlatformName, 1, 5, 0)
-	LegacyUnmaskedVersion       = NewDefaultApplication(constants.LegacyPlatformName, 1, 1, 0)
-	PrevLegacyUnmaskedVersion   = NewDefaultApplication(constants.LegacyPlatformName, 1, 0, 0)
 
 	VersionParser = NewDefaultApplicationParser()
 
@@ -143,17 +129,5 @@ func GetCompatibility(networkID uint32) Compatibility {
 		MinimumUnmaskedVersion,
 		GetApricotPhase0Time(networkID),
 		PrevMinimumUnmaskedVersion,
-	)
-}
-
-func GetLegacyCompatibility(networkID uint32) Compatibility {
-	return NewCompatibility(
-		LegacyApp,
-		LegacyCompatibleVersion,
-		GetApricotPhase5Time(networkID),
-		PrevLegacyCompatibleVersion,
-		LegacyUnmaskedVersion,
-		GetApricotPhase0Time(networkID),
-		PrevLegacyUnmaskedVersion,
 	)
 }
