@@ -70,6 +70,12 @@ var (
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
+
+	PotatoPhase1Times = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2022, time.March, 14, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 23, 14, 0, 0, 0, time.UTC),
+	}
+	PotatoPhase1DefaultTime = time.Date(2022, time.March, 7, 14, 0, 0, 0, time.UTC)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
@@ -119,6 +125,13 @@ func GetApricotPhase5Time(networkID uint32) time.Time {
 		return upgradeTime
 	}
 	return ApricotPhase5DefaultTime
+}
+
+func GetPotatoPhase1Time(networkID uint32) time.Time {
+	if upgradeTime, exists := PotatoPhase1Times[networkID]; exists {
+		return upgradeTime
+	}
+	return PotatoPhase1DefaultTime
 }
 
 func GetCompatibility(networkID uint32) Compatibility {
