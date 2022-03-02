@@ -239,7 +239,9 @@ func TestRewardDelegatorTxExecuteOnCommit(t *testing.T) {
 	err = vm.internalState.(*internalStateImpl).loadCurrentValidators()
 	assert.NoError(err)
 	// test validator stake
-	stake, ok := vm.Validators.GetWeight(vdrNodeID)
+	set, ok := vm.Validators.GetValidators()
+	assert.True(ok)
+	stake, ok := set.GetWeight(vdrNodeID)
 	assert.True(ok)
 	assert.Equal(vm.MinValidatorStake+vm.MinDelegatorStake, stake)
 
@@ -282,7 +284,7 @@ func TestRewardDelegatorTxExecuteOnCommit(t *testing.T) {
 	assert.Less(vdrReward, delReward, "the delegator's reward should be greater than the delegatee's because the delegatee's share is 25%")
 	assert.Equal(expectedReward, delReward+vdrReward, "expected total reward to be %d but is %d", expectedReward, delReward+vdrReward)
 
-	stake, ok = vm.Validators.GetWeight(vdrNodeID)
+	stake, ok = set.GetWeight(vdrNodeID)
 	assert.True(ok)
 	assert.Equal(vm.MinValidatorStake, stake)
 }
@@ -392,7 +394,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewSet(),
+		Validators:             validators.NewManager(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -427,7 +429,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .21,
-		Validators:             validators.NewSet(),
+		Validators:             validators.NewManager(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -591,7 +593,7 @@ func TestUptimeDisallowedAfterNeverConnecting(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewSet(),
+		Validators:             validators.NewManager(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 

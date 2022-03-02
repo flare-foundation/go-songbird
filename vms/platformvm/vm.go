@@ -503,8 +503,10 @@ func (vm *VM) getPercentConnected() (float64, error) {
 
 	validatorList := vm.Validators.List()
 
-	var err error
-	var connectedStake uint64
+	var (
+		connectedStake uint64
+		err            error
+	)
 	for _, vdr := range validatorList {
 		if !vm.uptimeManager.IsConnected(vdr.ID()) {
 			continue // not connected to us --> don't include

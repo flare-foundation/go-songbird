@@ -19,6 +19,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/version"
@@ -877,27 +878,24 @@ func initTestRemoteProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, 0, false)
 
-	// valManager := &validators.TestManager{
-	// 	T: t,
-	// }
-	// valManager.GetValidatorSetF = func() (map[ids.ShortID]uint64, error) {
-	// 	res := make(map[ids.ShortID]uint64)
-	// 	res[proVM.ctx.NodeID] = uint64(10)
-	// 	res[ids.ShortID{1}] = uint64(5)
-	// 	res[ids.ShortID{2}] = uint64(6)
-	// 	res[ids.ShortID{3}] = uint64(7)
-	// 	return res, nil
-	// }
+	valState := &validators.TestState{
+		T: t,
+	}
+	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
+	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+		res := make(map[ids.ShortID]uint64)
+		res[proVM.ctx.NodeID] = uint64(10)
+		res[ids.ShortID{1}] = uint64(5)
+		res[ids.ShortID{2}] = uint64(6)
+		res[ids.ShortID{3}] = uint64(7)
+		return res, nil
+	}
 
 	ctx := snow.DefaultContextTest()
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-
-	// FIXME
-	ctx.PlatformVMState = nil
-	ctx.ValidatorsRetriever = nil
-	ctx.ValidatorsUpdater = nil
+	ctx.ValidatorState = valState
 
 	dummyDBManager := manager.NewMemDB(version.DefaultVersion1_0_0)
 	// make sure that DBs are compressed correctly

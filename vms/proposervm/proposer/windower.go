@@ -58,7 +58,7 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 	// get the validator set by the p-chain height
 	validators, err := w.manager.GetValidatorsByBlockID(parentID)
 	if err != nil {
-		return 0, fmt.Errorf("could not get validators (block: %x): %w", parentID, err)
+		return 0, fmt.Errorf("could not get validators: %w", err)
 	}
 
 	// convert the list of validators to a slice
