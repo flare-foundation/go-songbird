@@ -6,7 +6,6 @@ package network
 import (
 	"context"
 	"crypto"
-	"math"
 	"net"
 	"testing"
 
@@ -74,9 +73,8 @@ func TestPeer_Close(t *testing.T) {
 		outbounds: make(map[string]*testListener),
 	}
 
-	vdrs := validators.NewManager(constants.LocalID,
-		validators.WithValidator(id, math.MaxUint64),
-	)
+	vdrs := validators.NewManager(constants.LocalID) // validators.WithValidator(id, math.MaxUint64),
+
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)

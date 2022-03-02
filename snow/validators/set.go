@@ -202,7 +202,7 @@ func (s *set) addWeight(vdrID ids.ShortID, weight uint64) error {
 
 	newTotalWeight, err := safemath.Add64(s.totalWeight, weight)
 	if err != nil {
-		return nil
+		return err
 	}
 	s.totalWeight = newTotalWeight
 	s.initialized = false

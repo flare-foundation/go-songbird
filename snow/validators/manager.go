@@ -17,7 +17,7 @@ type Manager interface {
 	fmt.Stringer
 
 	// SetSource sets the dynamic source of validators for this manager.
-	SetSource(source Source)
+	SetSource(source Source) error
 
 	// GetValidators returns the latest validator set.
 	GetValidators() (Set, error)
@@ -37,16 +37,8 @@ type Manager interface {
 	Contains(vdrID ids.ShortID) bool
 }
 
-type With func(Set)
-
-func WithValidator(vdr ids.ShortID, weight uint64) With {
-	return func(set Set) {
-		_ = set.AddWeight(vdr, weight)
-	}
-}
-
 // NewManager returns a new, empty manager
-func NewManager(networkID uint32, withs ...With) Manager {
+func NewManager(networkID uint32) Manager {
 	var validators Set
 	switch networkID {
 	case constants.CostonID:
@@ -58,9 +50,6 @@ func NewManager(networkID uint32, withs ...With) Manager {
 	default:
 		validators = loadCustomValidators()
 	}
-	for _, with := range withs {
-		with(validators)
-	}
 	return &manager{
 		networkID:  networkID,
 		validators: validators,
@@ -71,24 +60,83 @@ func NewManager(networkID uint32, withs ...With) Manager {
 type manager struct {
 	lock       sync.Mutex
 	networkID  uint32
+	lastID     ids.ID
 	validators Set
+	cache      map[ids.ID]Set
 	maskedVdrs ids.ShortSet
 	source     Source
 }
 
-func (m *manager) SetSource(source Source) {
+// SetSource sets the source that we load the dynamic set of validators from.
+func (m *manager) SetSource(source Source) error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
+	if m.source != nil {
+		return fmt.Errorf("validator source already set")
+	}
 	m.source = source
+	return nil
 }
 
-// GetValidatorSet implements the Manager interface.
+// GetValidators implements the validator manager interface. It should _always_
+// return the same set (same memory location), because it is used to propagate
+// the recent set of validators across many components.
 func (m *manager) GetValidators() (Set, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	if m.validators.Len() == 0 {
+
+	// If source has not been set, validators can be empty if people forgot to
+	// set `CUSTOM_VALIDATORS` on a custom network. Otherwise it will contain
+	// the default set for the respective network.
+	if m.source == nil && m.validators.Len() == 0 {
 		return nil, ErrNoValidators
 	}
+
+	// If source is not set, but we have a default set of validators with the
+	// network, we can return the default set.
+	if m.source == nil {
+		return m.validators, nil
+	}
+
+	// If the source is set, we can get the preferred block ID. If the preferred
+	// ID has not changed, we can simply return the current validator set.
+	preferredID, err := m.source.PreferredBlockID()
+	if err != nil {
+		return nil, fmt.Errorf("could not get preferred block: %w", err)
+	}
+	if preferredID == m.lastID {
+		return m.validators, nil
+	}
+
+	// At this point, the last ID has changed.
+	m.lastID = preferredID
+
+	// Otherwise, we check if this validator set has already been loaded from
+	// the EVM before through a specific retrieval by block ID. In that case, we
+	// update the latest validator set and return.
+	set, ok := m.cache[preferredID]
+	if ok {
+		err = m.validators.Set(set.List())
+		if err != nil {
+			return nil, fmt.Errorf("could not set latest validator set: %w", err)
+		}
+		return m.validators, nil
+	}
+
+	// Last but not least, if this is the first attempt to get this validator
+	// set, we retrieve it from the EVM, cache it under the preferred ID and
+	// update the latest set to have the same content.
+	set, err = m.getValidatorsByBlockID(preferredID)
+	if err != nil {
+		return nil, fmt.Errorf("could not get validators (preferred: %x): %w", preferredID, err)
+	}
+	m.cache[preferredID] = set
+
+	err = m.validators.Set(set.List())
+	if err != nil {
+		return nil, fmt.Errorf("could not set latest validator set: %w", err)
+	}
+
 	return m.validators, nil
 }
 
@@ -96,10 +144,49 @@ func (m *manager) GetValidators() (Set, error) {
 func (m *manager) GetValidatorsByBlockID(blockID ids.ID) (Set, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	if m.validators.Len() == 0 {
-		return nil, ErrNoValidators
+
+	// If no source is set, we should error.
+	if m.source == nil {
+		return nil, fmt.Errorf("validator source not set yet")
 	}
-	return m.validators, nil
+
+	// If this set is already cached, we return it.
+	set, ok := m.cache[blockID]
+	if ok {
+		return set, nil
+	}
+
+	// Otherwise, we try to load it from the EVM.
+	set, err := m.getValidatorsByBlockID(blockID)
+	if err != nil {
+		return nil, fmt.Errorf("could not get validators (block: %x): %w", blockID, err)
+	}
+
+	// Cache and return after loading form EVM.
+	m.cache[blockID] = set
+
+	return set, nil
+}
+
+// getValidatorsByBlockID uses the injected
+func (m *manager) getValidatorsByBlockID(blockID ids.ID) (Set, error) {
+
+	// This call loads the validators map from the EVM RPC client.
+	validatorMap, err := m.source.LoadValidators(blockID)
+	if err != nil {
+		return nil, fmt.Errorf("could not load validators: %w", err)
+	}
+
+	// Convert into validator set and return.
+	set := NewSet()
+	for validatorID, weight := range validatorMap {
+		err = set.AddWeight(validatorID, weight)
+		if err != nil {
+			return nil, fmt.Errorf("could not set validator weight (validator: %x, weight: %d): %w", validatorID, weight, err)
+		}
+	}
+
+	return set, nil
 }
 
 // MaskValidator implements the Manager interface.

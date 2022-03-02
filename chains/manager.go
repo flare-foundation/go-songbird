@@ -753,7 +753,10 @@ func (m *manager) createSnowmanChain(
 	// manager.
 	validatorSource, ok := vm.(validators.Source)
 	if ok {
-		m.Validators.SetSource(validatorSource)
+		err = m.Validators.SetSource(validatorSource)
+		if err != nil {
+			return nil, fmt.Errorf("could not set validator source: %w", err)
+		}
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it

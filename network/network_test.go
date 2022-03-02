@@ -9,7 +9,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"math"
 	"net"
 	"sync"
 	"testing"
@@ -347,7 +346,8 @@ func TestNewDefaultNetwork(t *testing.T) {
 		closed:  make(chan struct{}),
 	}
 
-	vdrs := validators.NewManager(0, validators.WithValidator(id, math.MaxUint64))
+	vdrs := validators.NewManager(0) // validators.WithValidator(id, math.MaxUint64),
+
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -426,10 +426,9 @@ func TestEstablishConnection(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+
 	beacons := validators.NewSet()
 
 	var (
@@ -566,10 +565,9 @@ func TestDoubleTrack(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+
 	beacons := validators.NewSet()
 
 	var (
@@ -707,10 +705,9 @@ func TestDoubleClose(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+
 	beacons := validators.NewSet()
 
 	var (
@@ -853,10 +850,9 @@ func TestTrackConnected(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+
 	beacons := validators.NewSet()
 
 	var (
@@ -995,10 +991,9 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+
 	beacons := validators.NewSet()
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -1172,11 +1167,10 @@ func TestPeerAliasesTicker(t *testing.T) {
 		},
 	}
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-		validators.WithValidator(id2, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+	// validators.WithValidator(id2, 1),
+
 	beacons := validators.NewSet()
 
 	var (
@@ -1467,11 +1461,10 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-		validators.WithValidator(id2, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+	// validators.WithValidator(id2, 1),
+
 	beacons := validators.NewSet()
 
 	listener0 := &testListener{
@@ -1919,7 +1912,7 @@ func TestPeerSignature(t *testing.T) {
 
 	vdrs := validators.NewManager(
 		0,
-		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+		// validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
 	)
 	beacons := validators.NewSet()
 
@@ -2349,8 +2342,8 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 
 	vdrs := validators.NewManager(
 		0,
-		validators.WithValidator(id1, 1),
-		validators.WithValidator(id0, 1),
+		// validators.WithValidator(id1, 1),
+		// validators.WithValidator(id0, 1),
 	)
 	beacons := validators.NewSet()
 
@@ -2491,10 +2484,9 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0,
-		validators.WithValidator(id0, 1),
-		validators.WithValidator(id1, 1),
-	)
+	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
+	// validators.WithValidator(id1, 1),
+
 	beacons := validators.NewSet()
 
 	var (
@@ -2669,7 +2661,7 @@ func TestPeerGossip(t *testing.T) {
 
 	vdrs := validators.NewManager(
 		0,
-		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+		// validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
 	)
 	beacons := validators.NewSet()
 
@@ -2907,7 +2899,7 @@ func TestAppGossip(t *testing.T) {
 
 	vdrs := validators.NewManager(
 		0,
-		validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
+		// validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
 	)
 
 	beacons := validators.NewSet()
