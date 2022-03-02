@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	errCurrentHeight   = errors.New("unexpectedly called GetCurrentHeight")
 	errGetValidatorSet = errors.New("unexpectedly called GetValidatorSet")
 )
 
@@ -22,22 +21,12 @@ type TestState struct {
 	CantGetValidatorSet bool
 
 	GetCurrentHeightF func() (uint64, error)
-	GetValidatorSetF  func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error)
+	GetValidatorSetF  func(blockID ids.ID) (map[ids.ShortID]uint64, error)
 }
 
-func (vm *TestState) GetCurrentHeight() (uint64, error) {
-	if vm.GetCurrentHeightF != nil {
-		return vm.GetCurrentHeightF()
-	}
-	if vm.CantGetCurrentHeight && vm.T != nil {
-		vm.T.Fatal(errCurrentHeight)
-	}
-	return 0, errCurrentHeight
-}
-
-func (vm *TestState) GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+func (vm *TestState) GetValidatorSet(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 	if vm.GetValidatorSetF != nil {
-		return vm.GetValidatorSetF(height, subnetID)
+		return vm.GetValidatorSetF(blockID)
 	}
 	if vm.CantGetValidatorSet && vm.T != nil {
 		vm.T.Fatal(errGetValidatorSet)

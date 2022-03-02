@@ -624,7 +624,7 @@ func TestGetBlock_MutatedSignature(t *testing.T) {
 	coreVM, valState, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 
 	// Make sure that we will be sampled to perform the proposals.
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 		res := make(map[ids.ShortID]uint64)
 		res[proVM.ctx.NodeID] = uint64(10)
 		return res, nil

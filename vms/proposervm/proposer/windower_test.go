@@ -20,17 +20,19 @@ func TestWindowerNoValidators(t *testing.T) {
 
 	subnetID := ids.GenerateTestID()
 	chainID := ids.GenerateTestID()
+	parentID := ids.GenerateTestID()
 	nodeID := ids.GenerateTestShortID()
 	vdrState := &validators.TestState{
 		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+		GetValidatorSetF: func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 			return nil, nil
 		},
 	}
 
 	w := New(vdrState, subnetID, chainID)
 
-	delay, err := w.Delay(1, 0, nodeID)
+	// TODO: check if parent ID works here
+	delay, err := w.Delay(1, nodeID, parentID)
 	assert.NoError(err)
 	assert.EqualValues(0, delay)
 }
@@ -40,11 +42,12 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 
 	subnetID := ids.GenerateTestID()
 	chainID := ids.GenerateTestID()
+	parentID := ids.GenerateTestID()
 	validatorID := ids.GenerateTestShortID()
 	nonValidatorID := ids.GenerateTestShortID()
 	vdrState := &validators.TestState{
 		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+		GetValidatorSetF: func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 			return map[ids.ShortID]uint64{
 				validatorID: 10,
 			}, nil
@@ -53,11 +56,13 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 
 	w := New(vdrState, subnetID, chainID)
 
-	validatorDelay, err := w.Delay(1, 0, validatorID)
+	// FIXME: double check parent ID
+	validatorDelay, err := w.Delay(1, validatorID, parentID)
 	assert.NoError(err)
 	assert.EqualValues(0, validatorDelay)
 
-	nonValidatorDelay, err := w.Delay(1, 0, nonValidatorID)
+	// FIXME: double check parent ID
+	nonValidatorDelay, err := w.Delay(1, nonValidatorID, parentID)
 	assert.NoError(err)
 	assert.EqualValues(MaxDelay, nonValidatorDelay)
 }
@@ -67,13 +72,14 @@ func TestWindowerChangeByHeight(t *testing.T) {
 
 	subnetID := ids.ID{0, 1}
 	chainID := ids.ID{0, 2}
+	parentID := ids.ID{0, 3}
 	validatorIDs := make([]ids.ShortID, MaxWindows)
 	for i := range validatorIDs {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 	vdrState := &validators.TestState{
 		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+		GetValidatorSetF: func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 			validators := make(map[ids.ShortID]uint64, MaxWindows)
 			for _, id := range validatorIDs {
 				validators[id] = 1
@@ -95,7 +101,8 @@ func TestWindowerChangeByHeight(t *testing.T) {
 	for i, expectedDelay := range expectedDelays1 {
 		vdrID := validatorIDs[i]
 		fmt.Println(vdrID)
-		validatorDelay, err := w.Delay(1, 0, vdrID)
+		// FIXME: double check parent ID
+		validatorDelay, err := w.Delay(1, vdrID, parentID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}
@@ -110,7 +117,8 @@ func TestWindowerChangeByHeight(t *testing.T) {
 	}
 	for i, expectedDelay := range expectedDelays2 {
 		vdrID := validatorIDs[i]
-		validatorDelay, err := w.Delay(2, 0, vdrID)
+		// FIXME: double check parent ID
+		validatorDelay, err := w.Delay(2, vdrID, parentID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}
@@ -127,13 +135,16 @@ func TestWindowerChangeByChain(t *testing.T) {
 	chainID1 := ids.ID{}
 	_, _ = rand.Read(chainID1[:]) // #nosec G404
 
+	parentID := ids.ID{}
+	_, _ = rand.Read(parentID[:])
+
 	validatorIDs := make([]ids.ShortID, MaxWindows)
 	for i := range validatorIDs {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 	vdrState := &validators.TestState{
 		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+		GetValidatorSetF: func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 			validators := make(map[ids.ShortID]uint64, MaxWindows)
 			for _, id := range validatorIDs {
 				validators[id] = 1
@@ -155,7 +166,8 @@ func TestWindowerChangeByChain(t *testing.T) {
 	}
 	for i, expectedDelay := range expectedDelays0 {
 		vdrID := validatorIDs[i]
-		validatorDelay, err := w0.Delay(1, 0, vdrID)
+		// FIXME: double check parent ID
+		validatorDelay, err := w0.Delay(1, vdrID, parentID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}
@@ -170,7 +182,8 @@ func TestWindowerChangeByChain(t *testing.T) {
 	}
 	for i, expectedDelay := range expectedDelays1 {
 		vdrID := validatorIDs[i]
-		validatorDelay, err := w1.Delay(1, 0, vdrID)
+		// FIXME: double check parent ID
+		validatorDelay, err := w1.Delay(1, vdrID, parentID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}

@@ -280,7 +280,8 @@ func TestBlockVerify_PostForkBlock_TimestampChecks(t *testing.T) {
 	}
 
 	// block cannot arrive before its creator window starts
-	blkWinDelay, err := proVM.Delay(childCoreBlk.Height(), pChainHeight, proVM.ctx.NodeID)
+	// TODO: check this is the correct parent ID
+	blkWinDelay, err := proVM.Delay(childCoreBlk.Height(), proVM.ctx.NodeID, prntProBlk.ID())
 	if err != nil {
 		t.Fatal("Could not calculate submission window")
 	}
@@ -507,7 +508,7 @@ func TestBlockVerify_PostForkBlock_PChainHeightChecks(t *testing.T) {
 	}
 
 	// block P-Chain height can be equal to current P-Chain height
-	currPChainHeight, _ := proVM.ctx.ValidatorState.GetCurrentHeight()
+	currPChainHeight, _ := proVM.ctx.PlatformVMState.GetCurrentHeight()
 	childSlb, err = block.BuildUnsigned(
 		prntProBlk.ID(),
 		childCoreBlk.Timestamp(),
@@ -709,7 +710,7 @@ func TestBlockVerify_PostForkBlockBuiltOnOption_PChainHeightChecks(t *testing.T)
 	}
 
 	// block P-Chain height can be equal to current P-Chain height
-	currPChainHeight, _ := proVM.ctx.ValidatorState.GetCurrentHeight()
+	currPChainHeight, _ := proVM.ctx.PlatformVMState.GetCurrentHeight()
 	childSlb, err = block.BuildUnsigned(
 		parentBlk.ID(),
 		childCoreBlk.Timestamp(),

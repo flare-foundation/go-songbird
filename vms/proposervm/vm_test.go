@@ -108,7 +108,7 @@ func initTestProposerVM(
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 		res := make(map[ids.ShortID]uint64)
 		res[proVM.ctx.NodeID] = uint64(10)
 		res[ids.ShortID{1}] = uint64(5)
@@ -601,7 +601,7 @@ func TestTwoProBlocksWithSameParentCanBothVerify(t *testing.T) {
 		}
 	}
 
-	pChainHeight, err := proVM.ctx.ValidatorState.GetCurrentHeight()
+	pChainHeight, err := proVM.ctx.PlatformVMState.GetCurrentHeight()
 	if err != nil {
 		t.Fatal("could not retrieve pChain height")
 	}
@@ -843,7 +843,7 @@ func TestExpiredBuildBlock(t *testing.T) {
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 		return map[ids.ShortID]uint64{
 			{1}: 100,
 		}, nil
@@ -1118,7 +1118,7 @@ func TestInnerVMRollback(t *testing.T) {
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 		return map[ids.ShortID]uint64{
 			{1}: 100,
 		}, nil
@@ -1276,7 +1276,7 @@ func TestInnerVMRollback(t *testing.T) {
 func TestBuildBlockDuringWindow(t *testing.T) {
 	coreVM, valState, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 		return map[ids.ShortID]uint64{
 			proVM.ctx.NodeID: 10,
 		}, nil

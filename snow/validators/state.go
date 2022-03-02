@@ -11,16 +11,12 @@ import (
 
 var _ State = &lockedState{}
 
-// State allows the lookup of validator sets on specified subnets at the
-// requested P-chain height.
+// State allows the lookup of the validator set at the requested block ID.
 type State interface {
-	// GetCurrentHeight returns the current height of the P-chain.
-	GetCurrentHeight() (uint64, error)
 
-	// GetValidatorSet returns the weights of the nodeIDs for the provided
-	// subnet at the requested P-chain height.
-	// The returned map should not be modified.
-	GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error)
+	// GetValidatorSet returns the weights of the nodeIDs at the requested block
+	// ID. The returned map should not be modified.
+	GetValidatorSet(blockID ids.ID) (map[ids.ShortID]uint64, error)
 }
 
 type lockedState struct {
@@ -35,18 +31,11 @@ func NewLockedState(lock sync.Locker, s State) State {
 	}
 }
 
-func (s *lockedState) GetCurrentHeight() (uint64, error) {
+func (s *lockedState) GetValidatorSet(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	return s.s.GetCurrentHeight()
-}
-
-func (s *lockedState) GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	return s.s.GetValidatorSet(height, subnetID)
+	return s.s.GetValidatorSet(blockID)
 }
 
 type noState struct{}
@@ -59,6 +48,6 @@ func (s *noState) GetCurrentHeight() (uint64, error) {
 	return 0, nil
 }
 
-func (s *noState) GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
+func (s *noState) GetValidatorSet(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 	return nil, nil
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/flare-foundation/flare/api/metrics"
 	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/platform"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
@@ -61,7 +62,8 @@ type Context struct {
 	Metrics      metrics.OptionalGatherer
 
 	// snowman++ attributes
-	ValidatorState    validators.State  // interface for P-Chain validators
+	ValidatorState    validators.State  // interface for FTSO validators
+	PlatformVMState   platform.VMState  // interface for the PChain height
 	StakingLeafSigner crypto.Signer     // block signer
 	StakingCertLeaf   *x509.Certificate // block certificate
 }

@@ -284,13 +284,8 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 		return err
 	}
 
-	pChainHeight, err := blk.pChainHeight()
-	if err != nil {
-		return err
-	}
-
 	// reset scheduler
-	minDelay, err := vm.Windower.Delay(blk.Height()+1, pChainHeight, vm.ctx.NodeID)
+	minDelay, err := vm.Windower.Delay(blk.Height()+1, vm.ctx.NodeID, preferred)
 	if err != nil {
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that
@@ -568,7 +563,7 @@ func (vm *VM) notifyInnerBlockReady() {
 }
 
 func (vm *VM) optimalPChainHeight(minPChainHeight uint64) (uint64, error) {
-	currentPChainHeight, err := vm.ctx.ValidatorState.GetCurrentHeight()
+	currentPChainHeight, err := vm.ctx.PlatformVMState.GetCurrentHeight()
 	if err != nil {
 		return 0, err
 	}
