@@ -3105,7 +3105,8 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 	targetNetwork.peers.add(peerToAdd)
 
 	if isValidator {
-		targetNetwork.config.Validators = targetNetwork.config.Validators.Mutate(validators.WithValidator(peerToAdd.nodeID, 10))
+		validators, _ := targetNetwork.config.Validators.GetValidators()
+		validators.AddWeight(peerToAdd.nodeID, 10)
 	}
 }
 

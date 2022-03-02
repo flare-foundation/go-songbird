@@ -172,9 +172,6 @@ type Client interface {
 	GetRewardUTXOs(context.Context, *api.GetTxArgs) ([][]byte, error)
 	// GetTimestamp returns the current chain timestamp
 	GetTimestamp(ctx context.Context) (time.Time, error)
-	// GetValidatorsAt returns the weights of the validator set of a provided subnet
-	// at the specified height.
-	GetValidatorsAt(ctx context.Context, subnetID ids.ID, height uint64) (map[string]uint64, error)
 }
 
 // Client implementation for interacting with the P Chain endpoint
@@ -626,13 +623,4 @@ func (c *client) GetTimestamp(ctx context.Context) (time.Time, error) {
 	res := &GetTimestampReply{}
 	err := c.requester.SendRequest(ctx, "getTimestamp", struct{}{}, res)
 	return res.Timestamp, err
-}
-
-func (c *client) GetValidatorsAt(ctx context.Context, subnetID ids.ID, height uint64) (map[string]uint64, error) {
-	res := &GetValidatorsAtReply{}
-	err := c.requester.SendRequest(ctx, "getValidatorsAt", &GetValidatorsAtArgs{
-		SubnetID: subnetID,
-		Height:   json.Uint64(height),
-	}, res)
-	return res.Validators, err
 }

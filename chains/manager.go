@@ -34,6 +34,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/networking/sender"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
+	"github.com/flare-foundation/flare/snow/platform"
 	"github.com/flare-foundation/flare/snow/triggers"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
@@ -204,8 +205,8 @@ type manager struct {
 	// Value: The chain
 	chains map[ids.ID]handler.Handler
 
-	// snowman++ related interface to allow validators retrival
-	validatorState validators.State
+	// platformVMState will give components access to the last P-Chain height
+	platformVMState platform.VMState
 }
 
 // New returns a new Manager
@@ -366,7 +367,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 			SNLookup:     m,
 			Metrics:      vmMetrics,
 
-			ValidatorState:    m.validatorState,
+			PlatformVMState:   m.platformVMState,
 			StakingCertLeaf:   m.StakingCert.Leaf,
 			StakingLeafSigner: m.StakingCert.PrivateKey.(crypto.Signer),
 		},
@@ -429,9 +430,9 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	}
 
 	// The validators of this blockchain
-	validators, ok := m.Validators.GetValidators()
-	if !ok {
-		return nil, fmt.Errorf("couldn't get validator set of network with ID %d. The network may not exist", m.NetworkID)
+	validators, err := m.Validators.GetValidators()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get validators: %w", err)
 	}
 
 	beacons := validators
@@ -736,25 +737,23 @@ func (m *manager) createSnowmanChain(
 		return nil, fmt.Errorf("couldn't initialize sender: %w", err)
 	}
 
-	// first vm to be init is P-Chain once, which provides validator interface to all ProposerVMs
-	if m.validatorState == nil {
-		if m.ManagerConfig.StakingEnabled {
-			valState, ok := vm.(validators.State)
-			if !ok {
-				return nil, fmt.Errorf("expected validators.State but got %T", vm)
-			}
-
-			// Initialize the validator state for future chains.
-			m.validatorState = validators.NewLockedState(&ctx.Lock, valState)
-
-			// Notice that this context is left unlocked. This is because the
-			// lock will already be held when accessing these values on the
-			// P-chain.
-			ctx.ValidatorState = valState
-		} else {
-			m.validatorState = validators.NewNoState()
-			ctx.ValidatorState = m.validatorState
+	// If the platform VM state is `nil`, we are initializing the first chain,
+	// which is the platform VM, so we should set this field to the type-asserted
+	// platform VM handle.
+	if m.platformVMState == nil {
+		platformVMState, ok := vm.(platform.VMState)
+		if !ok {
+			return nil, fmt.Errorf("first VM should implement `platform.VMState`")
 		}
+		m.platformVMState = platformVMState
+	}
+
+	// TODO: if the VM here is a validator source, then we are initializing the
+	// EVM and we should inject the EVM as validator source into the validator
+	// manager.
+	validatorSource, ok := vm.(validators.Source)
+	if ok {
+		m.Validators.SetSource(validatorSource)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it

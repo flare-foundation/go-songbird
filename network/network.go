@@ -306,9 +306,9 @@ func NewNetwork(
 	netw.clientUpgrader = NewTLSClientUpgrader(config.TLSConfig)
 
 	netw.dialer = dialer.NewDialer(constants.NetworkType, config.DialerConfig, log)
-	validators, ok := config.Validators.GetValidators()
-	if !ok {
-		return nil, errNoPrimaryValidators
+	validators, err := config.Validators.GetValidators()
+	if err != nil {
+		return nil, fmt.Errorf("could not get validators: %w", err)
 	}
 
 	inboundMsgThrottler, err := throttling.NewInboundMsgThrottler(
@@ -736,8 +736,8 @@ func (n *network) IP() utils.IPDesc {
 func (n *network) NodeUptime() (UptimeResult, bool) {
 	n.stateLock.RLock()
 	defer n.stateLock.RUnlock()
-	validators, ok := n.config.Validators.GetValidators()
-	if !ok {
+	validators, err := n.config.Validators.GetValidators()
+	if err != nil {
 		return UptimeResult{}, false
 	}
 

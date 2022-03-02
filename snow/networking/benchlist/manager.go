@@ -5,6 +5,7 @@ package benchlist
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -111,9 +112,9 @@ func (m *manager) RegisterChain(ctx *snow.ConsensusContext) error {
 		return nil
 	}
 
-	validators, ok := m.config.Validators.GetValidators()
-	if !ok {
-		return errUnknownValidators
+	validators, err := m.config.Validators.GetValidators()
+	if err != nil {
+		return fmt.Errorf("could not get validators: %w", err)
 	}
 
 	benchlist, err := NewBenchlist(

@@ -16,9 +16,14 @@ import (
 type Manager interface {
 	fmt.Stringer
 
-	// GetValidators returns the validator set for the given subnet
-	// Returns false if the subnet doesn't exist
-	GetValidators() (Set, bool)
+	// SetSource sets the dynamic source of validators for this manager.
+	SetSource(source Source)
+
+	// GetValidators returns the latest validator set.
+	GetValidators() (Set, error)
+
+	// GetValidatorsByBlockID returns the validator set
+	GetValidatorsByBlockID(blockID ids.ID) (Set, error)
 
 	// MaskValidator hides the named validator from future samplings
 	MaskValidator(vdrID ids.ShortID) error
@@ -30,10 +35,6 @@ type Manager interface {
 	// Contains returns true if there is a validator with the specified ID
 	// currently in the set.
 	Contains(vdrID ids.ShortID) bool
-
-	// Mutate will mutate the validator set by copying it and adding the given
-	// validators.
-	Mutate(withs ...With) Manager
 }
 
 type With func(Set)
@@ -72,16 +73,33 @@ type manager struct {
 	networkID  uint32
 	validators Set
 	maskedVdrs ids.ShortSet
+	source     Source
+}
+
+func (m *manager) SetSource(source Source) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.source = source
 }
 
 // GetValidatorSet implements the Manager interface.
-func (m *manager) GetValidators() (Set, bool) {
+func (m *manager) GetValidators() (Set, error) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	if m.validators.Len() == 0 {
-		return nil, false
+		return nil, ErrNoValidators
 	}
-	return m.validators, true
+	return m.validators, nil
+}
+
+// GetValidatorsByBlockID implements the Manager interface.
+func (m *manager) GetValidatorsByBlockID(blockID ids.ID) (Set, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if m.validators.Len() == 0 {
+		return nil, ErrNoValidators
+	}
+	return m.validators, nil
 }
 
 // MaskValidator implements the Manager interface.
@@ -122,20 +140,6 @@ func (m *manager) Contains(vdrID ids.ShortID) bool {
 	defer m.lock.Unlock()
 
 	return m.validators.Contains(vdrID)
-}
-
-// Mutate will copy the underyling validator set and add the given validators.
-func (m *manager) Mutate(withs ...With) Manager {
-	list := m.validators.List()
-	validators := NewSet()
-	_ = validators.Set(list)
-	for _, with := range withs {
-		with(validators)
-	}
-	return &manager{
-		networkID:  m.networkID,
-		validators: validators,
-	}
 }
 
 func (m *manager) String() string {

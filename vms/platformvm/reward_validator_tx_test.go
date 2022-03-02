@@ -239,8 +239,8 @@ func TestRewardDelegatorTxExecuteOnCommit(t *testing.T) {
 	err = vm.internalState.(*internalStateImpl).loadCurrentValidators()
 	assert.NoError(err)
 	// test validator stake
-	set, ok := vm.Validators.GetValidators()
-	assert.True(ok)
+	set, err := vm.Validators.GetValidators()
+	assert.NoError(err)
 	stake, ok := set.GetWeight(vdrNodeID)
 	assert.True(ok)
 	assert.Equal(vm.MinValidatorStake+vm.MinDelegatorStake, stake)

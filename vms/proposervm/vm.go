@@ -109,7 +109,7 @@ func (vm *VM) Initialize(
 	prefixDB := prefixdb.New(dbPrefix, rawDB)
 	vm.db = versiondb.New(prefixDB)
 	vm.State = state.New(vm.db)
-	vm.Windower = proposer.New(ctx.ValidatorState, ctx.SubnetID, ctx.ChainID)
+	vm.Windower = proposer.New(ctx.ValidatorManager, ctx.SubnetID, ctx.ChainID)
 	vm.Tree = tree.New()
 
 	indexerDB := versiondb.New(vm.db)
