@@ -748,9 +748,8 @@ func (m *manager) createSnowmanChain(
 		m.platformVMState = platformVMState
 	}
 
-	// TODO: if the VM here is a validator source, then we are initializing the
-	// EVM and we should inject the EVM as validator source into the validator
-	// manager.
+	// If the VM here is a validator source, then we are initializing the EVM
+	// and we should inject it as validator source into the validator manager.
 	validatorSource, ok := vm.(validators.Source)
 	if ok {
 		err = m.Validators.SetSource(validatorSource)

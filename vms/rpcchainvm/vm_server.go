@@ -6,6 +6,7 @@ package rpcchainvm
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -35,6 +36,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/appsender"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
@@ -590,7 +592,22 @@ func (vm *VMServer) BlockReject(_ context.Context, req *vmproto.BlockRejectReque
 }
 
 func (vm *VMServer) LoadValidators(_ context.Context, req *vmproto.LoadValidatorsRequest) (*vmproto.LoadValidatorsResponse, error) {
-	// TODO: fill the response
-	res := vmproto.LoadValidatorsResponse{}
+	validatorSource, ok := vm.vm.(validators.Source)
+	if !ok {
+		return nil, fmt.Errorf("VM is not a validator source")
+	}
+	blockID, err := ids.ToID(req.BlkId)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse block ID: %w", err)
+	}
+	validators, err := validatorSource.LoadValidators(blockID)
+	if err != nil {
+		return nil, fmt.Errorf("could not load validators from source: %w", err)
+	}
+	var res vmproto.LoadValidatorsResponse
+	for validatorID, weight := range validators {
+		res.ValidatorIds = append(res.ValidatorIds, validatorID[:])
+		res.Weights = append(res.Weights, weight)
+	}
 	return &res, nil
 }

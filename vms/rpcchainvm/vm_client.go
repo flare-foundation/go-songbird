@@ -655,11 +655,24 @@ func (vm *VMClient) Disconnected(nodeID ids.ShortID) error {
 
 func (vm *VMClient) LoadValidators(blockID ids.ID) (map[ids.ShortID]uint64, error) {
 	res, err := vm.client.LoadValidators(context.Background(), &vmproto.LoadValidatorsRequest{
-		BlockId: blockID[:],
+		BlkId: blockID[:],
 	})
-	// TODO: initialize map
-	validatorMap := make(map[ids.ShortID]uint64)
-	return validatorMap, err
+	if err != nil {
+		return nil, fmt.Errorf("could not get load validators response: %w", err)
+	}
+	if len(res.ValidatorIds) != len(res.Weights) {
+		return nil, fmt.Errorf("mismatch between validators and weights (%d != %d)", len(res.ValidatorIds), len(res.Weights))
+	}
+	validatorMap := make(map[ids.ShortID]uint64, len(res.ValidatorIds))
+	for i, validatorId := range res.ValidatorIds {
+		validatorID, err := ids.ToShortID(validatorId)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse validator ID: %w", err)
+		}
+		weight := res.Weights[i]
+		validatorMap[validatorID] = weight
+	}
+	return validatorMap, nil
 }
 
 // BlockClient is an implementation of Block that talks over RPC.
