@@ -5,6 +5,6 @@ import (
 )
 
 type Source interface {
-	PreferredBlockID() (ids.ID, error)
+	LastAccepted() (ids.ID, error)
 	LoadValidators(blockID ids.ID) (map[ids.ShortID]uint64, error)
 }

@@ -588,3 +588,9 @@ func (vm *VMServer) BlockReject(_ context.Context, req *vmproto.BlockRejectReque
 	}
 	return &emptypb.Empty{}, nil
 }
+
+func (vm *VMServer) LoadValidators(_ context.Context, req *vmproto.LoadValidatorsRequest) (*vmproto.LoadValidatorsResponse, error) {
+	// TODO: fill the response
+	res := vmproto.LoadValidatorsResponse{}
+	return &res, nil
+}

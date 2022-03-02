@@ -98,23 +98,23 @@ func (m *manager) GetValidators() (Set, error) {
 		return m.validators, nil
 	}
 
-	// If the source is set, we can get the preferred block ID. If the preferred
+	// If the source is set, we can get the accepted block ID. If the accepted
 	// ID has not changed, we can simply return the current validator set.
-	preferredID, err := m.source.PreferredBlockID()
+	acceptedID, err := m.source.LastAccepted()
 	if err != nil {
-		return nil, fmt.Errorf("could not get preferred block: %w", err)
+		return nil, fmt.Errorf("could not get accepted block: %w", err)
 	}
-	if preferredID == m.lastID {
+	if acceptedID == m.lastID {
 		return m.validators, nil
 	}
 
 	// At this point, the last ID has changed.
-	m.lastID = preferredID
+	m.lastID = acceptedID
 
 	// Otherwise, we check if this validator set has already been loaded from
 	// the EVM before through a specific retrieval by block ID. In that case, we
 	// update the latest validator set and return.
-	set, ok := m.cache[preferredID]
+	set, ok := m.cache[acceptedID]
 	if ok {
 		err = m.validators.Set(set.List())
 		if err != nil {
@@ -124,13 +124,13 @@ func (m *manager) GetValidators() (Set, error) {
 	}
 
 	// Last but not least, if this is the first attempt to get this validator
-	// set, we retrieve it from the EVM, cache it under the preferred ID and
+	// set, we retrieve it from the EVM, cache it under the accepted ID and
 	// update the latest set to have the same content.
-	set, err = m.getValidatorsByBlockID(preferredID)
+	set, err = m.getValidatorsByBlockID(acceptedID)
 	if err != nil {
-		return nil, fmt.Errorf("could not get validators (preferred: %x): %w", preferredID, err)
+		return nil, fmt.Errorf("could not get validators (accepted: %x): %w", acceptedID, err)
 	}
-	m.cache[preferredID] = set
+	m.cache[acceptedID] = set
 
 	err = m.validators.Set(set.List())
 	if err != nil {

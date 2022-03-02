@@ -653,6 +653,15 @@ func (vm *VMClient) Disconnected(nodeID ids.ShortID) error {
 	return err
 }
 
+func (vm *VMClient) LoadValidators(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+	res, err := vm.client.LoadValidators(context.Background(), &vmproto.LoadValidatorsRequest{
+		BlockId: blockID[:],
+	})
+	// TODO: initialize map
+	validatorMap := make(map[ids.ShortID]uint64)
+	return validatorMap, err
+}
+
 // BlockClient is an implementation of Block that talks over RPC.
 type BlockClient struct {
 	vm *VMClient
