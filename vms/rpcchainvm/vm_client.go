@@ -38,6 +38,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/appsender"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/components/chain"
@@ -653,7 +654,7 @@ func (vm *VMClient) Disconnected(nodeID ids.ShortID) error {
 	return err
 }
 
-func (vm *VMClient) LoadValidators(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+func (vm *VMClient) GetValidatorsByBlockID(blockID ids.ID) (validators.Set, error) {
 	res, err := vm.client.LoadValidators(context.Background(), &vmproto.LoadValidatorsRequest{
 		BlkId: blockID[:],
 	})
@@ -663,16 +664,19 @@ func (vm *VMClient) LoadValidators(blockID ids.ID) (map[ids.ShortID]uint64, erro
 	if len(res.ValidatorIds) != len(res.Weights) {
 		return nil, fmt.Errorf("mismatch between validators and weights (%d != %d)", len(res.ValidatorIds), len(res.Weights))
 	}
-	validatorMap := make(map[ids.ShortID]uint64, len(res.ValidatorIds))
+	validators := validators.NewSet()
 	for i, validatorId := range res.ValidatorIds {
 		validatorID, err := ids.ToShortID(validatorId)
 		if err != nil {
 			return nil, fmt.Errorf("could not parse validator ID: %w", err)
 		}
 		weight := res.Weights[i]
-		validatorMap[validatorID] = weight
+		err = validators.AddWeight(validatorID, weight)
+		if err != nil {
+			return nil, fmt.Errorf("could not add validator weight: %w", err)
+		}
 	}
-	return validatorMap, nil
+	return validators, nil
 }
 
 // BlockClient is an implementation of Block that talks over RPC.

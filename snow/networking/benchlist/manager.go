@@ -5,7 +5,6 @@ package benchlist
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -41,14 +40,14 @@ type Manager interface {
 
 // Config defines the configuration for a benchlist
 type Config struct {
-	Benchable              Benchable          `json:"-"`
-	Validators             validators.Manager `json:"-"`
-	StakingEnabled         bool               `json:"-"`
-	Threshold              int                `json:"threshold"`
-	MinimumFailingDuration time.Duration      `json:"minimumFailingDuration"`
-	Duration               time.Duration      `json:"duration"`
-	MaxPortion             float64            `json:"maxPortion"`
-	PeerSummaryEnabled     bool               `json:"peerSummaryEnabled"`
+	Benchable              Benchable      `json:"-"`
+	Validators             validators.Set `json:"-"`
+	StakingEnabled         bool           `json:"-"`
+	Threshold              int            `json:"threshold"`
+	MinimumFailingDuration time.Duration  `json:"minimumFailingDuration"`
+	Duration               time.Duration  `json:"duration"`
+	MaxPortion             float64        `json:"maxPortion"`
+	PeerSummaryEnabled     bool           `json:"peerSummaryEnabled"`
 }
 
 type manager struct {
@@ -112,16 +111,11 @@ func (m *manager) RegisterChain(ctx *snow.ConsensusContext) error {
 		return nil
 	}
 
-	validators, err := m.config.Validators.GetValidators()
-	if err != nil {
-		return fmt.Errorf("could not get validators: %w", err)
-	}
-
 	benchlist, err := NewBenchlist(
 		ctx.ChainID,
 		ctx.Log,
 		m.config.Benchable,
-		validators,
+		m.config.Validators,
 		m.config.Threshold,
 		m.config.MinimumFailingDuration,
 		m.config.Duration,

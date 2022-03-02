@@ -62,10 +62,12 @@ type Context struct {
 	Metrics      metrics.OptionalGatherer
 
 	// snowman++ attributes
-	ValidatorManager  validators.Manager // manager for validators
-	PlatformVMState   platform.VMState   // state of platform VM
-	StakingLeafSigner crypto.Signer      // block signer
-	StakingCertLeaf   *x509.Certificate  // block certificate
+	PlatformVMState     platform.VMState     // state of platform VM
+	ValidatorsRetriever validators.Retriever // retrieves validators from EVM
+	ValidatorsUpdater   validators.Updater   // updates validators across components
+
+	StakingLeafSigner crypto.Signer     // block signer
+	StakingCertLeaf   *x509.Certificate // block certificate
 }
 
 type ConsensusContext struct {

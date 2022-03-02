@@ -308,11 +308,7 @@ func (vm *VM) Shutdown() error {
 	vm.blockBuilder.Shutdown()
 
 	if vm.bootstrapped.GetValue() {
-		validators, err := vm.Validators.GetValidators()
-		if err != nil {
-			return fmt.Errorf("could not get validators: %w", err)
-		}
-		validatorList := validators.List()
+		validatorList := vm.Validators.List()
 
 		validatorIDs := make([]ids.ShortID, len(validatorList))
 		for i, vdr := range validatorList {
@@ -504,16 +500,11 @@ func (vm *VM) Logger() logging.Logger { return vm.ctx.Log }
 // Returns the percentage of the total stake on the Primary Network of nodes
 // connected to this node.
 func (vm *VM) getPercentConnected() (float64, error) {
-	validators, err := vm.Validators.GetValidators()
-	if err != nil {
-		return 0, fmt.Errorf("could not get validators: %w", err)
-	}
 
-	validatorList := validators.List()
+	validatorList := vm.Validators.List()
 
-	var (
-		connectedStake uint64
-	)
+	var err error
+	var connectedStake uint64
 	for _, vdr := range validatorList {
 		if !vm.uptimeManager.IsConnected(vdr.ID()) {
 			continue // not connected to us --> don't include
@@ -523,5 +514,5 @@ func (vm *VM) getPercentConnected() (float64, error) {
 			return 0, err
 		}
 	}
-	return float64(connectedStake) / float64(validators.Weight()), nil
+	return float64(connectedStake) / float64(vm.Validators.Weight()), nil
 }

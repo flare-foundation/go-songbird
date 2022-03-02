@@ -131,7 +131,7 @@ type Node struct {
 	beacons validators.Set
 
 	// current validators of the network
-	vdrs validators.Manager
+	validators validators.Set
 
 	// Handles HTTP API calls
 	APIServer server.Server
@@ -190,14 +190,13 @@ func (n *Node) initNetworking() error {
 	tlsConfig := network.TLSConfig(n.Config.StakingTLSCert)
 
 	// Initialize validator manager and primary network's validator set
-	n.vdrs = validators.NewManager(n.Config.NetworkID)
-	networkValidators, err := n.vdrs.GetValidators()
-	if err != nil {
-		return fmt.Errorf("could not get validators: %w", err)
+	n.validators = validators.NewDefaultSet(n.Config.NetworkID)
+	if n.validators.Len() == 0 {
+		return fmt.Errorf("no default validator list (network: %d)", n.Config.NetworkID)
 	}
 
 	// Configure benchlist
-	n.Config.BenchlistConfig.Validators = n.vdrs
+	n.Config.BenchlistConfig.Validators = n.validators
 	n.Config.BenchlistConfig.Benchable = n.Config.ConsensusRouter
 	n.Config.BenchlistConfig.StakingEnabled = n.Config.EnableStaking
 	n.benchlistManager = benchlist.NewManager(&n.Config.BenchlistConfig)
@@ -206,13 +205,13 @@ func (n *Node) initNetworking() error {
 
 	consensusRouter := n.Config.ConsensusRouter
 	if !n.Config.EnableStaking {
-		if err := networkValidators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
+		if err := n.validators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
 			return err
 		}
 		consensusRouter = &insecureValidatorManager{
-			Router: consensusRouter,
-			vdrs:   networkValidators,
-			weight: n.Config.DisabledStakingWeight,
+			Router:     consensusRouter,
+			validators: n.validators,
+			weight:     n.Config.DisabledStakingWeight,
 		}
 	}
 
@@ -248,7 +247,7 @@ func (n *Node) initNetworking() error {
 	n.Config.NetworkConfig.MyNodeID = n.ID
 	n.Config.NetworkConfig.MyIP = n.Config.IP
 	n.Config.NetworkConfig.NetworkID = n.Config.NetworkID
-	n.Config.NetworkConfig.Validators = n.vdrs
+	n.Config.NetworkConfig.Validators = n.validators
 	n.Config.NetworkConfig.Beacons = n.beacons
 	n.Config.NetworkConfig.TLSConfig = tlsConfig
 	n.Config.NetworkConfig.TLSKey = tlsKey
@@ -271,19 +270,19 @@ func (n *Node) initNetworking() error {
 
 type insecureValidatorManager struct {
 	router.Router
-	vdrs   validators.Set
-	weight uint64
+	validators validators.Set
+	weight     uint64
 }
 
 func (i *insecureValidatorManager) Connected(vdrID ids.ShortID, nodeVersion version.Application) {
-	_ = i.vdrs.AddWeight(vdrID, i.weight)
+	_ = i.validators.AddWeight(vdrID, i.weight)
 	i.Router.Connected(vdrID, nodeVersion)
 }
 
 func (i *insecureValidatorManager) Disconnected(vdrID ids.ShortID) {
 	// Shouldn't error unless the set previously had an error, which should
 	// never happen as described above
-	_ = i.vdrs.RemoveWeight(vdrID, i.weight)
+	_ = i.validators.RemoveWeight(vdrID, i.weight)
 	i.Router.Disconnected(vdrID)
 }
 
@@ -613,7 +612,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		Router:                                  n.Config.ConsensusRouter,
 		Net:                                     n.Net,
 		ConsensusParams:                         n.Config.ConsensusParams,
-		Validators:                              n.vdrs,
+		Validators:                              n.validators,
 		NodeID:                                  n.ID,
 		NetworkID:                               n.Config.NetworkID,
 		Server:                                  &n.APIServer,
@@ -644,21 +643,12 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		ResetProposerVMHeightIndex:              n.Config.ResetProposerVMHeightIndex,
 	})
 
-	vdrs := n.vdrs
-
-	// If staking is disabled, ignore updates to Subnets' validator sets
-	// Instead of updating node's validator manager, platform chain makes changes
-	// to its own local validator manager (which isn't used for sampling)
-	if !n.Config.EnableStaking {
-		vdrs = validators.NewManager(n.Config.NetworkID)
-	}
-
 	// Register the VMs that Avalanche supports
 	errs := wrappers.Errs{}
 	errs.Add(
 		n.Config.VMManager.RegisterFactory(constants.PlatformVMID, &platformvm.Factory{
 			Chains:                 n.chainManager,
-			Validators:             vdrs,
+			Validators:             n.validators,
 			UptimeLockedCalculator: n.uptimeCalculator,
 			StakingEnabled:         n.Config.EnableStaking,
 			WhitelistedSubnets:     n.Config.WhitelistedSubnets,
@@ -891,7 +881,6 @@ func (n *Node) initInfoAPI() error {
 
 	n.Log.Info("initializing info API")
 
-	validators, _ := n.vdrs.GetValidators()
 	service, err := info.NewService(
 		info.Parameters{
 			Version:               version.CurrentApp,
@@ -907,7 +896,7 @@ func (n *Node) initInfoAPI() error {
 		n.Config.VMManager,
 		n.Net,
 		version.NewDefaultApplicationParser(),
-		validators,
+		n.validators,
 	)
 	if err != nil {
 		return err

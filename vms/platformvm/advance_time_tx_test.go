@@ -556,9 +556,7 @@ func TestAdvanceTimeTxDelegatorStakerWeight(t *testing.T) {
 	assert.NoError(t, vm.internalState.Commit())
 
 	// Test validator weight before delegation
-	primarySet, err := vm.Validators.GetValidators()
-	assert.NoError(t, err)
-	vdrWeight, _ := primarySet.GetWeight(nodeID)
+	vdrWeight, _ := vm.Validators.GetWeight(nodeID)
 	assert.Equal(t, vm.MinValidatorStake, vdrWeight)
 
 	// Add delegator
@@ -588,7 +586,7 @@ func TestAdvanceTimeTxDelegatorStakerWeight(t *testing.T) {
 	assert.NoError(t, vm.internalState.Commit())
 
 	// Test validator weight after delegation
-	vdrWeight, _ = primarySet.GetWeight(nodeID)
+	vdrWeight, _ = vm.Validators.GetWeight(nodeID)
 	assert.Equal(t, vm.MinDelegatorStake+vm.MinValidatorStake, vdrWeight)
 }
 
@@ -620,9 +618,7 @@ func TestAdvanceTimeTxDelegatorStakers(t *testing.T) {
 	assert.NoError(t, vm.internalState.Commit())
 
 	// Test validator weight before delegation
-	primarySet, err := vm.Validators.GetValidators()
-	assert.Error(t, err)
-	vdrWeight, _ := primarySet.GetWeight(nodeID)
+	vdrWeight, _ := vm.Validators.GetWeight(nodeID)
 	assert.Equal(t, vm.MinValidatorStake, vdrWeight)
 
 	// Add delegator
@@ -652,7 +648,7 @@ func TestAdvanceTimeTxDelegatorStakers(t *testing.T) {
 	assert.NoError(t, vm.internalState.Commit())
 
 	// Test validator weight after delegation
-	vdrWeight, _ = primarySet.GetWeight(nodeID)
+	vdrWeight, _ = vm.Validators.GetWeight(nodeID)
 	assert.Equal(t, vm.MinDelegatorStake+vm.MinValidatorStake, vdrWeight)
 }
 

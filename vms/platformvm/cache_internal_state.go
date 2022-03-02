@@ -1033,13 +1033,9 @@ func (st *internalStateImpl) writeCurrentStakers() error {
 	}
 
 	// Attempt to update the stake metrics
-	validators, err := st.vm.Validators.GetValidators()
-	if err != nil {
-		return fmt.Errorf("could not get validators: %w", err)
-	}
-	weight, _ := validators.GetWeight(st.vm.ctx.NodeID)
+	weight, _ := st.vm.Validators.GetWeight(st.vm.ctx.NodeID)
 	st.vm.localStake.Set(float64(weight))
-	st.vm.totalStake.Set(float64(validators.Weight()))
+	st.vm.totalStake.Set(float64(st.vm.Validators.Weight()))
 	return nil
 }
 

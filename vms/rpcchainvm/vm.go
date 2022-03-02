@@ -14,9 +14,21 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 )
 
+// Handshake is a common handshake that is shared by plugin and host.
+var Handshake = plugin.HandshakeConfig{
+	ProtocolVersion:  10,
+	MagicCookieKey:   "VM_PLUGIN",
+	MagicCookieValue: "dynamic",
+}
+
+// PluginMap is the map of plugins we can dispense.
+var PluginMap = map[string]plugin.Plugin{
+	"vm": &Plugin{},
+}
+
 // Plugin is the implementation of plugin.Plugin so we can serve/consume this.
 // We also implement GRPCPlugin so that this plugin can be served over gRPC.
-type VMPlugin struct {
+type Plugin struct {
 	plugin.NetRPCUnsupportedPlugin
 	// Concrete implementation, written in Go. This is only used for plugins
 	// that are written in Go.
@@ -24,15 +36,15 @@ type VMPlugin struct {
 }
 
 // New creates a new plugin from the provided VM
-func New(vm block.ChainVM) *VMPlugin { return &VMPlugin{vm: vm} }
+func New(vm block.ChainVM) *Plugin { return &Plugin{vm: vm} }
 
 // GRPCServer registers a new GRPC server.
-func (p *VMPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
+func (p *Plugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
 	vmproto.RegisterVMServer(s, NewServer(p.vm, broker))
 	return nil
 }
 
 // GRPCClient returns a new GRPC client
-func (p *VMPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
+func (p *Plugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
 	return NewClient(vmproto.NewVMClient(c), broker), nil
 }

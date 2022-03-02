@@ -621,14 +621,16 @@ func TestBlockVerify_InvalidPostForkOption(t *testing.T) {
 }
 
 func TestGetBlock_MutatedSignature(t *testing.T) {
-	coreVM, valState, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+
+	// FIXME: validator source
 
 	// Make sure that we will be sampled to perform the proposals.
-	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
-		res := make(map[ids.ShortID]uint64)
-		res[proVM.ctx.NodeID] = uint64(10)
-		return res, nil
-	}
+	// valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+	// 	res := make(map[ids.ShortID]uint64)
+	// 	res[proVM.ctx.NodeID] = uint64(10)
+	// 	return res, nil
+	// }
 
 	proVM.Set(coreGenBlk.Timestamp())
 

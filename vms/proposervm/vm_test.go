@@ -57,7 +57,7 @@ func initTestProposerVM(
 	minPChainHeight uint64,
 ) (
 	*block.TestVM,
-	*validators.TestState,
+	validators.Retriever, // FIXME
 	*VM,
 	*snowman.TestBlock,
 	manager.Manager,
@@ -104,24 +104,28 @@ func initTestProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, minPChainHeight, false)
 
-	valState := &validators.TestState{
-		T: t,
-	}
-	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
-		res := make(map[ids.ShortID]uint64)
-		res[proVM.ctx.NodeID] = uint64(10)
-		res[ids.ShortID{1}] = uint64(5)
-		res[ids.ShortID{2}] = uint64(6)
-		res[ids.ShortID{3}] = uint64(7)
-		return res, nil
-	}
+	// valState := &validators.TestState{
+	// 	T: t,
+	// }
+	// valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
+	// valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+	// 	res := make(map[ids.ShortID]uint64)
+	// 	res[proVM.ctx.NodeID] = uint64(10)
+	// 	res[ids.ShortID{1}] = uint64(5)
+	// 	res[ids.ShortID{2}] = uint64(6)
+	// 	res[ids.ShortID{3}] = uint64(7)
+	// 	return res, nil
+	// }
 
 	ctx := snow.DefaultContextTest()
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.ValidatorState = valState
+
+	// FIXME
+	ctx.PlatformVMState = nil
+	ctx.ValidatorsRetriever = nil
+	ctx.ValidatorsUpdater = nil
 
 	dummyDBManager := manager.NewMemDB(version.DefaultVersion1_0_0)
 	// make sure that DBs are compressed correctly
@@ -141,7 +145,7 @@ func initTestProposerVM(
 		t.Fatal(err)
 	}
 
-	return coreVM, valState, proVM, coreGenBlk, dummyDBManager
+	return coreVM, nil, proVM, coreGenBlk, dummyDBManager
 }
 
 // VM.BuildBlock tests section
@@ -839,21 +843,26 @@ func TestExpiredBuildBlock(t *testing.T) {
 
 	proVM := New(coreVM, time.Time{}, 0, false)
 
-	valState := &validators.TestState{
-		T: t,
-	}
-	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
-		return map[ids.ShortID]uint64{
-			{1}: 100,
-		}, nil
-	}
+	// valState := &validators.TestState{
+	// 	T: t,
+	// }
+	// valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
+	// valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+	// 	return map[ids.ShortID]uint64{
+	// 		{1}: 100,
+	// 	}, nil
+	// }
 
+	// FIXME: same
 	ctx := snow.DefaultContextTest()
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.ValidatorState = valState
+
+	// FIXME
+	ctx.PlatformVMState = nil
+	ctx.ValidatorsRetriever = nil
+	ctx.ValidatorsUpdater = nil
 
 	dbManager := manager.NewMemDB(version.DefaultVersion1_0_0)
 	toEngine := make(chan common.Message, 1)
@@ -1114,15 +1123,15 @@ func TestInnerVMRollback(t *testing.T) {
 		BytesV:     []byte{0},
 	}
 
-	valState := &validators.TestState{
-		T: t,
-	}
-	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
-		return map[ids.ShortID]uint64{
-			{1}: 100,
-		}, nil
-	}
+	// valState := &validators.TestState{
+	// 	T: t,
+	// }
+	// valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
+	// valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+	// 	return map[ids.ShortID]uint64{
+	// 		{1}: 100,
+	// 	}, nil
+	// }
 
 	coreVM := &block.TestVM{}
 	coreVM.T = t
@@ -1149,7 +1158,11 @@ func TestInnerVMRollback(t *testing.T) {
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.ValidatorState = valState
+
+	// FIXME
+	ctx.PlatformVMState = nil
+	ctx.ValidatorsRetriever = nil
+	ctx.ValidatorsUpdater = nil
 
 	coreVM.InitializeF = func(
 		*snow.Context,
@@ -1274,13 +1287,15 @@ func TestInnerVMRollback(t *testing.T) {
 }
 
 func TestBuildBlockDuringWindow(t *testing.T) {
-	coreVM, valState, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
-	valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
-		return map[ids.ShortID]uint64{
-			proVM.ctx.NodeID: 10,
-		}, nil
-	}
+	// FIXME: validator source
+
+	// valState.GetValidatorSetF = func(blockID ids.ID) (map[ids.ShortID]uint64, error) {
+	// 	return map[ids.ShortID]uint64{
+	// 		proVM.ctx.NodeID: 10,
+	// 	}, nil
+	// }
 
 	coreBlk0 := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{

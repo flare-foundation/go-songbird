@@ -20,7 +20,7 @@ type Factory struct {
 	Chains chains.Manager
 
 	// Node's validator set maps subnetID -> validators of the subnet
-	Validators validators.Manager
+	Validators validators.Set
 
 	// Provides access to the uptime manager as a thread safe data structure
 	UptimeLockedCalculator uptime.LockedCalculator

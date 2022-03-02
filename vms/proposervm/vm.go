@@ -5,6 +5,7 @@ package proposervm
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/flare-foundation/flare/database"
@@ -17,6 +18,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
@@ -55,6 +57,7 @@ type VM struct {
 	hIndexer                indexer.HeightIndexer
 
 	proposer.Windower
+	validators.Updater
 	tree.Tree
 	scheduler.Scheduler
 	mockable.Clock
@@ -109,7 +112,8 @@ func (vm *VM) Initialize(
 	prefixDB := prefixdb.New(dbPrefix, rawDB)
 	vm.db = versiondb.New(prefixDB)
 	vm.State = state.New(vm.db)
-	vm.Windower = proposer.New(ctx.ValidatorManager, ctx.SubnetID, ctx.ChainID)
+	vm.Windower = proposer.New(ctx.ValidatorsRetriever, ctx.ChainID)
+	vm.Updater = ctx.ValidatorsUpdater
 	vm.Tree = tree.New()
 
 	indexerDB := versiondb.New(vm.db)
@@ -285,7 +289,7 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 	}
 
 	// reset scheduler
-	minDelay, err := vm.Windower.Delay(blk.Height()+1, vm.ctx.NodeID, preferred)
+	minDelay, err := vm.Windower.Delay(blk.Height()+1, preferred, vm.ctx.NodeID)
 	if err != nil {
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that
@@ -365,6 +369,9 @@ func (vm *VM) repairAcceptedChain() error {
 		lastAcceptedID = lastAccepted.Parent()
 		if err := vm.State.SetLastAccepted(lastAcceptedID); err != nil {
 			return err
+		}
+		if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
+			return fmt.Errorf("could not update validators: %w", err)
 		}
 
 		// If the indexer checkpoint was previously pointing to the last

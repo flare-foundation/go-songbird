@@ -9,6 +9,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"math"
 	"net"
 	"sync"
 	"testing"
@@ -17,6 +18,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
@@ -346,9 +348,12 @@ func TestNewDefaultNetwork(t *testing.T) {
 		closed:  make(chan struct{}),
 	}
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id, math.MaxUint64),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id, math.MaxUint64)
+	require.NoError(t, err)
+
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
@@ -356,7 +361,7 @@ func TestNewDefaultNetwork(t *testing.T) {
 	net, err := newDefaultNetwork(
 		id,
 		ip,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -426,10 +431,13 @@ func TestEstablishConnection(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
 
 	var (
 		wg0 sync.WaitGroup
@@ -464,7 +472,7 @@ func TestEstablishConnection(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -482,7 +490,7 @@ func TestEstablishConnection(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -565,10 +573,13 @@ func TestDoubleTrack(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
 
 	var (
 		wg0 sync.WaitGroup
@@ -603,7 +614,7 @@ func TestDoubleTrack(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -621,7 +632,7 @@ func TestDoubleTrack(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -705,10 +716,13 @@ func TestDoubleClose(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
 
 	var (
 		wg0 sync.WaitGroup
@@ -743,7 +757,7 @@ func TestDoubleClose(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -761,7 +775,7 @@ func TestDoubleClose(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -850,10 +864,13 @@ func TestTrackConnected(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
 
 	var (
 		wg0 sync.WaitGroup
@@ -888,7 +905,7 @@ func TestTrackConnected(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -906,7 +923,7 @@ func TestTrackConnected(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -991,10 +1008,14 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
+
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
@@ -1009,7 +1030,7 @@ func TestTrackConnectedRace(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1027,7 +1048,7 @@ func TestTrackConnectedRace(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1167,11 +1188,15 @@ func TestPeerAliasesTicker(t *testing.T) {
 		},
 	}
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-	// validators.WithValidator(id2, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id2, 1)
+	require.NoError(t, err)
 
 	var (
 		wg0     sync.WaitGroup
@@ -1269,7 +1294,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1291,7 +1316,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1313,7 +1338,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 		id2,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1336,7 +1361,7 @@ func TestPeerAliasesTicker(t *testing.T) {
 		id2,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1461,11 +1486,15 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-	// validators.WithValidator(id2, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id2, 1)
+	require.NoError(t, err)
 
 	listener0 := &testListener{
 		addr: &net.TCPAddr{
@@ -1665,7 +1694,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1687,7 +1716,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1709,7 +1738,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 		id1,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1731,7 +1760,7 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 		id2,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1910,11 +1939,11 @@ func TestPeerSignature(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewManager(
-		0,
-		// validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
-	)
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id2, math.MaxUint64)
+	require.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -1977,7 +2006,7 @@ func TestPeerSignature(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -1995,7 +2024,7 @@ func TestPeerSignature(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -2013,7 +2042,7 @@ func TestPeerSignature(t *testing.T) {
 		id2,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -2340,12 +2369,13 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(
-		0,
-		// validators.WithValidator(id1, 1),
-		// validators.WithValidator(id0, 1),
-	)
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
 
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -2377,7 +2407,7 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 		id0,
 		ip0,
 		net0Compatibility,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -2395,7 +2425,7 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 		id1,
 		ip1,
 		net1Compatibility,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -2484,10 +2514,13 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewManager(0) // validators.WithValidator(id0, 1),
-	// validators.WithValidator(id1, 1),
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id0, 1)
+	require.NoError(t, err)
+	err = validators.AddWeight(id1, 1)
+	require.NoError(t, err)
 
 	var (
 		wg0 sync.WaitGroup
@@ -2522,7 +2555,7 @@ func TestPeerTrackedSubnets(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		subnetSet,
@@ -2540,7 +2573,7 @@ func TestPeerTrackedSubnets(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		subnetSet,
@@ -2659,11 +2692,11 @@ func TestPeerGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewManager(
-		0,
-		// validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
-	)
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id2, math.MaxUint64)
+	require.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2734,7 +2767,7 @@ func TestPeerGossip(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		subnetSet,
@@ -2752,7 +2785,7 @@ func TestPeerGossip(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		subnetSet,
@@ -2770,7 +2803,7 @@ func TestPeerGossip(t *testing.T) {
 		id2,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{}, // tracks no subnet
@@ -2897,12 +2930,11 @@ func TestAppGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewManager(
-		0,
-		// validators.WithValidator(id2, math.MaxUint64), // id2 is a validator
-	)
-
 	beacons := validators.NewSet()
+
+	validators := validators.NewSet()
+	err := validators.AddWeight(id2, math.MaxUint64)
+	require.NoError(t, err)
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2982,7 +3014,7 @@ func TestAppGossip(t *testing.T) {
 		id0,
 		ip0,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert0.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -3000,7 +3032,7 @@ func TestAppGossip(t *testing.T) {
 		id1,
 		ip1,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert1.PrivateKey.(crypto.Signer),
 		ids.Set{},
@@ -3018,7 +3050,7 @@ func TestAppGossip(t *testing.T) {
 		id2,
 		ip2,
 		defaultVersionManager,
-		vdrs,
+		validators,
 		beacons,
 		cert2.PrivateKey.(crypto.Signer),
 		ids.Set{}, // tracks no subnet
@@ -3097,14 +3129,13 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 	targetNetwork.peers.add(peerToAdd)
 
 	if isValidator {
-		validators, _ := targetNetwork.config.Validators.GetValidators()
-		validators.AddWeight(peerToAdd.nodeID, 10)
+		_ = targetNetwork.config.Validators.AddWeight(peerToAdd.nodeID, 10)
 	}
 }
 
 func clearPeersData(targetNetwork *network) {
 	targetNetwork.peers.reset()
-	targetNetwork.config.Validators = validators.NewManager(0)
+	targetNetwork.config.Validators = validators.NewSet()
 }
 
 func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {
@@ -3119,7 +3150,7 @@ func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {
 func newDefaultNetwork(
 	id ids.ShortID,
 	ip utils.DynamicIPDesc,
-	vdrs validators.Manager,
+	validators validators.Set,
 	beacons validators.Set,
 	tlsKey crypto.Signer,
 	subnetSet ids.Set,
@@ -3141,7 +3172,7 @@ func newDefaultNetwork(
 	netConfig.MyNodeID = id
 	netConfig.MyIP = ip
 	netConfig.NetworkID = networkID
-	netConfig.Validators = vdrs
+	netConfig.Validators = validators
 	netConfig.Beacons = beacons
 	netConfig.TLSKey = tlsKey
 	netConfig.TLSConfig = tlsConfig
@@ -3166,7 +3197,7 @@ func newDefaultNetwork(
 func newTestNetwork(id ids.ShortID,
 	ip utils.DynamicIPDesc,
 	versionCompatibility version.Compatibility,
-	vdrs validators.Manager,
+	validators validators.Set,
 	beacons validators.Set,
 	tlsKey crypto.Signer,
 	subnetSet ids.Set,
@@ -3176,7 +3207,7 @@ func newTestNetwork(id ids.ShortID,
 	metrics *prometheus.Registry,
 	msgCreator message.Creator,
 	router router.Router) (Network, error) {
-	n, err := newDefaultNetwork(id, ip, vdrs, beacons, tlsKey, subnetSet, tlsConfig, listener, metrics, msgCreator, router)
+	n, err := newDefaultNetwork(id, ip, validators, beacons, tlsKey, subnetSet, tlsConfig, listener, metrics, msgCreator, router)
 	if err != nil {
 		return nil, err
 	}

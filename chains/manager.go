@@ -138,14 +138,14 @@ type ManagerConfig struct {
 	DecisionEvents              *triggers.EventDispatcher
 	ConsensusEvents             *triggers.EventDispatcher
 	DBManager                   dbManager.Manager
-	MsgCreator                  message.Creator    // message creator, shared with network
-	Router                      router.Router      // Routes incoming messages to the appropriate chain
-	Net                         network.Network    // Sends consensus messages to other validators
-	ConsensusParams             avcon.Parameters   // The consensus parameters (alpha, beta, etc.) for new chains
-	Validators                  validators.Manager // Validators validating on this chain
-	NodeID                      ids.ShortID        // The ID of this node
-	NetworkID                   uint32             // ID of the network this node is connected to
-	Server                      *server.Server     // Handles HTTP API calls
+	MsgCreator                  message.Creator  // message creator, shared with network
+	Router                      router.Router    // Routes incoming messages to the appropriate chain
+	Net                         network.Network  // Sends consensus messages to other validators
+	ConsensusParams             avcon.Parameters // The consensus parameters (alpha, beta, etc.) for new chains
+	Validators                  validators.Set   // Validators validating on this chain
+	NodeID                      ids.ShortID      // The ID of this node
+	NetworkID                   uint32           // ID of the network this node is connected to
+	Server                      *server.Server   // Handles HTTP API calls
 	Keystore                    keystore.Keystore
 	AtomicMemory                *atomic.Memory
 	AVAXAssetID                 ids.ID
@@ -205,8 +205,10 @@ type manager struct {
 	// Value: The chain
 	chains map[ids.ID]handler.Handler
 
-	// platformVMState will give components access to the last P-Chain height
-	platformVMState platform.VMState
+	// these are needed for snowman++ related initialization
+	platformVMState     platform.VMState
+	validatorsRetriever validators.Retriever
+	validatorsUpdater   validators.Updater
 }
 
 // New returns a new Manager
@@ -367,7 +369,10 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 			SNLookup:     m,
 			Metrics:      vmMetrics,
 
-			PlatformVMState:   m.platformVMState,
+			PlatformVMState:     m.platformVMState,
+			ValidatorsRetriever: m.validatorsRetriever,
+			ValidatorsUpdater:   m.validatorsUpdater,
+
 			StakingCertLeaf:   m.StakingCert.Leaf,
 			StakingLeafSigner: m.StakingCert.PrivateKey.(crypto.Signer),
 		},
@@ -430,12 +435,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	}
 
 	// The validators of this blockchain
-	validators, err := m.Validators.GetValidators()
-	if err != nil {
-		return nil, fmt.Errorf("couldn't get validators: %w", err)
-	}
-
-	beacons := validators
+	beacons := m.Validators
 	if chainParams.CustomBeacons != nil {
 		beacons = chainParams.CustomBeacons
 	}
@@ -448,7 +448,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 		chain, err = m.createAvalancheChain(
 			ctx,
 			chainParams.GenesisData,
-			validators,
+			m.Validators,
 			beacons,
 			vm,
 			fxs,
@@ -463,7 +463,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 		chain, err = m.createSnowmanChain(
 			ctx,
 			chainParams.GenesisData,
-			validators,
+			m.Validators,
 			beacons,
 			vm,
 			fxs,
@@ -748,14 +748,17 @@ func (m *manager) createSnowmanChain(
 		m.platformVMState = platformVMState
 	}
 
-	// If the VM here is a validator source, then we are initializing the EVM
-	// and we should inject it as validator source into the validator manager.
-	validatorSource, ok := vm.(validators.Source)
+	// If the VM here is a validators retriever, then we are initializing the
+	// EVM and we should keep a reference to the retriever in the manager state
+	// so we can inject it into proposer VMs and their windower.
+	// Additionally, we should initialize a validators updater that will be
+	// called by the EVM every time the last accepted block changes in order to
+	// propagate validator changes across all components.
+	// We wrap the retriever into a caching retriever to improve performance.
+	retriever, ok := vm.(validators.Retriever)
 	if ok {
-		err = m.Validators.SetSource(validatorSource)
-		if err != nil {
-			return nil, fmt.Errorf("could not set validator source: %w", err)
-		}
+		m.validatorsRetriever = validators.NewCachingRetriever(retriever)
+		m.validatorsUpdater = validators.NewUpdater(m.Validators, m.validatorsRetriever)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it

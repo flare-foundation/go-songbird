@@ -322,7 +322,7 @@ func defaultVM() (*VM, database.Database, *common.SenderTest) {
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		TxFee:                  defaultTxFee,
 		CreateSubnetTxFee:      100 * defaultTxFee,
 		CreateBlockchainTxFee:  100 * defaultTxFee,
@@ -401,7 +401,7 @@ func GenesisVMWithArgs(t *testing.T, args *BuildGenesisArgs) ([]byte, chan commo
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		TxFee:                  defaultTxFee,
 		MinValidatorStake:      defaultMinValidatorStake,
@@ -525,12 +525,8 @@ func TestGenesis(t *testing.T) {
 	}
 
 	// Ensure current validator set of primary network is correct
-	vdrSet, err := vm.Validators.GetValidators()
-	if err != nil {
-		t.Fatalf("Missing the primary network validator set")
-	}
-	currentValidators := vdrSet.List()
-	if len(currentValidators) != 0 {
+	validatorList := vm.Validators.List()
+	if len(validatorList) != 0 {
 		t.Fatal("vm's current validator set is wrong")
 	}
 
@@ -1724,7 +1720,7 @@ func TestRestartPartiallyAccepted(t *testing.T) {
 	firstDB := db.NewPrefixDBManager([]byte{})
 	firstVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1806,7 +1802,7 @@ func TestRestartPartiallyAccepted(t *testing.T) {
 
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1846,7 +1842,7 @@ func TestRestartFullyAccepted(t *testing.T) {
 	firstDB := db.NewPrefixDBManager([]byte{})
 	firstVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1923,7 +1919,7 @@ func TestRestartFullyAccepted(t *testing.T) {
 
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1969,7 +1965,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -2231,7 +2227,7 @@ func TestUnverifiedParent(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -2387,7 +2383,7 @@ func TestUnverifiedParentPanic(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
