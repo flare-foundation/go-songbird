@@ -22,8 +22,9 @@ type postForkBlock struct {
 
 // Accept:
 // 1) Sets this blocks status to Accepted.
-// 2) Persists this block in storage
-// 3) Calls Reject() on siblings of this block and their descendants.
+// 2) Updates the validator set.
+// 3) Persists this block in storage
+// 4) Calls Reject() on siblings of this block and their descendants.
 func (b *postForkBlock) Accept() error {
 	blkID := b.ID()
 	if err := b.vm.State.SetLastAccepted(blkID); err != nil {

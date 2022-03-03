@@ -36,17 +36,17 @@ type Windower interface {
 // windower interfaces with P-Chain and it is responsible for calculating the
 // delay for the block submission window of a given validator
 type windower struct {
-	manager validators.Retriever
-	nonce   uint64
-	sampler sampler.WeightedWithoutReplacement
+	retriever validators.Retriever
+	nonce     uint64
+	sampler   sampler.WeightedWithoutReplacement
 }
 
-func New(manager validators.Retriever, chainID ids.ID) Windower {
+func New(retriever validators.Retriever, chainID ids.ID) Windower {
 	w := wrappers.Packer{Bytes: chainID[:]}
 	return &windower{
-		manager: manager,
-		nonce:   w.UnpackLong(),
-		sampler: sampler.NewDeterministicWeightedWithoutReplacement(),
+		retriever: retriever,
+		nonce:     w.UnpackLong(),
+		sampler:   sampler.NewDeterministicWeightedWithoutReplacement(),
 	}
 }
 
@@ -56,7 +56,7 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 	}
 
 	// get the validator set by the p-chain height
-	validators, err := w.manager.GetValidatorsByBlockID(parentID)
+	validators, err := w.retriever.GetValidatorsByBlockID(parentID)
 	if err != nil {
 		return 0, fmt.Errorf("could not get validators: %w", err)
 	}
