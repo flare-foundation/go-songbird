@@ -66,7 +66,7 @@ var (
 		constants.CostonID:   time.Date(2022, time.February, 25, 16, 0, 0, 0, time.UTC),
 		constants.SongbirdID: time.Date(2022, time.March, 7, 16, 0, 0, 0, time.UTC),
 	}
-	ApricotPhase5DefaultTime = time.Date(2022, time.February, 11, 15, 0, 0, 0, time.UTC)
+	ApricotPhase5DefaultTime = time.Date(2200, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
