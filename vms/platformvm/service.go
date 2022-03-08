@@ -939,12 +939,7 @@ type SampleValidatorsReply struct {
 func (service *Service) SampleValidators(_ *http.Request, args *SampleValidatorsArgs, reply *SampleValidatorsReply) error {
 	service.vm.ctx.Log.Debug("Platform: SampleValidators called with Size = %d", args.Size)
 
-	validators, ok := service.vm.Validators.GetValidators()
-	if !ok {
-		return fmt.Errorf("couldn't get validators. Is the network being validated?")
-	}
-
-	sample, err := validators.Sample(int(args.Size))
+	sample, err := service.vm.Validators.Sample(int(args.Size))
 	if err != nil {
 		return fmt.Errorf("sampling errored with %w", err)
 	}
@@ -1700,12 +1695,7 @@ func (service *Service) GetBlockchainStatus(_ *http.Request, args *GetBlockchain
 }
 
 func (service *Service) nodeValidates(blockchainID ids.ID) bool {
-	validators, ok := service.vm.Validators.GetValidators()
-	if !ok {
-		return false
-	}
-
-	return validators.Contains(service.vm.ctx.NodeID)
+	return service.vm.Validators.Contains(service.vm.ctx.NodeID)
 }
 
 func (service *Service) chainExists(blockID ids.ID, chainID ids.ID) (bool, error) {
@@ -2191,11 +2181,7 @@ type GetTotalStakeReply struct {
 
 // GetTotalStake returns the total amount staked on the Primary Network
 func (service *Service) GetTotalStake(_ *http.Request, _ *struct{}, reply *GetTotalStakeReply) error {
-	validators, ok := service.vm.Validators.GetValidators()
-	if !ok {
-		return errNoPrimaryValidators
-	}
-	reply.Stake = json.Uint64(validators.Weight())
+	reply.Stake = json.Uint64(service.vm.Validators.Weight())
 	return nil
 }
 
@@ -2282,37 +2268,5 @@ func (service *Service) GetTimestamp(_ *http.Request, args *struct{}, reply *Get
 	service.vm.ctx.Log.Debug("Platform: GetTimestamp called")
 
 	reply.Timestamp = service.vm.internalState.GetTimestamp()
-	return nil
-}
-
-// GetValidatorsAtArgs is the response from GetValidatorsAt
-type GetValidatorsAtArgs struct {
-	Height   json.Uint64 `json:"height"`
-	SubnetID ids.ID      `json:"subnetID"`
-}
-
-// GetValidatorsAtReply is the response from GetValidatorsAt
-type GetValidatorsAtReply struct {
-	Validators map[string]uint64 `json:"validators"`
-}
-
-// GetValidatorsAt returns the weights of the validator set of a provided subnet
-// at the specified height.
-func (service *Service) GetValidatorsAt(_ *http.Request, args *GetValidatorsAtArgs, reply *GetValidatorsAtReply) error {
-	service.vm.ctx.Log.Info(
-		"Platform: GetValidatorsAt called with Height %d and SubnetID %s",
-		args.Height,
-		args.SubnetID,
-	)
-
-	validators, err := service.vm.GetValidatorSet(uint64(args.Height), args.SubnetID)
-	if err != nil {
-		return fmt.Errorf("couldn't get validator set: %w", err)
-	}
-
-	reply.Validators = make(map[string]uint64, len(validators))
-	for nodeID, weight := range validators {
-		reply.Validators[nodeID.PrefixedString(constants.NodeIDPrefix)] = weight
-	}
 	return nil
 }

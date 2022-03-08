@@ -4,6 +4,8 @@
 package proposer
 
 import (
+	"bytes"
+	"fmt"
 	"sort"
 	"time"
 
@@ -25,8 +27,8 @@ var _ Windower = &windower{}
 
 type Windower interface {
 	Delay(
-		chainHeight,
-		pChainHeight uint64,
+		height uint64,
+		parentID ids.ID,
 		validatorID ids.ShortID,
 	) (time.Duration, error)
 }
@@ -34,69 +36,61 @@ type Windower interface {
 // windower interfaces with P-Chain and it is responsible for calculating the
 // delay for the block submission window of a given validator
 type windower struct {
-	state       validators.State
-	subnetID    ids.ID
-	chainSource uint64
-	sampler     sampler.WeightedWithoutReplacement
+	retriever validators.Retriever
+	nonce     uint64
+	sampler   sampler.WeightedWithoutReplacement
 }
 
-func New(state validators.State, subnetID, chainID ids.ID) Windower {
+func New(retriever validators.Retriever, chainID ids.ID) Windower {
 	w := wrappers.Packer{Bytes: chainID[:]}
 	return &windower{
-		state:       state,
-		subnetID:    subnetID,
-		chainSource: w.UnpackLong(),
-		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
+		retriever: retriever,
+		nonce:     w.UnpackLong(),
+		sampler:   sampler.NewDeterministicWeightedWithoutReplacement(),
 	}
 }
 
-func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID) (time.Duration, error) {
+func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID) (time.Duration, error) {
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
 
 	// get the validator set by the p-chain height
-	validatorsMap, err := w.state.GetValidatorSet(pChainHeight, w.subnetID)
+	validators, err := w.retriever.GetValidatorsByBlockID(parentID)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("could not get validators: %w", err)
 	}
 
-	// convert the map of validators to a slice
-	validators := make(validatorsSlice, 0, len(validatorsMap))
-	weight := uint64(0)
-	for k, v := range validatorsMap {
-		validators = append(validators, validatorData{
-			id:     k,
-			weight: v,
-		})
-		newWeight, err := math.Add64(weight, v)
+	// convert the list of validators to a slice
+	totalWeight := uint64(0)
+	validatorIDs := make([]ids.ShortID, 0, validators.Len())
+	weights := make([]uint64, 0, validators.Len())
+	for _, validator := range validators.List() {
+		totalWeight, err = math.Add64(totalWeight, validator.Weight())
 		if err != nil {
 			return 0, err
 		}
-		weight = newWeight
+		validatorIDs = append(validatorIDs, validatorID)
+		weights = append(weights, validator.Weight())
 	}
 
 	// canonically sort validators
 	// Note: validators are sorted by ID, sorting by weight would not create a
 	// canonically sorted list
-	sort.Sort(validators)
+	sort.Slice(validatorIDs, func(i int, j int) bool {
+		return bytes.Compare(validatorIDs[i][:], validatorIDs[j][:]) == -1
+	})
 
-	// convert the slice of validators to a slice of weights
-	validatorWeights := make([]uint64, len(validators))
-	for i, v := range validators {
-		validatorWeights[i] = v.weight
-	}
-
-	if err := w.sampler.Initialize(validatorWeights); err != nil {
+	if err := w.sampler.Initialize(weights); err != nil {
 		return 0, err
 	}
 
 	numToSample := MaxWindows
-	if weight < uint64(numToSample) {
-		numToSample = int(weight)
+	if totalWeight < uint64(numToSample) {
+		numToSample = int(totalWeight)
 	}
 
-	seed := chainHeight ^ w.chainSource
+	seed := height ^ w.nonce
 	w.sampler.Seed(int64(seed))
 
 	indices, err := w.sampler.Sample(numToSample)
@@ -106,7 +100,7 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 
 	delay := time.Duration(0)
 	for _, index := range indices {
-		nodeID := validators[index].id
+		nodeID := validatorIDs[index]
 		if nodeID == validatorID {
 			return delay, nil
 		}

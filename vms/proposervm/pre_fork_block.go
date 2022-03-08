@@ -90,7 +90,7 @@ func (b *preForkBlock) verifyPostForkChild(child *postForkBlock) error {
 
 	childID := child.ID()
 	childPChainHeight := child.PChainHeight()
-	currentPChainHeight, err := b.vm.ctx.ValidatorState.GetCurrentHeight()
+	currentPChainHeight, err := b.vm.ctx.PlatformVMState.GetCurrentHeight()
 	if err != nil {
 		b.vm.ctx.Log.Error("couldn't retrieve current P-Chain height while verifying %s: %s", childID, err)
 		return err
