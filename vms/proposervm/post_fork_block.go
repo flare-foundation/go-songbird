@@ -25,10 +25,15 @@ type postForkBlock struct {
 // 2) Persists this block in storage
 // 3) Calls Reject() on siblings of this block and their descendants.
 func (b *postForkBlock) Accept() error {
+	//_, ok := b.vm.Updater
+	//if ok {
+	//	fmt.Println("")
+	//}
 	blkID := b.ID()
 	if err := b.vm.State.SetLastAccepted(blkID); err != nil {
 		return err
 	}
+	fmt.Println("b.vm.Updater: ", b.vm.Updater)
 	if err := b.vm.Updater.UpdateValidators(blkID); err != nil {
 		return fmt.Errorf("could not update validators: %w", err)
 	}

@@ -11,10 +11,13 @@ type Updater interface {
 }
 
 func NewUpdater(validators Set, retriever Retriever) Updater {
+	fmt.Println("NewUpdater called.")
+	validators.AddWeight(ids.ShortID{1}, 123)
 	u := updater{
 		validators: validators,
 		retriever:  retriever,
 	}
+	fmt.Println(u)
 	return &u
 }
 

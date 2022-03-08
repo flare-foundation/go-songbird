@@ -604,6 +604,7 @@ func (vm *VMServer) LoadValidators(_ context.Context, req *vmproto.LoadValidator
 	if err != nil {
 		return nil, fmt.Errorf("could not load validators from source: %w", err)
 	}
+	fmt.Println("validators are: ", validators)
 	var res vmproto.LoadValidatorsResponse
 	for _, validator := range validators.List() {
 		validatorID := validator.ID()

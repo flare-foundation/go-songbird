@@ -320,6 +320,8 @@ func (m *manager) ForceCreateChain(chainParams ChainParameters) {
 
 // Create a chain
 func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, error) {
+	fmt.Println("VMAlias is: ", chainParams.VMAlias)
+	fmt.Println("chainParams.ID.String(): ", chainParams.ID.String())
 	vmID, err := m.VMManager.Lookup(chainParams.VMAlias)
 	if err != nil {
 		return nil, fmt.Errorf("error while looking up VM: %w", err)
@@ -406,6 +408,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 
 	fxs := make([]*common.Fx, len(chainParams.FxAliases))
 	for i, fxAlias := range chainParams.FxAliases {
+		fmt.Println("Alias: ", fxAlias)
 		fxID, err := m.VMManager.Lookup(fxAlias)
 		if err != nil {
 			return nil, fmt.Errorf("error while looking up Fx: %w", err)
@@ -757,8 +760,11 @@ func (m *manager) createSnowmanChain(
 	// We wrap the retriever into a caching retriever to improve performance.
 	retriever, ok := vm.(validators.Retriever)
 	if ok {
+		fmt.Println("retriever, ok := vm.(validators.Retriever) true")
 		m.validatorsRetriever = validators.NewCachingRetriever(retriever)
 		m.validatorsUpdater = validators.NewUpdater(m.Validators, m.validatorsRetriever)
+	} else {
+		fmt.Println("retriever, ok := vm.(validators.Retriever) false")
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it
