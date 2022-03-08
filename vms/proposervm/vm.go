@@ -87,10 +87,16 @@ func New(
 	minimumPChainHeight uint64,
 	resetHeightIndex bool,
 ) *VM {
+	u := validators.NewUpdater(validators.NewSet(), nil)
+	fmt.Println("updater getting initialised")
+	if u == nil {
+		fmt.Println("nil updater!!!!")
+	}
 	proVM := &VM{
 		ChainVM:             vm,
 		activationTime:      activationTime,
 		minimumPChainHeight: minimumPChainHeight,
+		Updater:             u,
 	}
 
 	proVM.resetHeightIndexOngoing.SetValue(resetHeightIndex)
@@ -318,6 +324,18 @@ func (vm *VM) LastAccepted() (ids.ID, error) {
 	}
 	return lastAccepted, err
 }
+
+func (vm *VM) GetValidatorsByBlockID(blockID ids.ID) (validators.Set, error) {
+	s := validators.NewSet()
+	s.AddWeight(ids.ShortID{11}, 2)
+	return s, nil
+}
+
+//type up struct{}
+//
+//func (vm *up) UpdateValidators(blockID ids.ID) error {
+//	return nil
+//}
 
 func (vm *VM) repairAcceptedChain() error {
 	lastAcceptedID, err := vm.GetLastAccepted()
