@@ -16,7 +16,6 @@ import (
 	"github.com/flare-foundation/flare/chains"
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
@@ -42,8 +41,7 @@ import (
 )
 
 const (
-	droppedTxCacheSize     = 64
-	validatorSetsCacheSize = 64
+	droppedTxCacheSize = 64
 
 	// MaxValidatorWeightFactor is the maximum factor of the validator stake
 	// that is allowed to be placed on a validator.
@@ -58,7 +56,6 @@ var (
 	errDSCantValidate    = errors.New("new blockchain can't be validated by primary network")
 	errStartTimeTooEarly = errors.New("start time is before the current chain time")
 	errStartAfterEndTime = errors.New("start time is after the end time")
-	errWrongCacheType    = errors.New("unexpectedly cached type")
 
 	_ block.ChainVM        = &VM{}
 	_ validators.Connector = &VM{}
@@ -311,11 +308,7 @@ func (vm *VM) Shutdown() error {
 	vm.blockBuilder.Shutdown()
 
 	if vm.bootstrapped.GetValue() {
-		validators, exist := vm.Validators.GetValidators()
-		if !exist {
-			return errNoPrimaryValidators
-		}
-		validatorList := validators.List()
+		validatorList := vm.Validators.List()
 
 		validatorIDs := make([]ids.ShortID, len(validatorList))
 		for i, vdr := range validatorList {
@@ -457,89 +450,6 @@ func (vm *VM) Disconnected(vdrID ids.ShortID) error {
 	return vm.internalState.Commit()
 }
 
-// GetValidatorSet returns the validator set at the specified height for the
-// provided subnetID.
-func (vm *VM) GetValidatorSet(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-	validatorSetsCache, exists := vm.validatorSetCaches[subnetID]
-	if !exists {
-		validatorSetsCache = &cache.LRU{Size: validatorSetsCacheSize}
-		// Only cache whitelisted subnets
-		if vm.WhitelistedSubnets.Contains(subnetID) || subnetID == constants.PrimaryNetworkID {
-			vm.validatorSetCaches[subnetID] = validatorSetsCache
-		}
-	}
-
-	if validatorSetIntf, ok := validatorSetsCache.Get(height); ok {
-		validatorSet, ok := validatorSetIntf.(map[ids.ShortID]uint64)
-		if !ok {
-			return nil, errWrongCacheType
-		}
-		vm.metrics.validatorSetsCached.Inc()
-		return validatorSet, nil
-	}
-
-	lastAcceptedHeight, err := vm.GetCurrentHeight()
-	if err != nil {
-		return nil, err
-	}
-	if lastAcceptedHeight < height {
-		return nil, database.ErrNotFound
-	}
-
-	// get the start time to track metrics
-	startTime := vm.Clock().Time()
-
-	validators, ok := vm.Validators.GetValidators()
-	if !ok {
-		return nil, errNotEnoughValidators
-	}
-	validatorList := validators.List()
-
-	validatorSet := make(map[ids.ShortID]uint64, len(validatorList))
-	for _, vdr := range validatorList {
-		validatorSet[vdr.ID()] = vdr.Weight()
-	}
-
-	for i := lastAcceptedHeight; i > height; i-- {
-		diffs, err := vm.internalState.GetValidatorWeightDiffs(i, subnetID)
-		if err != nil {
-			return nil, err
-		}
-
-		for nodeID, diff := range diffs {
-			var op func(uint64, uint64) (uint64, error)
-			if diff.Decrease {
-				// The validator's weight was decreased at this block, so in the
-				// prior block it was higher.
-				op = safemath.Add64
-			} else {
-				// The validator's weight was increased at this block, so in the
-				// prior block it was lower.
-				op = safemath.Sub64
-			}
-
-			newWeight, err := op(validatorSet[nodeID], diff.Amount)
-			if err != nil {
-				return nil, err
-			}
-			if newWeight == 0 {
-				delete(validatorSet, nodeID)
-			} else {
-				validatorSet[nodeID] = newWeight
-			}
-		}
-	}
-
-	// cache the validator set
-	validatorSetsCache.Put(height, validatorSet)
-
-	endTime := vm.Clock().Time()
-	vm.metrics.validatorSetsCreated.Inc()
-	vm.metrics.validatorSetsDuration.Add(float64(endTime.Sub(startTime)))
-	vm.metrics.validatorSetsHeightDiff.Add(float64(lastAcceptedHeight - height))
-	return validatorSet, nil
-}
-
 // GetCurrentHeight returns the height of the last accepted block
 func (vm *VM) GetCurrentHeight() (uint64, error) {
 	lastAccepted, err := vm.getBlock(vm.lastAcceptedID)
@@ -590,12 +500,8 @@ func (vm *VM) Logger() logging.Logger { return vm.ctx.Log }
 // Returns the percentage of the total stake on the Primary Network of nodes
 // connected to this node.
 func (vm *VM) getPercentConnected() (float64, error) {
-	validators, exists := vm.Validators.GetValidators()
-	if !exists {
-		return 0, errNoPrimaryValidators
-	}
 
-	validatorList := validators.List()
+	validatorList := vm.Validators.List()
 
 	var (
 		connectedStake uint64
@@ -610,5 +516,5 @@ func (vm *VM) getPercentConnected() (float64, error) {
 			return 0, err
 		}
 	}
-	return float64(connectedStake) / float64(validators.Weight()), nil
+	return float64(connectedStake) / float64(vm.Validators.Weight()), nil
 }

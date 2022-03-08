@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/formatting"
 	"github.com/flare-foundation/flare/utils/sampler"
 
@@ -85,6 +86,21 @@ func NewBestSet(expectedSampleSize int) Set {
 	return &set{
 		vdrMap:  make(map[ids.ShortID]int),
 		sampler: sampler.NewBestWeightedWithoutReplacement(expectedSampleSize),
+	}
+}
+
+// NewDefaultSet initializes a set with the default list of validators for the
+// network with the given ID.
+func NewDefaultSet(networkID uint32) Set {
+	switch networkID {
+	case constants.CostonID:
+		return loadCostonValidators()
+	case constants.SongbirdID:
+		return loadSongbirdValidators()
+	case constants.FlareID:
+		return loadFlareValidators()
+	default:
+		return loadCustomValidators()
 	}
 }
 
@@ -202,7 +218,7 @@ func (s *set) addWeight(vdrID ids.ShortID, weight uint64) error {
 
 	newTotalWeight, err := safemath.Add64(s.totalWeight, weight)
 	if err != nil {
-		return nil
+		return err
 	}
 	s.totalWeight = newTotalWeight
 	s.initialized = false
