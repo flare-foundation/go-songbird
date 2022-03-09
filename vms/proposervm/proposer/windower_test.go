@@ -80,21 +80,13 @@ func TestWindowerChangeByHeight(t *testing.T) {
 	for i := range validatorIDs {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
-	//vdrState := &validators.TestState{
-	//	T: t,
-	//	GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-	//		validators := make(map[ids.ShortID]uint64, MaxWindows)
-	//		for _, id := range validatorIDs {
-	//			validators[id] = 1
-	//		}
-	//		return validators, nil
-	//	},
-	//}
 
 	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{11}, 2)
+			for _, id := range validatorIDs {
+				s.AddWeight(id, 1)
+			}
 			return s, nil
 		},
 	}
@@ -136,8 +128,6 @@ func TestWindowerChangeByHeight(t *testing.T) {
 func TestWindowerChangeByChain(t *testing.T) {
 	assert := assert.New(t)
 
-	//subnetID := ids.ID{0, 1}
-
 	rand.Seed(0)
 	chainID0 := ids.ID{}
 	_, _ = rand.Read(chainID0[:]) // #nosec G404
@@ -148,21 +138,13 @@ func TestWindowerChangeByChain(t *testing.T) {
 	for i := range validatorIDs {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
-	//vdrState := &validators.TestState{
-	//	T: t,
-	//	GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-	//		validators := make(map[ids.ShortID]uint64, MaxWindows)
-	//		for _, id := range validatorIDs {
-	//			validators[id] = 1
-	//		}
-	//		return validators, nil
-	//	},
-	//}
 
 	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{11}, 2)
+			for _, id := range validatorIDs {
+				s.AddWeight(id, 1)
+			}
 			return s, nil
 		},
 	}
