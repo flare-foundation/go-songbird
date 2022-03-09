@@ -60,14 +60,12 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 	if err != nil {
 		return 0, fmt.Errorf("could not get validators: %w", err)
 	}
-	fmt.Println("Validators are: ", validators)
-	fmt.Println("Delay function caled")
+
 	// convert the list of validators to a slice
 	totalWeight := uint64(0)
 	validatorIDs := make([]ids.ShortID, 0, validators.Len())
 	weights := make([]uint64, 0, validators.Len())
 	for _, validator := range validators.List() {
-		fmt.Println("Inside loop")
 		totalWeight, err = math.Add64(totalWeight, validator.Weight())
 		if err != nil {
 			return 0, err
@@ -108,6 +106,5 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 		}
 		delay += WindowDuration
 	}
-	fmt.Println("delay is: ", delay)
 	return delay, nil
 }
