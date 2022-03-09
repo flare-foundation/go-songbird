@@ -87,16 +87,17 @@ func New(
 	minimumPChainHeight uint64,
 	resetHeightIndex bool,
 ) *VM {
-	u := validators.NewUpdater(validators.NewSet(), nil)
-	fmt.Println("updater getting initialised")
-	if u == nil {
-		fmt.Println("nil updater!!!!")
-	}
+
 	proVM := &VM{
 		ChainVM:             vm,
 		activationTime:      activationTime,
 		minimumPChainHeight: minimumPChainHeight,
-		Updater:             u,
+	}
+	u := validators.NewUpdater(validators.NewSet(), validators.NewCachingRetriever(proVM))
+	proVM.Updater = u
+	fmt.Println("updater getting initialised")
+	if u == nil {
+		fmt.Println("nil updater!!!!")
 	}
 
 	proVM.resetHeightIndexOngoing.SetValue(resetHeightIndex)

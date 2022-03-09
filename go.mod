@@ -6,7 +6,7 @@ module github.com/flare-foundation/flare
 // go.mod (here, only major.minor can be specified)
 go 1.16
 
-replace github.com/flare-foundation/coreth => github.com/flare-foundation/coreth v0.3.3-0.20220304114945-543e31fef8ec
+replace github.com/flare-foundation/coreth => github.com/flare-foundation/coreth v0.3.3-0.20220308132458-629f1b95d3d2
 
 require (
 	github.com/Microsoft/go-winio v0.4.14
