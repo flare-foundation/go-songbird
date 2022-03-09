@@ -70,7 +70,7 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 		if err != nil {
 			return 0, err
 		}
-		validatorIDs = append(validatorIDs, validatorID)
+		validatorIDs = append(validatorIDs, validator.ID())
 		weights = append(weights, validator.Weight())
 	}
 
