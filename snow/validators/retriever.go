@@ -15,7 +15,7 @@ const (
 )
 
 type Retriever interface {
-	GetValidatorsByBlockID(blockID ids.ID) (Set, error)
+	GetValidators(blockID ids.ID) (Set, error)
 }
 
 type cachingRetriever struct {
@@ -34,12 +34,12 @@ func NewCachingRetriever(retriever Retriever) Retriever {
 	return &c
 }
 
-func (c *cachingRetriever) GetValidatorsByBlockID(blockID ids.ID) (Set, error) {
+func (c *cachingRetriever) GetValidators(blockID ids.ID) (Set, error) {
 	entry, ok := c.cache.Get(blockID)
 	if ok {
 		return entry.(Set), nil
 	}
-	set, err := c.retriever.GetValidatorsByBlockID(blockID)
+	set, err := c.retriever.GetValidators(blockID)
 	if err != nil {
 		return nil, fmt.Errorf("could not get validator set (block: %x): %w", blockID, err)
 	}

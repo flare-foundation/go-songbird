@@ -591,7 +591,7 @@ func (vm *VMServer) BlockReject(_ context.Context, req *vmproto.BlockRejectReque
 	return &emptypb.Empty{}, nil
 }
 
-func (vm *VMServer) LoadValidators(_ context.Context, req *vmproto.LoadValidatorsRequest) (*vmproto.LoadValidatorsResponse, error) {
+func (vm *VMServer) FetchValidators(_ context.Context, req *vmproto.FetchValidatorsRequest) (*vmproto.FetchValidatorsResponse, error) {
 	retriever, ok := vm.vm.(validators.Retriever)
 	if !ok {
 		return nil, fmt.Errorf("VM is not a validator source")
@@ -600,11 +600,11 @@ func (vm *VMServer) LoadValidators(_ context.Context, req *vmproto.LoadValidator
 	if err != nil {
 		return nil, fmt.Errorf("could not parse block ID: %w", err)
 	}
-	validators, err := retriever.GetValidatorsByBlockID(blockID)
+	validators, err := retriever.GetValidators(blockID)
 	if err != nil {
 		return nil, fmt.Errorf("could not load validators from source: %w", err)
 	}
-	var res vmproto.LoadValidatorsResponse
+	var res vmproto.FetchValidatorsResponse
 	for _, validator := range validators.List() {
 		validatorID := validator.ID()
 		res.ValidatorIds = append(res.ValidatorIds, validatorID[:])
