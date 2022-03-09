@@ -654,8 +654,8 @@ func (vm *VMClient) Disconnected(nodeID ids.ShortID) error {
 	return err
 }
 
-func (vm *VMClient) GetValidatorsByBlockID(blockID ids.ID) (validators.Set, error) {
-	res, err := vm.client.LoadValidators(context.Background(), &vmproto.LoadValidatorsRequest{
+func (vm *VMClient) GetValidators(blockID ids.ID) (validators.Set, error) {
+	res, err := vm.client.FetchValidators(context.Background(), &vmproto.FetchValidatorsRequest{
 		BlkId: blockID[:],
 	})
 	if err != nil {
