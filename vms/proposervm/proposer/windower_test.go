@@ -39,19 +39,10 @@ func TestWindowerNoValidators(t *testing.T) {
 func TestWindowerRepeatedValidator(t *testing.T) {
 	assert := assert.New(t)
 
-	//subnetID := ids.GenerateTestID()
 	chainID := ids.GenerateTestID()
 	validatorID := ids.GenerateTestShortID()
 	nonValidatorID := ids.GenerateTestShortID()
-	fmt.Println("Ids: ", validatorID, nonValidatorID)
-	//vdrState := &validators.TestState{
-	//	T: t,
-	//	GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-	//		return map[ids.ShortID]uint64{
-	//			validatorID: 10,
-	//		}, nil
-	//	},
-	//}
+
 	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet() //todo use the validatorID in NewSet and NOT use the nonValidatorID
@@ -74,7 +65,6 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 func TestWindowerChangeByHeight(t *testing.T) {
 	assert := assert.New(t)
 
-	//subnetID := ids.ID{0, 1}
 	chainID := ids.ID{0, 2}
 	validatorIDs := make([]ids.ShortID, MaxWindows)
 	for i := range validatorIDs {
