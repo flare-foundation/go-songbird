@@ -107,7 +107,7 @@ func TestPeersDataSample(t *testing.T) {
 	data.initialize()
 	trackedSubnetIDs := ids.Set{}
 	trackedSubnetIDs.Add(constants.PrimaryNetworkID)
-	networkWithValidators := &network{config: &Config{Validators: validators.NewManager(constants.LocalID)}}
+	networkWithValidators := &network{config: &Config{Validators: validators.NewDefaultSet(constants.LocalID)}}
 	// Case: Empty
 	peers, err := data.sample(constants.PrimaryNetworkID, false, 0)
 	assert.NoError(t, err)
