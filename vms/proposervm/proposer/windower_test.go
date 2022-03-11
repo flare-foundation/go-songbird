@@ -21,11 +21,11 @@ func TestWindowerNoValidators(t *testing.T) {
 	chainID := ids.GenerateTestID()
 	nodeID := ids.GenerateTestShortID()
 
+	noValidators := validators.NewSet()
+
 	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{11}, 3)
-			return s, nil
+			return noValidators, nil
 		},
 	}
 
