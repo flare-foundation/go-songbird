@@ -322,7 +322,7 @@ func defaultVM() (*VM, database.Database, *common.SenderTest) {
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		TxFee:                  defaultTxFee,
 		CreateSubnetTxFee:      100 * defaultTxFee,
 		CreateBlockchainTxFee:  100 * defaultTxFee,
@@ -401,7 +401,7 @@ func GenesisVMWithArgs(t *testing.T, args *BuildGenesisArgs) ([]byte, chan commo
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		TxFee:                  defaultTxFee,
 		MinValidatorStake:      defaultMinValidatorStake,
@@ -466,7 +466,6 @@ func GenesisVMWithArgs(t *testing.T, args *BuildGenesisArgs) ([]byte, chan commo
 
 // Ensure genesis state is parsed from bytes and stored correctly
 func TestGenesis(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -524,16 +523,6 @@ func TestGenesis(t *testing.T) {
 		}
 	}
 
-	// Ensure current validator set of primary network is correct
-	vdrSet, ok := vm.Validators.GetValidators()
-	if !ok {
-		t.Fatalf("Missing the primary network validator set")
-	}
-	currentValidators := vdrSet.List()
-	if len(currentValidators) != 0 {
-		t.Fatal("vm's current validator set is wrong")
-	}
-
 	// Ensure genesis timestamp is correct
 	if timestamp := vm.internalState.GetTimestamp(); timestamp.Unix() != int64(genesisState.Time) {
 		t.Fatalf("vm's time is incorrect. Expected %v got %v", genesisState.Time, timestamp)
@@ -547,7 +536,6 @@ func TestGenesis(t *testing.T) {
 
 // accept proposal to add validator to primary network
 func TestAddValidatorCommit(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -628,7 +616,6 @@ func TestAddValidatorCommit(t *testing.T) {
 
 // verify invalid proposal to add validator to primary network
 func TestInvalidAddValidatorCommit(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -685,7 +672,6 @@ func TestInvalidAddValidatorCommit(t *testing.T) {
 
 // Reject proposal to add validator to primary network
 func TestAddValidatorReject(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -761,7 +747,6 @@ func TestAddValidatorReject(t *testing.T) {
 
 // Reject proposal to add validator to primary network
 func TestAddValidatorInvalidNotReissued(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -800,7 +785,6 @@ func TestAddValidatorInvalidNotReissued(t *testing.T) {
 
 // Accept proposal to add validator to subnet
 func TestAddSubnetValidatorAccept(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -884,7 +868,6 @@ func TestAddSubnetValidatorAccept(t *testing.T) {
 
 // Reject proposal to add validator to subnet
 func TestAddSubnetValidatorReject(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -968,7 +951,6 @@ func TestAddSubnetValidatorReject(t *testing.T) {
 
 // Test case where primary network validator rewarded
 func TestRewardValidatorAccept(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1068,7 +1050,6 @@ func TestRewardValidatorAccept(t *testing.T) {
 
 // Test case where primary network validator not rewarded
 func TestRewardValidatorReject(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1157,7 +1138,6 @@ func TestRewardValidatorReject(t *testing.T) {
 
 // Test case where primary network validator is preferred to be rewarded
 func TestRewardValidatorPreferred(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1244,7 +1224,6 @@ func TestRewardValidatorPreferred(t *testing.T) {
 
 // Ensure BuildBlock errors when there is no block to build
 func TestUnneededBuildBlock(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1260,7 +1239,6 @@ func TestUnneededBuildBlock(t *testing.T) {
 
 // test acceptance of proposal to create a new chain
 func TestCreateChain(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1317,7 +1295,6 @@ func TestCreateChain(t *testing.T) {
 // 3) Advance timestamp to validator's start time (moving the validator from pending to current)
 // 4) Advance timestamp to validator's end time (removing validator from current)
 func TestCreateSubnet(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1549,7 +1526,6 @@ func TestCreateSubnet(t *testing.T) {
 
 // test asset import
 func TestAtomicImport(t *testing.T) {
-	t.Skip()
 	vm, baseDB, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1643,7 +1619,6 @@ func TestAtomicImport(t *testing.T) {
 
 // test optimistic asset import
 func TestOptimisticAtomicImport(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -1724,7 +1699,7 @@ func TestRestartPartiallyAccepted(t *testing.T) {
 	firstDB := db.NewPrefixDBManager([]byte{})
 	firstVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1806,7 +1781,7 @@ func TestRestartPartiallyAccepted(t *testing.T) {
 
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1846,7 +1821,7 @@ func TestRestartFullyAccepted(t *testing.T) {
 	firstDB := db.NewPrefixDBManager([]byte{})
 	firstVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1923,7 +1898,7 @@ func TestRestartFullyAccepted(t *testing.T) {
 
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1969,7 +1944,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -2231,7 +2206,7 @@ func TestUnverifiedParent(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -2303,7 +2278,6 @@ func TestUnverifiedParent(t *testing.T) {
 }
 
 func TestMaxStakeAmount(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -2387,7 +2361,7 @@ func TestUnverifiedParentPanic(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewManager(0),
+		Validators:             validators.NewDefaultSet(0),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -2474,7 +2448,6 @@ func TestUnverifiedParentPanic(t *testing.T) {
 }
 
 func TestRejectedStateRegressionInvalidValidatorTimestamp(t *testing.T) {
-	t.Skip()
 	assert := assert.New(t)
 
 	vm, baseDB, _ := defaultVM()
@@ -2703,7 +2676,6 @@ func TestRejectedStateRegressionInvalidValidatorTimestamp(t *testing.T) {
 }
 
 func TestRejectedStateRegressionInvalidValidatorReward(t *testing.T) {
-	t.Skip()
 	assert := assert.New(t)
 
 	vm, baseDB, _ := defaultVM()
