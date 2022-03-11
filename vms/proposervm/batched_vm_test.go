@@ -890,12 +890,34 @@ func initTestRemoteProposerVM(
 		res[ids.ShortID{3}] = uint64(7)
 		return res, nil
 	}
+	vmState := &validators.TestVMState{
+		T: t,
+		GetCurrentHeightF: func() (uint64, error) {
+			return defaultPChainHeight, nil
+		},
+	}
+	updater := &validators.TestUpdater{
+		T: t,
+		UpdateValidatorsF: func(blockID ids.ID) error {
+			return nil // todo implement it
+		},
+	}
+	retriever := &validators.TestRetriever{
+		T: t,
+		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+			s := validators.NewSet()
+			s.AddWeight(ids.ShortID{11}, 3)
+			return s, nil
+		},
+	}
 
 	ctx := snow.DefaultContextTest()
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.ValidatorState = valState
+	ctx.PlatformVMState = vmState
+	ctx.ValidatorsUpdater = updater
+	ctx.ValidatorsRetriever = retriever
 
 	dummyDBManager := manager.NewMemDB(version.DefaultVersion1_0_0)
 	// make sure that DBs are compressed correctly
