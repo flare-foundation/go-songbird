@@ -3064,9 +3064,10 @@ func createPeer(peerID ids.ShortID, peerIPDesc utils.IPDesc, peerVersion version
 func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool) {
 	targetNetwork.peers.add(peerToAdd)
 
-	//if isValidator {
-	//	targetNetwork.config.Validators = targetNetwork.config.Validators.Mutate(validators.WithValidator(peerToAdd.nodeID, 10))
-	//}
+	if isValidator {
+		//targetNetwork.config.Validators = targetNetwork.config.Validators.Mutate(validators.WithValidator(peerToAdd.nodeID, 10))
+		targetNetwork.config.Validators.AddWeight(peerToAdd.nodeID, 10)
+	}
 }
 
 func clearPeersData(targetNetwork *network) {
