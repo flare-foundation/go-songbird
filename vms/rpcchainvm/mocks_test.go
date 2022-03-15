@@ -2,12 +2,119 @@ package rpcchainvm
 
 import (
 	"context"
+	"time"
 
+	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/snow/engine/common"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/version"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/flare-foundation/flare/api/proto/vmproto"
 )
+
+type ChainVMMock struct {
+	GetValidatorsFunc func(blockID ids.ID) (validators.Set, error)
+
+	AppRequestFunc           func(nodeID ids.ShortID, requestID uint32, deadline time.Time, request []byte) error
+	AppRequestFailedFunc     func(nodeID ids.ShortID, requestID uint32) error
+	AppResponseFunc          func(nodeID ids.ShortID, requestID uint32, response []byte) error
+	AppGossipFunc            func(nodeID ids.ShortID, msg []byte) error
+	HealthCheckFunc          func() (interface{}, error)
+	ConnectedFunc            func(id ids.ShortID, nodeVersion version.Application) error
+	DisconnectedFunc         func(id ids.ShortID) error
+	InitializeFunc           func(ctx *snow.Context, dbManager manager.Manager, genesisBytes []byte, upgradeBytes []byte, configBytes []byte, toEngine chan<- common.Message, fxs []*common.Fx, appSender common.AppSender) error
+	SetStateFunc             func(state snow.State) error
+	ShutdownFunc             func() error
+	VersionFunc              func() (string, error)
+	CreateStaticHandlersFunc func() (map[string]*common.HTTPHandler, error)
+	CreateHandlersFunc       func() (map[string]*common.HTTPHandler, error)
+	GetBlockFunc             func(ids.ID) (snowman.Block, error)
+	ParseBlockFunc           func([]byte) (snowman.Block, error)
+	BuildBlockFunc           func() (snowman.Block, error)
+	SetPreferenceFunc        func(ids.ID) error
+	LastAcceptedFunc         func() (ids.ID, error)
+}
+
+func (c ChainVMMock) GetValidators(blockID ids.ID) (validators.Set, error) {
+	return c.GetValidatorsFunc(blockID)
+}
+
+func (c ChainVMMock) AppRequest(nodeID ids.ShortID, requestID uint32, deadline time.Time, request []byte) error {
+	return c.AppRequestFunc(nodeID, requestID, deadline, request)
+}
+
+func (c ChainVMMock) AppRequestFailed(nodeID ids.ShortID, requestID uint32) error {
+	return c.AppRequestFailedFunc(nodeID, requestID)
+}
+
+func (c ChainVMMock) AppResponse(nodeID ids.ShortID, requestID uint32, response []byte) error {
+	return c.AppResponseFunc(nodeID, requestID, response)
+}
+
+func (c ChainVMMock) AppGossip(nodeID ids.ShortID, msg []byte) error {
+	return c.AppGossipFunc(nodeID, msg)
+}
+
+func (c ChainVMMock) HealthCheck() (interface{}, error) {
+	return c.HealthCheckFunc()
+}
+
+func (c ChainVMMock) Connected(id ids.ShortID, nodeVersion version.Application) error {
+	return c.ConnectedFunc(id, nodeVersion)
+}
+
+func (c ChainVMMock) Disconnected(id ids.ShortID) error {
+	return c.DisconnectedFunc(id)
+}
+
+func (c ChainVMMock) Initialize(ctx *snow.Context, dbManager manager.Manager, genesisBytes []byte, upgradeBytes []byte, configBytes []byte, toEngine chan<- common.Message, fxs []*common.Fx, appSender common.AppSender) error {
+	return c.InitializeFunc(ctx, dbManager, genesisBytes, upgradeBytes, configBytes, toEngine, fxs, appSender)
+}
+
+func (c ChainVMMock) SetState(state snow.State) error {
+	return c.SetStateFunc(state)
+}
+
+func (c ChainVMMock) Shutdown() error {
+	return c.ShutdownFunc()
+}
+
+func (c ChainVMMock) Version() (string, error) {
+	return c.VersionFunc()
+}
+
+func (c ChainVMMock) CreateStaticHandlers() (map[string]*common.HTTPHandler, error) {
+	return c.CreateStaticHandlersFunc()
+}
+
+func (c ChainVMMock) CreateHandlers() (map[string]*common.HTTPHandler, error) {
+	return c.CreateHandlersFunc()
+}
+
+func (c ChainVMMock) GetBlock(id ids.ID) (snowman.Block, error) {
+	return c.GetBlockFunc(id)
+}
+
+func (c ChainVMMock) ParseBlock(bytes []byte) (snowman.Block, error) {
+	return c.ParseBlockFunc(bytes)
+}
+
+func (c ChainVMMock) BuildBlock() (snowman.Block, error) {
+	return c.BuildBlockFunc()
+}
+
+func (c ChainVMMock) SetPreference(id ids.ID) error {
+	return c.SetPreferenceFunc(id)
+}
+
+func (c ChainVMMock) LastAccepted() (ids.ID, error) {
+	return c.LastAcceptedFunc()
+}
 
 type VMClientMock struct {
 	InitializeFunc           func(ctx context.Context, in *vmproto.InitializeRequest, opts ...grpc.CallOption) (*vmproto.InitializeResponse, error)
