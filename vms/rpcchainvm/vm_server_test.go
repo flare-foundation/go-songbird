@@ -23,6 +23,8 @@ func TestVMServer_FetchValidators(t *testing.T) {
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
 		0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
 	}
+
+	// Generate fake validator set.
 	validIDs := generateValidIDs(5)
 	set := validators.NewSet()
 	for i := range validIDs {
@@ -42,6 +44,13 @@ func TestVMServer_FetchValidators(t *testing.T) {
 			name:             "nominal case",
 			blockID:          testBlockID[:],
 			set:              set,
+			retrieverFailure: false,
+			wantErr:          require.NoError,
+		},
+		{
+			name:             "empty validator list",
+			blockID:          testBlockID[:],
+			set:              validators.NewSet(),
 			retrieverFailure: false,
 			wantErr:          require.NoError,
 		},
@@ -67,6 +76,9 @@ func TestVMServer_FetchValidators(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
+			// Set up mock to assert that the expected block ID is given, and
+			// either return an error if test.retrieverFailure is set to true,
+			// or return the test set otherwise.
 			chainVMMock := ChainVMMock{
 				GetValidatorsFunc: func(gotID ids.ID) (validators.Set, error) {
 					assert.Equal(t, testBlockID, gotID)
@@ -78,7 +90,7 @@ func TestVMServer_FetchValidators(t *testing.T) {
 					return test.set, nil
 				},
 			}
-
+			// Create a VMServer using the mock.
 			server := NewServer(chainVMMock, nil)
 
 			resp, err := server.FetchValidators(context.Background(), &vmproto.FetchValidatorsRequest{
@@ -86,6 +98,8 @@ func TestVMServer_FetchValidators(t *testing.T) {
 			})
 			test.wantErr(t, err)
 
+			// If no error, assert that the response matches with the expected
+			// output for this test.
 			if err == nil {
 				assert.Len(t, resp.Weights, test.set.Len())
 				assert.Len(t, resp.ValidatorIds, test.set.Len())

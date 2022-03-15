@@ -1,3 +1,6 @@
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package rpcchainvm
 
 import (
@@ -74,6 +77,9 @@ func TestVMClient_GetValidators(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
+			// Set up mock to assert that the expected block ID is given, and
+			// either return an error if test.fetchFailure is set to true,
+			// or return a response with the test parameters otherwise.
 			clientMock := VMClientMock{
 				FetchValidatorsFunc: func(_ context.Context, req *vmproto.FetchValidatorsRequest, _ ...grpc.CallOption) (*vmproto.FetchValidatorsResponse, error) {
 					assert.Equal(t, testBlockID[:], req.BlkId[:])
@@ -90,13 +96,16 @@ func TestVMClient_GetValidators(t *testing.T) {
 					return &resp, nil
 				},
 			}
+			// Create a VMClient using the mock.
 			client := NewClient(clientMock, nil)
 
-			resp, err := client.GetValidators(testBlockID)
+			set, err := client.GetValidators(testBlockID)
 			test.wantErr(t, err)
 
+			// If no error, assert that the returned set matches with the expected
+			// output for this test.
 			if err == nil {
-				got := resp.List()
+				got := set.List()
 				assert.Len(t, got, len(test.validatorIDs))
 				for i := range got {
 					id := got[i].ID()
@@ -108,6 +117,8 @@ func TestVMClient_GetValidators(t *testing.T) {
 	}
 }
 
+// generateValidIDs generates n byte slices of size 20.
+// These are intended to be compatible with the ids.ShortID type.
 func generateValidIDs(n int) [][]byte {
 	res := make([][]byte, n)
 	for i := 0; i < n; i++ {

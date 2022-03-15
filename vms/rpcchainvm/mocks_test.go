@@ -1,9 +1,16 @@
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
 package rpcchainvm
 
 import (
 	"context"
 	"time"
 
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/flare-foundation/flare/api/proto/vmproto"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
@@ -11,10 +18,6 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/version"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
-
-	"github.com/flare-foundation/flare/api/proto/vmproto"
 )
 
 type ChainVMMock struct {
