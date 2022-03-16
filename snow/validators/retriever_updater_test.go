@@ -5,8 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
 )
@@ -27,7 +25,7 @@ func TestGetValidatorsFromDefaultSet(t *testing.T) {
 	}
 	cr := NewCachingRetriever(&testRetriever{})
 	set, err := cr.GetValidators(testBlockID)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint64(1000000), set.Weight())
 }
 
