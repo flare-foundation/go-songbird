@@ -370,8 +370,10 @@ func (vm *VM) repairAcceptedChain() error {
 		if err := vm.State.SetLastAccepted(lastAcceptedID); err != nil {
 			return err
 		}
-		if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
-			return fmt.Errorf("could not update validators: %w", err)
+		if vm.Updater != nil {
+			if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
+				return fmt.Errorf("could not update validators: %w", err)
+			}
 		}
 
 		// If the indexer checkpoint was previously pointing to the last
