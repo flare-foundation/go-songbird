@@ -369,9 +369,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 			SNLookup:     m,
 			Metrics:      vmMetrics,
 
-			PlatformVMState:     m.platformVMState,
-			ValidatorsRetriever: m.validatorsRetriever,
-			ValidatorsUpdater:   m.validatorsUpdater,
+			PlatformVMState: m.platformVMState,
 
 			StakingCertLeaf:   m.StakingCert.Leaf,
 			StakingLeafSigner: m.StakingCert.PrivateKey.(crypto.Signer),
@@ -402,6 +400,22 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	if err != nil {
 		return nil, fmt.Errorf("error while creating vm: %w", err)
 	}
+
+	// If the VM here is a validators retriever, then we are initializing the
+	// EVM and we should keep a reference to the retriever in the manager state
+	// so we can inject it into proposer VMs and their windower.
+	// Additionally, we should initialize a validators updater that will be
+	// called by the EVM every time the last accepted block changes in order to
+	// propagate validator changes across all components.
+	// We wrap the retriever into a caching retriever to improve performance.
+	retriever, ok := vm.(validators.Retriever)
+	if ok {
+		m.validatorsRetriever = validators.NewCachingRetriever(retriever)
+		m.validatorsUpdater = validators.NewUpdater(m.Validators, m.validatorsRetriever)
+		ctx.ValidatorsUpdater = m.validatorsUpdater
+		ctx.ValidatorsRetriever = m.validatorsRetriever
+	}
+
 	// TODO: Shutdown VM if an error occurs
 
 	fxs := make([]*common.Fx, len(chainParams.FxAliases))
@@ -746,19 +760,6 @@ func (m *manager) createSnowmanChain(
 			return nil, fmt.Errorf("first VM should implement `platform.VMState`")
 		}
 		m.platformVMState = platformVMState
-	}
-
-	// If the VM here is a validators retriever, then we are initializing the
-	// EVM and we should keep a reference to the retriever in the manager state
-	// so we can inject it into proposer VMs and their windower.
-	// Additionally, we should initialize a validators updater that will be
-	// called by the EVM every time the last accepted block changes in order to
-	// propagate validator changes across all components.
-	// We wrap the retriever into a caching retriever to improve performance.
-	retriever, ok := vm.(validators.Retriever)
-	if ok {
-		m.validatorsRetriever = validators.NewCachingRetriever(retriever)
-		m.validatorsUpdater = validators.NewUpdater(m.Validators, m.validatorsRetriever)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it
