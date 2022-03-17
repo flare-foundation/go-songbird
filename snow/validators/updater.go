@@ -27,6 +27,7 @@ type updater struct {
 }
 
 func (u *updater) UpdateValidators(blockID ids.ID) error {
+	fmt.Println("UpdateValidators called with blockID: ", blockID.String())
 	validators, err := u.retriever.GetValidators(blockID)
 	if err != nil {
 		return fmt.Errorf("could not get validators (block: %x): %w", blockID, err)
