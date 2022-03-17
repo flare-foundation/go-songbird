@@ -20,10 +20,10 @@ var (
 	// Flare versioning constants.
 	Current                      = NewDefaultVersion(0, 6, 0)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
-	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 2, 0)
-	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
+	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
 
 	VersionParser = NewDefaultApplicationParser()
 
