@@ -217,7 +217,7 @@ func New(config *ManagerConfig) Manager {
 		Aliaser:       ids.NewAliaser(),
 		ManagerConfig: *config,
 		subnets:       make(map[ids.ID]Subnet),
-		chains:        make(map[ids.ID]handler.Handler),
+		chains:        make(map[ids.ID]handler.Handler), //todo update updater and validators?
 	}
 }
 
@@ -398,9 +398,16 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 	}
 
 	// Create the chain
-	vm, err := vmFactory.New(ctx.Context)
+	vm, err := vmFactory.New(ctx.Context) // todo check for type assertion of vm here and then assign here?
 	if err != nil {
 		return nil, fmt.Errorf("error while creating vm: %w", err)
+	}
+	retriever, ok := vm.(validators.Retriever)
+	if ok {
+		m.validatorsRetriever = validators.NewCachingRetriever(retriever)
+		m.validatorsUpdater = validators.NewUpdater(m.Validators, m.validatorsRetriever)
+		ctx.ValidatorsUpdater = m.validatorsUpdater
+		ctx.ValidatorsRetriever = m.validatorsRetriever
 	}
 	// TODO: Shutdown VM if an error occurs
 
