@@ -219,8 +219,9 @@ github.com/flare-foundation/coreth v0.3.1-0.20220219134233-0c0a76526e9d/go.mod h
 github.com/flare-foundation/coreth v0.3.1/go.mod h1:EBvV826hD+GX9AX1k/PpLrenCAPzEJk9yct8CDIcGQo=
 github.com/flare-foundation/coreth v0.3.2/go.mod h1:ZUIwNUsgK4Dax/HifkP8RdwIGUa4ci6RTB0ZQMfFWRg=
 github.com/flare-foundation/coreth v0.3.3/go.mod h1:jIGqqwhbdF/thekCsrYKduK+eoE+BTcsPjU/hkTLuHI=
-github.com/flare-foundation/coreth v0.3.4-0.20220317200844-70776f7aa5a7 h1:c7GBkROvL8zDp8tShBoPwkPVUczM/EU7G5PEynU5Mu4=
 github.com/flare-foundation/coreth v0.3.4-0.20220317200844-70776f7aa5a7/go.mod h1:hCuk3BQ2T/VNnXHR5FC3R6kp7dw/2v9OnIsb/PeFY7U=
+github.com/flare-foundation/coreth v0.3.4-0.20220318193547-1c2644eb0b67 h1:Xn3uV9wmy3Y/ttaPCG1xidU6ijjOTQrPo2/ZHLw9MZk=
+github.com/flare-foundation/coreth v0.3.4-0.20220318193547-1c2644eb0b67/go.mod h1:+txxdd1OBrV9iBhw6dNZb7CF0mh3MmQ5ejooMd8NtV4=
 github.com/flare-foundation/flare v0.5.0/go.mod h1:ai++PWjLrLOZYheY7qutUJbReWsJSe5XO47QcIQQW0U=
 github.com/flare-foundation/flare v0.5.1-0.20220218223919-053cf219b47c/go.mod h1:s7Pdz389BY8S4R59VEO43qfO59NGVOANIjbqGm99FcE=
 github.com/flare-foundation/flare v0.5.1-0.20220219122715-d2993195fa0a/go.mod h1:9xMiQ+VgZQdBPxJoNAiwfrkFHFKreBn17yKMZiUbXx0=
@@ -228,6 +229,7 @@ github.com/flare-foundation/flare v0.5.1-0.20220219193849-77148a5607bd/go.mod h1
 github.com/flare-foundation/flare v0.5.1/go.mod h1:To8+n/K90jEda3xHPn9NnGwHWIPFu+aKFJ1c+CEPVIU=
 github.com/flare-foundation/flare v0.5.3-0.20220224180542-fe1de5b7bcca/go.mod h1:ia8R2h8r3CUiWveBkWJwsf+DJ1aNaOufyFiqJTwMq34=
 github.com/flare-foundation/flare v0.5.4-0.20220317200519-32e012f8b1a0/go.mod h1:L6ZmVV6Eep4qbKzD2asasLglkS5kPli7TUv6RjexXFs=
+github.com/flare-foundation/flare v0.5.4-0.20220318182635-7246514d0e16/go.mod h1:pZkSXMLnYg1vbpgHor2qysG/v7VVTxTBbq4btLBJaLk=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fogleman/gg v1.3.0/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
