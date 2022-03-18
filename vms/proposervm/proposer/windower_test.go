@@ -45,7 +45,7 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 
 	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet() //todo use the validatorID in NewSet and NOT use the nonValidatorID
+			s := validators.NewSet()
 			s.AddWeight(validatorID, 10)
 			return s, nil
 		},

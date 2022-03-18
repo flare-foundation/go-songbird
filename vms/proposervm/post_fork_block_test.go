@@ -280,7 +280,7 @@ func TestBlockVerify_PostForkBlock_TimestampChecks(t *testing.T) {
 	}
 
 	// block cannot arrive before its creator window starts
-	blkWinDelay, err := proVM.Delay(childCoreBlk.Height(), childProBlk.Parent(), proVM.ctx.NodeID) // todo add parent id here
+	blkWinDelay, err := proVM.Delay(childCoreBlk.Height(), childProBlk.Parent(), proVM.ctx.NodeID)
 	if err != nil {
 		t.Fatal("Could not calculate submission window")
 	}
