@@ -206,9 +206,7 @@ type manager struct {
 	chains map[ids.ID]handler.Handler
 
 	// these are needed for snowman++ related initialization
-	platformVMState     platform.VMState
-	validatorsRetriever validators.Retriever
-	validatorsUpdater   validators.Updater
+	platformVMState platform.VMState
 }
 
 // New returns a new Manager
@@ -369,9 +367,7 @@ func (m *manager) buildChain(chainParams ChainParameters, sb Subnet) (*chain, er
 			SNLookup:     m,
 			Metrics:      vmMetrics,
 
-			PlatformVMState:     m.platformVMState,
-			ValidatorsRetriever: m.validatorsRetriever,
-			ValidatorsUpdater:   m.validatorsUpdater,
+			PlatformVMState: m.platformVMState,
 
 			StakingCertLeaf:   m.StakingCert.Leaf,
 			StakingLeafSigner: m.StakingCert.PrivateKey.(crypto.Signer),
@@ -757,8 +753,8 @@ func (m *manager) createSnowmanChain(
 	// We wrap the retriever into a caching retriever to improve performance.
 	retriever, ok := vm.(validators.Retriever)
 	if ok {
-		m.validatorsRetriever = validators.NewCachingRetriever(retriever)
-		m.validatorsUpdater = validators.NewUpdater(m.Validators, m.validatorsRetriever)
+		ctx.Context.ValidatorsRetriever = validators.NewCachingRetriever(retriever)
+		ctx.Context.ValidatorsUpdater = validators.NewUpdater(m.Validators, ctx.Context.ValidatorsRetriever)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it
