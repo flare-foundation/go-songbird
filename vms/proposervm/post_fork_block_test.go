@@ -890,8 +890,8 @@ func TestBlockAccept_PostForkBlock_TwoProBlocksWithSameCoreBlock_OneIsAccepted(t
 	if err != nil {
 		t.Fatal("could not build proBlk2")
 	}
-	if proBlk1.ID() == proBlk2.ID() {
-		t.Fatal("proBlk1 and proBlk2 should be different for this test")
+	if proBlk1.ID() != proBlk2.ID() {
+		t.Fatal("proBlk1 and proBlk2 should not be different for this test")
 	}
 
 	// set proBlk1 as preferred
