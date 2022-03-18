@@ -370,8 +370,10 @@ func (vm *VM) repairAcceptedChain() error {
 		if err := vm.State.SetLastAccepted(lastAcceptedID); err != nil {
 			return err
 		}
-		if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
-			return fmt.Errorf("could not update validators: %w", err)
+		if vm.isValidatorBridge() {
+			if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
+				return fmt.Errorf("could not update validators: %w", err)
+			}
 		}
 
 		// If the indexer checkpoint was previously pointing to the last
@@ -579,4 +581,9 @@ func (vm *VM) optimalPChainHeight(minPChainHeight uint64) (uint64, error) {
 	}
 	optimalHeight := currentPChainHeight - optimalHeightDelay
 	return math.Max64(optimalHeight, minPChainHeight), nil
+}
+
+func (vm *VM) isValidatorBridge() bool {
+	_, ok := vm.ChainVM.(validators.Retriever)
+	return ok
 }

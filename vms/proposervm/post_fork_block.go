@@ -30,8 +30,10 @@ func (b *postForkBlock) Accept() error {
 	if err := b.vm.State.SetLastAccepted(blkID); err != nil {
 		return err
 	}
-	if err := b.vm.Updater.UpdateValidators(blkID); err != nil {
-		return fmt.Errorf("could not update validators: %w", err)
+	if b.vm.isValidatorBridge() {
+		if err := b.vm.Updater.UpdateValidators(blkID); err != nil {
+			return fmt.Errorf("could not update validators: %w", err)
+		}
 	}
 
 	// Persist this block, its height index, and its status

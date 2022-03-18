@@ -55,7 +55,6 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 		return MaxDelay, nil
 	}
 
-	// get the validator set by the p-chain height
 	validators, err := w.retriever.GetValidators(parentID)
 	if err != nil {
 		return 0, fmt.Errorf("could not get validators: %w", err)

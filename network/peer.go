@@ -47,15 +47,6 @@ type alias struct {
 type peer struct {
 	net *network // network this peer is part of
 
-	// If a peer's version changes to an incompatible version while being connected
-	// too us, we usually drop him when we receive his next pong message.
-	// `resetVersion` and `regotVersion` track a mechanism which allows os to
-	// re-request and re-set a peer version once, in a particular edge case where
-	// the peer's version is compatible with our local legacy version. This allows
-	// us to avoid a one-time disconnect when a hard fork changes the peer version.
-	resetVersion utils.AtomicBool
-	regotVersion utils.AtomicBool
-
 	// True if this peer has sent us a valid Version message and
 	// is running a compatible version.
 	// Only modified on the connection's reader routine.
@@ -518,7 +509,6 @@ func (p *peer) sendGetVersion() {
 func (p *peer) sendVersion() {
 	p.net.stateLock.RLock()
 	myIP := p.net.currentIP.IP()
-	compatibility := p.net.compatibility()
 	myVersionTime, myVersionSig, err := p.net.getVersion(myIP)
 	if err != nil {
 		p.net.stateLock.RUnlock()
@@ -530,7 +520,7 @@ func (p *peer) sendVersion() {
 		p.net.dummyNodeID,
 		p.net.clock.Unix(),
 		myIP,
-		compatibility.Version().String(),
+		p.net.versionCompatibility.Version().String(),
 		myVersionTime,
 		myVersionSig,
 		whitelistedSubnets.List(),
@@ -601,12 +591,8 @@ func (p *peer) handleGetVersion(_ message.InboundMessage) {
 
 // assumes the [stateLock] is not held
 func (p *peer) handleVersion(msg message.InboundMessage) {
-
-	// We always allow the first version message through; if we have already processed
-	// the first version message, we let the message through only if the version
-	// reset was requested, but the second version message not yet processed.
 	switch {
-	case p.gotVersion.GetValue() && (!p.resetVersion.GetValue() || p.regotVersion.GetValue()):
+	case p.gotVersion.GetValue():
 		p.net.log.Verbo("dropping duplicated version message from %s%s at %s", constants.NodeIDPrefix, p.nodeID, p.getIP())
 		return
 	case msg.Get(message.NodeID).(uint32) == p.net.dummyNodeID:
@@ -650,8 +636,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		return
 	}
 
-	compatibilities := p.net.compatibilities()
-	if version.Before(compatibilities, peerVersion) {
+	if p.net.versionCompatibility.Version().Before(peerVersion) {
 		if p.net.config.Beacons.Contains(p.nodeID) {
 			p.net.log.Info(
 				"beacon %s%s at %s attempting to connect with newer version %s. You may want to update your client",
@@ -665,7 +650,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		}
 	}
 
-	if err := version.Compatible(compatibilities, (peerVersion)); err != nil {
+	if err := p.net.versionCompatibility.Compatible(peerVersion); err != nil {
 		p.net.log.Verbo("peer %s%s at %s version (%s) not compatible: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), peerVersion, err)
 		p.discardIP()
 		return
@@ -738,19 +723,10 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		}
 	}
 
-	p.versionStruct.SetValue(peerVersion)
-	p.versionStr.SetValue(peerVersion.String())
-
-	// If this processing is due to a version reset, we don't need to resend the
-	// peer list or mark the handshake as finished.
-	if p.gotVersion.GetValue() {
-		p.net.log.Debug("executed version reset from peer %s%s at %s", constants.NodeIDPrefix, p.nodeID, p.getIP())
-		p.regotVersion.SetValue(true)
-		return
-	}
-
 	p.sendPeerList()
 
+	p.versionStruct.SetValue(peerVersion)
+	p.versionStr.SetValue(peerVersion.String())
 	p.gotVersion.SetValue(true)
 
 	p.tryMarkFinishedHandshake()
@@ -854,20 +830,8 @@ func (p *peer) handlePong(msg message.InboundMessage) {
 		return
 	}
 
-	compatibilities := p.net.compatibilities()
 	peerVersion := p.versionStruct.GetValue().(version.Application)
-	if err := version.Compatible(compatibilities, peerVersion); err != nil {
-
-		// If we have not yet attempted to reset the peer's version before, and his currently registered
-		// version is compatible with our legacy version, we allow resetting of the peer's version by
-		// requesting his version a second time, but only once.
-		if !p.resetVersion.GetValue() && p.net.legacyCompatibility.Compatible(peerVersion) == nil {
-			p.net.log.Debug("requesting version reset from peer %s%s at %s", constants.NodeIDPrefix, p.nodeID, p.getIP())
-			p.resetVersion.SetValue(true)
-			p.sendGetVersion()
-			return
-		}
-
+	if err := p.net.versionCompatibility.Compatible(peerVersion); err != nil {
 		p.net.log.Debug("disconnecting from peer %s%s at %s version (%s) not compatible: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), peerVersion, err)
 		p.discardIP()
 	}

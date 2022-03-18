@@ -18,20 +18,12 @@ import (
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
-	Current                      = NewDefaultVersion(0, 5, 2)
+	Current                      = NewDefaultVersion(0, 6, 0)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
-	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 2, 0)
-	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
-
-	// Legacy versioning constants.
-	Legacy                      = NewDefaultVersion(1, 7, 5)
-	LegacyApp                   = NewDefaultApplication(constants.LegacyPlatformName, Legacy.Major(), Legacy.Minor(), Legacy.Patch())
-	LegacyCompatibleVersion     = NewDefaultApplication(constants.LegacyPlatformName, 1, 7, 0)
-	PrevLegacyCompatibleVersion = NewDefaultApplication(constants.LegacyPlatformName, 1, 5, 0)
-	LegacyUnmaskedVersion       = NewDefaultApplication(constants.LegacyPlatformName, 1, 1, 0)
-	PrevLegacyUnmaskedVersion   = NewDefaultApplication(constants.LegacyPlatformName, 1, 0, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
+	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
 
 	VersionParser = NewDefaultApplicationParser()
 
@@ -70,6 +62,12 @@ var (
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
+
+	FlareHardFork1Times = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2022, time.March, 23, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+	}
+	FlareHardFork1DefaultTime = time.Date(2022, time.March, 20, 18, 0, 0, 0, time.UTC)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
@@ -121,6 +119,13 @@ func GetApricotPhase5Time(networkID uint32) time.Time {
 	return ApricotPhase5DefaultTime
 }
 
+func GetFlareHardFork1Time(networkID uint32) time.Time {
+	if upgradeTime, exists := FlareHardFork1Times[networkID]; exists {
+		return upgradeTime
+	}
+	return FlareHardFork1DefaultTime
+}
+
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
@@ -130,17 +135,5 @@ func GetCompatibility(networkID uint32) Compatibility {
 		MinimumUnmaskedVersion,
 		GetApricotPhase0Time(networkID),
 		PrevMinimumUnmaskedVersion,
-	)
-}
-
-func GetLegacyCompatibility(networkID uint32) Compatibility {
-	return NewCompatibility(
-		LegacyApp,
-		LegacyCompatibleVersion,
-		GetApricotPhase5Time(networkID),
-		PrevLegacyCompatibleVersion,
-		LegacyUnmaskedVersion,
-		GetApricotPhase0Time(networkID),
-		PrevLegacyUnmaskedVersion,
 	)
 }
