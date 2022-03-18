@@ -155,6 +155,17 @@ func (vm *VM) Initialize(
 		return err
 	}
 
+	if vm.isValidatorBridge() {
+		lastID, err := vm.LastAccepted()
+		if err != nil {
+			return fmt.Errorf("could not get last accepted on initialization: %w", err)
+		}
+		err = vm.UpdateValidators(lastID)
+		if err != nil {
+			return fmt.Errorf("could not update validators on initialization: %w", err)
+		}
+	}
+
 	// check and possibly rebuild height index
 	innerHVM, ok := vm.ChainVM.(block.HeightIndexedChainVM)
 	if !ok {
