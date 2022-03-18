@@ -120,7 +120,7 @@ func GetApricotPhase5Time(networkID uint32) time.Time {
 }
 
 func GetFlareHardFork1Time(networkID uint32) time.Time {
-	if upgradeTime, exists := ApricotPhase5Times[networkID]; exists {
+	if upgradeTime, exists := FlareHardFork1Times[networkID]; exists {
 		return upgradeTime
 	}
 	return FlareHardFork1DefaultTime
