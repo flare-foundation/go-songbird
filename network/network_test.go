@@ -14,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common/math"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/stretchr/testify/assert"
@@ -346,7 +348,8 @@ func TestNewDefaultNetwork(t *testing.T) {
 		closed:  make(chan struct{}),
 	}
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id, 0)
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -425,7 +428,9 @@ func TestEstablishConnection(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 
 	var (
@@ -562,7 +567,9 @@ func TestDoubleTrack(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 
 	var (
@@ -700,7 +707,10 @@ func TestDoubleClose(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
+
 	beacons := validators.NewSet()
 
 	var (
@@ -843,7 +853,9 @@ func TestTrackConnected(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 
 	var (
@@ -982,7 +994,9 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -1156,7 +1170,11 @@ func TestPeerAliasesTicker(t *testing.T) {
 		},
 	}
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
+	vdrs.AddWeight(id2, 1)
+
 	beacons := validators.NewSet()
 
 	var (
@@ -1447,7 +1465,11 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
-	vdrs := validators.NewDefaultSet(0)
+	//vdrs := validators.NewDefaultSet(constants.CostonID)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
+	vdrs.AddWeight(id2, 1)
 	beacons := validators.NewSet()
 
 	listener0 := &testListener{
@@ -1893,7 +1915,9 @@ func TestPeerSignature(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewDefaultSet(0)
+	//vdrs := validators.NewDefaultSet(constants.CostonID)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id2, math.MaxUint64)
 	beacons := validators.NewSet()
 
 	allPeers := ids.ShortSet{}
@@ -2320,7 +2344,10 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id1, 1)
+	vdrs.AddWeight(id0, 1)
+
 	beacons := validators.NewSet()
 
 	metrics0 := prometheus.NewRegistry()
@@ -2460,7 +2487,10 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id0, 1)
+	vdrs.AddWeight(id1, 1)
+
 	beacons := validators.NewSet()
 
 	var (
@@ -2633,7 +2663,7 @@ func TestPeerGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewDefaultSet(constants.CostonID)
 	beacons := validators.NewSet()
 
 	allPeers := ids.ShortSet{}
@@ -2868,7 +2898,7 @@ func TestAppGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewDefaultSet(0)
+	vdrs := validators.NewDefaultSet(constants.CostonID)
 
 	beacons := validators.NewSet()
 
@@ -3065,14 +3095,13 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 	targetNetwork.peers.add(peerToAdd)
 
 	if isValidator {
-		//targetNetwork.config.Validators = targetNetwork.config.Validators.Mutate(validators.WithValidator(peerToAdd.nodeID, 10))
 		targetNetwork.config.Validators.AddWeight(peerToAdd.nodeID, 10)
 	}
 }
 
 func clearPeersData(targetNetwork *network) {
 	targetNetwork.peers.reset()
-	targetNetwork.config.Validators = validators.NewDefaultSet(0)
+	targetNetwork.config.Validators = validators.NewDefaultSet(constants.CostonID)
 }
 
 func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {
