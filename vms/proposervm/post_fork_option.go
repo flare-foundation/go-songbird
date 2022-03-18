@@ -34,7 +34,7 @@ func (b *postForkOption) Accept() error {
 	if err := b.vm.State.SetLastAccepted(blkID); err != nil {
 		return err
 	}
-	if b.vm.Updater != nil {
+	if b.vm.isValidatorBridge() {
 		if err := b.vm.Updater.UpdateValidators(blkID); err != nil {
 			return fmt.Errorf("could not update validators: %w", err)
 		}
