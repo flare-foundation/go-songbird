@@ -133,7 +133,11 @@ func initTestProposerVM(
 		T: t,
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{11}, 3)
+			s.AddWeight(proVM.ctx.NodeID, 10)
+			s.AddWeight(ids.ShortID{1}, 5)
+			s.AddWeight(ids.ShortID{2}, 6)
+			s.AddWeight(ids.ShortID{3}, 7)
+
 			return s, nil
 		},
 	}
@@ -888,7 +892,7 @@ func TestExpiredBuildBlock(t *testing.T) {
 		T: t,
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{11}, 3)
+			s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
 		},
 	}
@@ -1186,7 +1190,7 @@ func TestInnerVMRollback(t *testing.T) {
 		T: t,
 		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{11}, 3)
+			s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
 		},
 	}
