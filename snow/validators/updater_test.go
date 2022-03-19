@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/constants"
 )
 
 func TestUpdaterFromDefaultSet(t *testing.T) {
@@ -26,7 +25,7 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 	//}
 
 	r := NewTestRetriever()
-	u := NewUpdater(NewDefaultSet(constants.CostonID), r)
+	u := NewUpdater(loadCostonValidators(), r)
 	err := u.UpdateValidators(testBlockID)
 
 	assert.NoError(t, err)
@@ -37,7 +36,7 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 
 	v, err := r.GetValidators(testBlockID)
 	assert.NoError(t, err)
-	assert.Equal(t, NewDefaultSet(constants.CostonID), v)
+	assert.Equal(t, loadCostonValidators(), v)
 	assert.Equal(t, Counter, 0)
 
 	//v, err := r.GetValidators(testBlockIDNonExistent)
