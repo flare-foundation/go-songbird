@@ -392,7 +392,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewDefaultSet(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -427,7 +427,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .21,
-		Validators:             validators.NewDefaultSet(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -591,7 +591,7 @@ func TestUptimeDisallowedAfterNeverConnecting(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewDefaultSet(0),
+		Validators:             validators.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 

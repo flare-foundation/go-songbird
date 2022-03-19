@@ -2661,7 +2661,7 @@ func TestPeerGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewDefaultSet(constants.CostonID)
+	vdrs := validators.NewSet()
 	beacons := validators.NewSet()
 
 	allPeers := ids.ShortSet{}
@@ -2896,7 +2896,7 @@ func TestAppGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewDefaultSet(constants.CostonID)
+	vdrs := validators.NewSet()
 
 	beacons := validators.NewSet()
 
@@ -3099,7 +3099,7 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 
 func clearPeersData(targetNetwork *network) {
 	targetNetwork.peers.reset()
-	targetNetwork.config.Validators = validators.NewDefaultSet(constants.CostonID)
+	targetNetwork.config.Validators = validators.NewSet()
 }
 
 func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {
