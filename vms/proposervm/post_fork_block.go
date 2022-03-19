@@ -4,8 +4,6 @@
 package proposervm
 
 import (
-	"fmt"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
@@ -30,11 +28,6 @@ func (b *postForkBlock) Accept() error {
 	if err := b.vm.State.SetLastAccepted(blkID); err != nil {
 		return err
 	}
-	if b.vm.isValidatorBridge() {
-		if err := b.vm.Updater.UpdateValidators(blkID); err != nil {
-			return fmt.Errorf("could not update validators: %w", err)
-		}
-	}
 
 	// Persist this block, its height index, and its status
 	b.status = choices.Accepted
@@ -44,6 +37,13 @@ func (b *postForkBlock) Accept() error {
 
 	delete(b.vm.verifiedBlocks, blkID)
 	b.vm.lastAcceptedTime = b.Timestamp()
+
+	innerID := b.innerBlk.ID()
+	if err := b.vm.ctx.ValidatorsUpdater.UpdateValidators(innerID); err != nil {
+		return err
+	}
+
+	b.vm.ctx.Log.Debug("updated validators to accepted block (hash: %x)", innerID)
 
 	// mark the inner block as accepted and all conflicting inner blocks as
 	// rejected

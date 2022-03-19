@@ -57,7 +57,6 @@ type VM struct {
 	hIndexer                indexer.HeightIndexer
 
 	proposer.Windower
-	validators.Updater
 	tree.Tree
 	scheduler.Scheduler
 	mockable.Clock
@@ -113,7 +112,6 @@ func (vm *VM) Initialize(
 	vm.db = versiondb.New(prefixDB)
 	vm.State = state.New(vm.db)
 	vm.Windower = proposer.New(ctx.ValidatorsRetriever, ctx.ChainID)
-	vm.Updater = ctx.ValidatorsUpdater
 	vm.Tree = tree.New()
 
 	indexerDB := versiondb.New(vm.db)
@@ -156,14 +154,15 @@ func (vm *VM) Initialize(
 	}
 
 	if vm.isValidatorBridge() {
-		lastID, err := vm.LastAccepted()
+		acceptedID, err := vm.ChainVM.LastAccepted()
 		if err != nil {
-			return fmt.Errorf("could not get last accepted on initialization: %w", err)
+			return fmt.Errorf("could not get last accepted: %w", err)
 		}
-		err = vm.UpdateValidators(lastID)
+		err = vm.ctx.ValidatorsUpdater.UpdateValidators(acceptedID)
 		if err != nil {
-			return fmt.Errorf("could not update validators on initialization: %w", err)
+			return fmt.Errorf("could not update validators: %w", err)
 		}
+		vm.ctx.Log.Debug("initialized validators with accepted black (hash: %x)", acceptedID)
 	}
 
 	// check and possibly rebuild height index
@@ -380,11 +379,6 @@ func (vm *VM) repairAcceptedChain() error {
 		lastAcceptedID = lastAccepted.Parent()
 		if err := vm.State.SetLastAccepted(lastAcceptedID); err != nil {
 			return err
-		}
-		if vm.isValidatorBridge() {
-			if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
-				return fmt.Errorf("could not update validators: %w", err)
-			}
 		}
 
 		// If the indexer checkpoint was previously pointing to the last
