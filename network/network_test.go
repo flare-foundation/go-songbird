@@ -9,12 +9,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"math"
 	"net"
 	"sync"
 	"testing"
 	"time"
-
-	"math"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -349,7 +348,7 @@ func TestNewDefaultNetwork(t *testing.T) {
 	}
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id, 0)
+	_ = vdrs.AddWeight(id, math.MaxUint64)
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -429,8 +428,8 @@ func TestEstablishConnection(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 
 	var (
@@ -568,8 +567,8 @@ func TestDoubleTrack(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 
 	var (
@@ -708,8 +707,8 @@ func TestDoubleClose(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
 
 	beacons := validators.NewSet()
 
@@ -854,8 +853,8 @@ func TestTrackConnected(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 
 	var (
@@ -995,8 +994,8 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
 	beacons := validators.NewSet()
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -1171,9 +1170,9 @@ func TestPeerAliasesTicker(t *testing.T) {
 	}
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
-	vdrs.AddWeight(id2, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id2, 1)
 
 	beacons := validators.NewSet()
 
@@ -1466,9 +1465,9 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
-	vdrs.AddWeight(id2, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id2, 1)
 	beacons := validators.NewSet()
 
 	listener0 := &testListener{
@@ -1915,7 +1914,7 @@ func TestPeerSignature(t *testing.T) {
 	caller1.outbounds[ip2.IP().String()] = listener2
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id2, math.MaxUint64)
+	_ = vdrs.AddWeight(id2, math.MaxUint64) // id2 is a validator
 	beacons := validators.NewSet()
 
 	allPeers := ids.ShortSet{}
@@ -2343,8 +2342,8 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id1, 1)
-	vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
 
 	beacons := validators.NewSet()
 
@@ -2486,8 +2485,8 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller1.outbounds[ip0.IP().String()] = listener0
 
 	vdrs := validators.NewSet()
-	vdrs.AddWeight(id0, 1)
-	vdrs.AddWeight(id1, 1)
+	_ = vdrs.AddWeight(id0, 1)
+	_ = vdrs.AddWeight(id1, 1)
 
 	beacons := validators.NewSet()
 
@@ -2662,6 +2661,7 @@ func TestPeerGossip(t *testing.T) {
 	caller1.outbounds[ip2.IP().String()] = listener2
 
 	vdrs := validators.NewSet()
+	_ = vdrs.AddWeight(id2, math.MaxUint64) // id2 is a validator
 	beacons := validators.NewSet()
 
 	allPeers := ids.ShortSet{}
@@ -2897,7 +2897,7 @@ func TestAppGossip(t *testing.T) {
 	caller1.outbounds[ip2.IP().String()] = listener2
 
 	vdrs := validators.NewSet()
-
+	_ = vdrs.AddWeight(id2, math.MaxUint64) // id2 is a validator
 	beacons := validators.NewSet()
 
 	allPeers := ids.ShortSet{}
@@ -3093,7 +3093,7 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 	targetNetwork.peers.add(peerToAdd)
 
 	if isValidator {
-		targetNetwork.config.Validators.AddWeight(peerToAdd.nodeID, 10)
+		_ = targetNetwork.config.Validators.AddWeight(peerToAdd.nodeID, 10)
 	}
 }
 

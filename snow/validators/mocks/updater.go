@@ -1,13 +1,13 @@
-package validators
+package mocks
 
 import (
 	"github.com/flare-foundation/flare/ids"
 )
 
-type UpdaterMock struct {
+type Updater struct {
 	UpdateValidatorsFunc func(blockID ids.ID) error
 }
 
-func (m *UpdaterMock) UpdateValidators(blockID ids.ID) error {
+func (m *Updater) UpdateValidators(blockID ids.ID) error {
 	return m.UpdateValidatorsFunc(blockID)
 }

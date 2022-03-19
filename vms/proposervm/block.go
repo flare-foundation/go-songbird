@@ -82,6 +82,9 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 	}
 
 	childPChainHeight := child.PChainHeight()
+	if childPChainHeight < parentPChainHeight {
+		return errPChainHeightNotMonotonic
+	}
 
 	expectedInnerParentID := p.innerBlk.ID()
 	innerParentID := child.innerBlk.Parent()

@@ -21,6 +21,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validators/mocks"
 	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
@@ -57,7 +58,7 @@ func initTestProposerVM(
 	minPChainHeight uint64,
 ) (
 	*block.TestVM,
-	*validators.TestState,
+	*mocks.TestState,
 	*VM,
 	*snowman.TestBlock,
 	manager.Manager,
@@ -104,7 +105,7 @@ func initTestProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, minPChainHeight, false)
 
-	valState := &validators.TestState{
+	valState := &mocks.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
@@ -117,17 +118,17 @@ func initTestProposerVM(
 		return res, nil
 	}
 
-	vmState := &validators.VMStateMock{
+	vmState := &mocks.VMState{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.UpdaterMock{
+	updater := &mocks.Updater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.RetrieverMock{
+	retriever := &mocks.Retriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(proVM.ctx.NodeID, 10)
@@ -863,7 +864,7 @@ func TestExpiredBuildBlock(t *testing.T) {
 
 	proVM := New(coreVM, time.Time{}, 0, false)
 
-	valState := &validators.TestState{
+	valState := &mocks.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
@@ -873,17 +874,17 @@ func TestExpiredBuildBlock(t *testing.T) {
 		}, nil
 	}
 
-	vmState := &validators.VMStateMock{
+	vmState := &mocks.VMState{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.UpdaterMock{
+	updater := &mocks.Updater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.RetrieverMock{
+	retriever := &mocks.Retriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(ids.ShortID{1}, 100)
@@ -1158,7 +1159,7 @@ func TestInnerVMRollback(t *testing.T) {
 		BytesV:     []byte{0},
 	}
 
-	valState := &validators.TestState{
+	valState := &mocks.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
@@ -1168,17 +1169,17 @@ func TestInnerVMRollback(t *testing.T) {
 		}, nil
 	}
 
-	vmState := &validators.VMStateMock{
+	vmState := &mocks.VMState{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.UpdaterMock{
+	updater := &mocks.Updater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.RetrieverMock{
+	retriever := &mocks.Retriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(ids.ShortID{1}, 100)

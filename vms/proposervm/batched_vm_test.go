@@ -20,6 +20,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validators/mocks"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/version"
@@ -878,7 +879,7 @@ func initTestRemoteProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, 0, false)
 
-	valState := &validators.TestState{
+	valState := &mocks.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
@@ -890,17 +891,17 @@ func initTestRemoteProposerVM(
 		res[ids.ShortID{3}] = uint64(7)
 		return res, nil
 	}
-	vmState := &validators.VMStateMock{
+	vmState := &mocks.VMState{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.UpdaterMock{
+	updater := &mocks.Updater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.RetrieverMock{
+	retriever := &mocks.Retriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(ids.ShortID{11}, 3)
