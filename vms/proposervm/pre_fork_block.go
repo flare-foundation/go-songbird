@@ -32,7 +32,7 @@ func (b *preForkBlock) Accept() error {
 		return err
 	}
 
-	b.vm.ctx.Log.Debug("updated validators to pre-fork block (hash: %x)", innerID)
+	b.vm.ctx.Log.Debug("updated validators to pre-fork block (hash: %s)", innerID.Hex())
 
 	return nil
 }

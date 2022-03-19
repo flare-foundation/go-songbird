@@ -53,7 +53,7 @@ func (b *postForkOption) Accept() error {
 		return err
 	}
 
-	b.vm.ctx.Log.Debug("updated validators to post-fork option (hash: %x)", innerID)
+	b.vm.ctx.Log.Debug("updated validators to post-fork option (hash: %s)", innerID.Hex())
 
 	return nil
 }
