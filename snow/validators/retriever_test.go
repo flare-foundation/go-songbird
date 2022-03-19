@@ -13,6 +13,9 @@ type testRetriever struct {
 	m map[ids.ID]Set
 }
 
+var Counter = 0
+var GetValidatorsCallCounter = 0
+
 func NewTestRetriever() *testRetriever {
 	return &testRetriever{
 		m: make(map[ids.ID]Set),
@@ -20,14 +23,18 @@ func NewTestRetriever() *testRetriever {
 }
 
 func (c *testRetriever) GetValidators(blockID ids.ID) (Set, error) {
-	if s, ok := c.m[blockID]; ok {
+	GetValidatorsCallCounter++
+	Counter = 0
+	if s, ok := c.m[blockID]; ok { //todo have a counter here
 		return s, nil
 	}
+	Counter++
 	c.m[blockID] = NewDefaultSet(constants.CostonID)
-	return NewDefaultSet(constants.CostonID), nil
+	return c.m[blockID], nil
 }
 
 func TestCachingRetriever_GetValidators(t *testing.T) {
+	GetValidatorsCallCounter = 0
 	testBlockID := ids.ID{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -46,8 +53,17 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 	set, err := cr.GetValidators(testBlockID)
 	assert.NoError(t, err)
 	assert.Equal(t, uint64(1000000), set.Weight())
+	assert.Equal(t, Counter, 1)
+	assert.Equal(t, GetValidatorsCallCounter, 1)
+
+	set, err = cr.GetValidators(testBlockID)
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(1000000), set.Weight())
+	//assert.Equal(t, Counter, 0)
+	assert.Equal(t, GetValidatorsCallCounter, 1)
 
 	//set, err = cr.GetValidators(testBlockIDNonExistent)
-	//assert.Error(t, err)
+	//assert.NoError(t, err)
 	//assert.Equal(t, NewSet(), set)
+	//assert.Equal(t, Counter, 0)
 }
