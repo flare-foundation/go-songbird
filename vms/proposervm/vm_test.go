@@ -123,15 +123,13 @@ func initTestProposerVM(
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.TestUpdater{
-		T: t,
+	updater := &validators.UpdaterMock{
 		UpdateValidatorsF: func(blockID ids.ID) error {
-			return nil // todo implement it
+			return nil
 		},
 	}
-	retriever := &validators.TestRetriever{
-		T: t,
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(proVM.ctx.NodeID, 10)
 			s.AddWeight(ids.ShortID{1}, 5)
@@ -882,15 +880,13 @@ func TestExpiredBuildBlock(t *testing.T) {
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.TestUpdater{
-		T: t,
+	updater := &validators.UpdaterMock{
 		UpdateValidatorsF: func(blockID ids.ID) error {
-			return nil // todo implement it
+			return nil
 		},
 	}
-	retriever := &validators.TestRetriever{
-		T: t,
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
@@ -1180,15 +1176,13 @@ func TestInnerVMRollback(t *testing.T) {
 			return defaultPChainHeight, nil
 		},
 	}
-	updater := &validators.TestUpdater{
-		T: t,
+	updater := &validators.UpdaterMock{
 		UpdateValidatorsF: func(blockID ids.ID) error {
-			return nil // todo implement it
+			return nil
 		},
 	}
-	retriever := &validators.TestRetriever{
-		T: t,
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil

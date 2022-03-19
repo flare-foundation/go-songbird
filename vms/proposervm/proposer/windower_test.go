@@ -23,8 +23,8 @@ func TestWindowerNoValidators(t *testing.T) {
 
 	noValidators := validators.NewSet()
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			return noValidators, nil
 		},
 	}
@@ -43,8 +43,8 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 	validatorID := ids.GenerateTestShortID()
 	nonValidatorID := ids.GenerateTestShortID()
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			s.AddWeight(validatorID, 10)
 			return s, nil
@@ -71,8 +71,8 @@ func TestWindowerChangeByHeight(t *testing.T) {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			for _, id := range validatorIDs {
 				s.AddWeight(id, 1)
@@ -129,8 +129,8 @@ func TestWindowerChangeByChain(t *testing.T) {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDF: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validators.RetrieverMock{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			for _, id := range validatorIDs {
 				s.AddWeight(id, 1)
