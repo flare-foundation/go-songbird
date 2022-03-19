@@ -162,7 +162,8 @@ func (vm *VM) Initialize(
 		if err != nil {
 			return fmt.Errorf("could not update validators: %w", err)
 		}
-		vm.ctx.Log.Debug("initialized validators with accepted black (hash: %x)", acceptedID)
+
+		vm.ctx.Log.Debug("initialized validators with accepted block (hash: %x)", acceptedID)
 	}
 
 	// check and possibly rebuild height index

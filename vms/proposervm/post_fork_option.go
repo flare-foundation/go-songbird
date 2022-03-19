@@ -47,7 +47,7 @@ func (b *postForkOption) Accept() error {
 		return err
 	}
 
-	b.vm.ctx.Log.Debug("updated validators to accepted block (hash: %x)", innerID)
+	b.vm.ctx.Log.Debug("updated validators to post-fork option (hash: %x)", innerID)
 
 	// mark the inner block as accepted and all conflicting inner blocks as
 	// rejected
