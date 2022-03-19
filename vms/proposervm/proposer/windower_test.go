@@ -13,7 +13,6 @@ import (
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
-	"github.com/flare-foundation/flare/snow/validators/mocks"
 )
 
 func TestWindowerNoValidators(t *testing.T) {
@@ -24,7 +23,7 @@ func TestWindowerNoValidators(t *testing.T) {
 
 	noValidators := validators.NewSet()
 
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			return noValidators, nil
 		},
@@ -44,7 +43,7 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 	validatorID := ids.GenerateTestShortID()
 	nonValidatorID := ids.GenerateTestShortID()
 
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			_ = s.AddWeight(validatorID, 10)
@@ -72,7 +71,7 @@ func TestWindowerChangeByHeight(t *testing.T) {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			for _, id := range validatorIDs {
@@ -130,7 +129,7 @@ func TestWindowerChangeByChain(t *testing.T) {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
 			for _, id := range validatorIDs {

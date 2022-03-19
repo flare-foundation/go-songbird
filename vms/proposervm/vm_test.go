@@ -21,7 +21,6 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/validators"
-	"github.com/flare-foundation/flare/snow/validators/mocks"
 	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
@@ -58,7 +57,9 @@ func initTestProposerVM(
 	minPChainHeight uint64,
 ) (
 	*block.TestVM,
-	*mocks.TestState,
+	*validators.TestState,
+	*validators.TestRetriever,
+	*validators.TestUpdater,
 	*VM,
 	*snowman.TestBlock,
 	manager.Manager,
@@ -105,38 +106,24 @@ func initTestProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, minPChainHeight, false)
 
-	valState := &mocks.TestState{
+	valState := &validators.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-		res := make(map[ids.ShortID]uint64)
-		res[proVM.ctx.NodeID] = uint64(10)
-		res[ids.ShortID{1}] = uint64(5)
-		res[ids.ShortID{2}] = uint64(6)
-		res[ids.ShortID{3}] = uint64(7)
-		return res, nil
-	}
 
-	vmState := &mocks.VMState{
-		GetCurrentHeightF: func() (uint64, error) {
-			return defaultPChainHeight, nil
-		},
-	}
-	updater := &mocks.Updater{
-		UpdateValidatorsFunc: func(blockID ids.ID) error {
-			return nil
-		},
-	}
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(proVM.ctx.NodeID, 10)
-			s.AddWeight(ids.ShortID{1}, 5)
-			s.AddWeight(ids.ShortID{2}, 6)
-			s.AddWeight(ids.ShortID{3}, 7)
-
+			_ = s.AddWeight(proVM.ctx.NodeID, 10)
+			_ = s.AddWeight(ids.ShortID{1}, 5)
+			_ = s.AddWeight(ids.ShortID{2}, 6)
+			_ = s.AddWeight(ids.ShortID{3}, 7)
 			return s, nil
+		},
+	}
+	updater := &validators.TestUpdater{
+		UpdateValidatorsFunc: func(blockID ids.ID) error {
+			return nil
 		},
 	}
 
@@ -144,7 +131,7 @@ func initTestProposerVM(
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.PlatformVMState = vmState
+	ctx.PlatformVMState = valState
 	ctx.ValidatorsUpdater = updater
 	ctx.ValidatorsRetriever = retriever
 
@@ -166,14 +153,14 @@ func initTestProposerVM(
 		t.Fatal(err)
 	}
 
-	return coreVM, valState, proVM, coreGenBlk, dummyDBManager
+	return coreVM, valState, retriever, updater, proVM, coreGenBlk, dummyDBManager
 }
 
 // VM.BuildBlock tests section
 
 func TestBuildBlockTimestampAreRoundedToSeconds(t *testing.T) {
 	// given the same core block, BuildBlock returns the same proposer block
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 	skewedTimestamp := time.Now().Truncate(time.Second).Add(time.Millisecond)
 	proVM.Set(skewedTimestamp)
 
@@ -202,7 +189,7 @@ func TestBuildBlockTimestampAreRoundedToSeconds(t *testing.T) {
 
 func TestBuildBlockIsIdempotent(t *testing.T) {
 	// given the same core block, BuildBlock returns the same proposer block
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	coreBlk := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -234,7 +221,7 @@ func TestBuildBlockIsIdempotent(t *testing.T) {
 
 func TestFirstProposerBlockIsBuiltOnTopOfGenesis(t *testing.T) {
 	// setup
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	coreBlk := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -267,7 +254,7 @@ func TestFirstProposerBlockIsBuiltOnTopOfGenesis(t *testing.T) {
 
 // both core blocks and pro blocks must be built on preferred
 func TestProposerBlocksAreBuiltOnPreferredProBlock(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	// add two proBlks...
 	coreBlk1 := &snowman.TestBlock{
@@ -366,7 +353,7 @@ func TestProposerBlocksAreBuiltOnPreferredProBlock(t *testing.T) {
 }
 
 func TestCoreBlocksMustBeBuiltOnPreferredCoreBlock(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	coreBlk1 := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -464,7 +451,7 @@ func TestCoreBlocksMustBeBuiltOnPreferredCoreBlock(t *testing.T) {
 
 // VM.ParseBlock tests section
 func TestCoreBlockFailureCauseProposerBlockParseFailure(t *testing.T) {
-	coreVM, _, proVM, _, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, _, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	innerBlk := &snowman.TestBlock{
 		BytesV:     []byte{1},
@@ -502,7 +489,7 @@ func TestCoreBlockFailureCauseProposerBlockParseFailure(t *testing.T) {
 }
 
 func TestTwoProBlocksWrappingSameCoreBlockCanBeParsed(t *testing.T) {
-	coreVM, _, proVM, gencoreBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, gencoreBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	// create two Proposer blocks at the same height
 	innerBlk := &snowman.TestBlock{
@@ -584,7 +571,7 @@ func TestTwoProBlocksWrappingSameCoreBlockCanBeParsed(t *testing.T) {
 
 // VM.BuildBlock and VM.ParseBlock interoperability tests section
 func TestTwoProBlocksWithSameParentCanBothVerify(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
 	// one block is built from this proVM
 	localcoreBlk := &snowman.TestBlock{
@@ -657,7 +644,7 @@ func TestTwoProBlocksWithSameParentCanBothVerify(t *testing.T) {
 
 // Pre Fork tests section
 func TestPreFork_Initialize(t *testing.T) {
-	_, _, proVM, coreGenBlk, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
+	_, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
 
 	// checks
 	blkID, err := proVM.LastAccepted()
@@ -680,7 +667,7 @@ func TestPreFork_Initialize(t *testing.T) {
 
 func TestPreFork_BuildBlock(t *testing.T) {
 	// setup
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
 
 	coreBlk := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -722,7 +709,7 @@ func TestPreFork_BuildBlock(t *testing.T) {
 
 func TestPreFork_ParseBlock(t *testing.T) {
 	// setup
-	coreVM, _, proVM, _, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
+	coreVM, _, _, _, proVM, _, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
 
 	coreBlk := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -768,7 +755,7 @@ func TestPreFork_ParseBlock(t *testing.T) {
 }
 
 func TestPreFork_SetPreference(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, mockable.MaxTime, 0) // disable ProBlks
 
 	coreBlk0 := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -864,30 +851,20 @@ func TestExpiredBuildBlock(t *testing.T) {
 
 	proVM := New(coreVM, time.Time{}, 0, false)
 
-	valState := &mocks.TestState{
+	valState := &validators.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-		return map[ids.ShortID]uint64{
-			{1}: 100,
-		}, nil
-	}
 
-	vmState := &mocks.VMState{
-		GetCurrentHeightF: func() (uint64, error) {
-			return defaultPChainHeight, nil
-		},
-	}
-	updater := &mocks.Updater{
+	updater := &validators.TestUpdater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{1}, 100)
+			_ = s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
 		},
 	}
@@ -896,7 +873,7 @@ func TestExpiredBuildBlock(t *testing.T) {
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.PlatformVMState = vmState
+	ctx.PlatformVMState = valState
 	ctx.ValidatorsUpdater = updater
 	ctx.ValidatorsRetriever = retriever
 
@@ -1038,7 +1015,7 @@ func (b *wrappedBlock) Verify() error {
 }
 
 func TestInnerBlockDeduplication(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // disable ProBlks
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // disable ProBlks
 
 	coreBlk := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -1159,30 +1136,20 @@ func TestInnerVMRollback(t *testing.T) {
 		BytesV:     []byte{0},
 	}
 
-	valState := &mocks.TestState{
+	valState := &validators.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-		return map[ids.ShortID]uint64{
-			{1}: 100,
-		}, nil
-	}
 
-	vmState := &mocks.VMState{
-		GetCurrentHeightF: func() (uint64, error) {
-			return defaultPChainHeight, nil
-		},
-	}
-	updater := &mocks.Updater{
+	updater := &validators.TestUpdater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &mocks.Retriever{
+	retriever := &validators.TestRetriever{
 		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
 			s := validators.NewSet()
-			s.AddWeight(ids.ShortID{1}, 100)
+			_ = s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
 		},
 	}
@@ -1212,7 +1179,7 @@ func TestInnerVMRollback(t *testing.T) {
 	ctx.NodeID = hashing.ComputeHash160Array(hashing.ComputeHash256(pTestCert.Leaf.Raw))
 	ctx.StakingCertLeaf = pTestCert.Leaf
 	ctx.StakingLeafSigner = pTestCert.PrivateKey.(crypto.Signer)
-	ctx.PlatformVMState = vmState
+	ctx.PlatformVMState = valState
 	ctx.ValidatorsUpdater = updater
 	ctx.ValidatorsRetriever = retriever
 
@@ -1339,12 +1306,12 @@ func TestInnerVMRollback(t *testing.T) {
 }
 
 func TestBuildBlockDuringWindow(t *testing.T) {
-	coreVM, valState, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
+	coreVM, _, retrieve, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-		return map[ids.ShortID]uint64{
-			proVM.ctx.NodeID: 10,
-		}, nil
+	retrieve.GetValidatorsByBlockIDFunc = func(blockID ids.ID) (validators.Set, error) {
+		s := validators.NewSet()
+		_ = s.AddWeight(proVM.ctx.NodeID, 10)
+		return s, nil
 	}
 
 	coreBlk0 := &snowman.TestBlock{
@@ -1452,7 +1419,7 @@ func TestBuildBlockDuringWindow(t *testing.T) {
 //        C(Z)
 func TestTwoForks_OneIsAccepted(t *testing.T) {
 	forkTime := time.Unix(0, 0)
-	coreVM, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
+	coreVM, _, _, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
 
 	// create pre-fork block X and post-fork block A
 	xBlock := &snowman.TestBlock{
@@ -1566,7 +1533,7 @@ func TestTwoForks_OneIsAccepted(t *testing.T) {
 
 func TestTooFarAdvanced(t *testing.T) {
 	forkTime := time.Unix(0, 0)
-	coreVM, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
+	coreVM, _, _, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
 
 	xBlock := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -1658,7 +1625,7 @@ func TestTooFarAdvanced(t *testing.T) {
 // B(...) is B(X.opts[0])
 // B(...) is C(X.opts[1])
 func TestTwoOptions_OneIsAccepted(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 	proVM.Set(coreGenBlk.Timestamp())
 
 	xBlockID := ids.GenerateTestID()
@@ -1750,7 +1717,7 @@ func TestTwoOptions_OneIsAccepted(t *testing.T) {
 func TestLaggedPChainHeight(t *testing.T) {
 	assert := assert.New(t)
 
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 	proVM.Set(coreGenBlk.Timestamp())
 
 	innerBlock := &snowman.TestBlock{
