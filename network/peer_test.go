@@ -14,7 +14,6 @@ import (
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
-	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
@@ -74,9 +73,8 @@ func TestPeer_Close(t *testing.T) {
 		outbounds: make(map[string]*testListener),
 	}
 
-	vdrs := validators.NewManager(constants.LocalID,
-		validators.WithValidator(id, math.MaxUint64),
-	)
+	vdrs := validators.NewSet()
+	vdrs.AddWeight(id, math.MaxUint64)
 	beacons := validators.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
