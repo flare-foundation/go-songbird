@@ -18,19 +18,20 @@ import (
 func TestWindowerNoValidators(t *testing.T) {
 	assert := assert.New(t)
 
-	subnetID := ids.GenerateTestID()
 	chainID := ids.GenerateTestID()
 	nodeID := ids.GenerateTestShortID()
-	vdrState := &validators.TestState{
-		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-			return nil, nil
+
+	noValidators := validators.NewSet()
+
+	retriever := &validators.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
+			return noValidators, nil
 		},
 	}
 
-	w := New(vdrState, subnetID, chainID)
+	w := New(retriever, chainID)
 
-	delay, err := w.Delay(1, 0, nodeID)
+	delay, err := w.Delay(1, ids.ID{}, nodeID)
 	assert.NoError(err)
 	assert.EqualValues(0, delay)
 }
@@ -38,26 +39,25 @@ func TestWindowerNoValidators(t *testing.T) {
 func TestWindowerRepeatedValidator(t *testing.T) {
 	assert := assert.New(t)
 
-	subnetID := ids.GenerateTestID()
 	chainID := ids.GenerateTestID()
 	validatorID := ids.GenerateTestShortID()
 	nonValidatorID := ids.GenerateTestShortID()
-	vdrState := &validators.TestState{
-		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-			return map[ids.ShortID]uint64{
-				validatorID: 10,
-			}, nil
+
+	retriever := &validators.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
+			s := validators.NewSet()
+			_ = s.AddWeight(validatorID, 10)
+			return s, nil
 		},
 	}
 
-	w := New(vdrState, subnetID, chainID)
+	w := New(retriever, chainID)
 
-	validatorDelay, err := w.Delay(1, 0, validatorID)
+	validatorDelay, err := w.Delay(1, ids.ID{}, validatorID)
 	assert.NoError(err)
 	assert.EqualValues(0, validatorDelay)
 
-	nonValidatorDelay, err := w.Delay(1, 0, nonValidatorID)
+	nonValidatorDelay, err := w.Delay(1, ids.ID{}, nonValidatorID)
 	assert.NoError(err)
 	assert.EqualValues(MaxDelay, nonValidatorDelay)
 }
@@ -65,24 +65,23 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 func TestWindowerChangeByHeight(t *testing.T) {
 	assert := assert.New(t)
 
-	subnetID := ids.ID{0, 1}
 	chainID := ids.ID{0, 2}
 	validatorIDs := make([]ids.ShortID, MaxWindows)
 	for i := range validatorIDs {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
-	vdrState := &validators.TestState{
-		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-			validators := make(map[ids.ShortID]uint64, MaxWindows)
+
+	retriever := &validators.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
+			s := validators.NewSet()
 			for _, id := range validatorIDs {
-				validators[id] = 1
+				_ = s.AddWeight(id, 1)
 			}
-			return validators, nil
+			return s, nil
 		},
 	}
 
-	w := New(vdrState, subnetID, chainID)
+	w := New(retriever, chainID)
 
 	expectedDelays1 := []time.Duration{
 		2 * WindowDuration,
@@ -95,7 +94,7 @@ func TestWindowerChangeByHeight(t *testing.T) {
 	for i, expectedDelay := range expectedDelays1 {
 		vdrID := validatorIDs[i]
 		fmt.Println(vdrID)
-		validatorDelay, err := w.Delay(1, 0, vdrID)
+		validatorDelay, err := w.Delay(1, ids.ID{}, vdrID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}
@@ -110,7 +109,7 @@ func TestWindowerChangeByHeight(t *testing.T) {
 	}
 	for i, expectedDelay := range expectedDelays2 {
 		vdrID := validatorIDs[i]
-		validatorDelay, err := w.Delay(2, 0, vdrID)
+		validatorDelay, err := w.Delay(2, ids.ID{}, vdrID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}
@@ -118,8 +117,6 @@ func TestWindowerChangeByHeight(t *testing.T) {
 
 func TestWindowerChangeByChain(t *testing.T) {
 	assert := assert.New(t)
-
-	subnetID := ids.ID{0, 1}
 
 	rand.Seed(0)
 	chainID0 := ids.ID{}
@@ -131,19 +128,19 @@ func TestWindowerChangeByChain(t *testing.T) {
 	for i := range validatorIDs {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
-	vdrState := &validators.TestState{
-		T: t,
-		GetValidatorSetF: func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-			validators := make(map[ids.ShortID]uint64, MaxWindows)
+
+	retriever := &validators.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
+			s := validators.NewSet()
 			for _, id := range validatorIDs {
-				validators[id] = 1
+				_ = s.AddWeight(id, 1)
 			}
-			return validators, nil
+			return s, nil
 		},
 	}
 
-	w0 := New(vdrState, subnetID, chainID0)
-	w1 := New(vdrState, subnetID, chainID1)
+	w0 := New(retriever, chainID0)
+	w1 := New(retriever, chainID1)
 
 	expectedDelays0 := []time.Duration{
 		5 * WindowDuration,
@@ -155,7 +152,7 @@ func TestWindowerChangeByChain(t *testing.T) {
 	}
 	for i, expectedDelay := range expectedDelays0 {
 		vdrID := validatorIDs[i]
-		validatorDelay, err := w0.Delay(1, 0, vdrID)
+		validatorDelay, err := w0.Delay(1, ids.ID{}, vdrID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}
@@ -170,7 +167,7 @@ func TestWindowerChangeByChain(t *testing.T) {
 	}
 	for i, expectedDelay := range expectedDelays1 {
 		vdrID := validatorIDs[i]
-		validatorDelay, err := w1.Delay(1, 0, vdrID)
+		validatorDelay, err := w1.Delay(1, ids.ID{}, vdrID)
 		assert.NoError(err)
 		assert.EqualValues(expectedDelay, validatorDelay)
 	}

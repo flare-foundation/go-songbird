@@ -13,6 +13,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/vms/proposervm/block"
 	"github.com/flare-foundation/flare/vms/proposervm/proposer"
 )
@@ -27,7 +28,7 @@ import (
 //     Y
 func TestInvalidByzantineProposerParent(t *testing.T) {
 	forkTime := time.Unix(0, 0) // enable ProBlks
-	coreVM, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
+	coreVM, _, _, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
 
 	xBlock := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -96,7 +97,7 @@ func TestInvalidByzantineProposerParent(t *testing.T) {
 //    / \
 //   Y   Z
 func TestInvalidByzantineProposerOracleParent(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 	proVM.Set(coreGenBlk.Timestamp())
 
 	xBlockID := ids.GenerateTestID()
@@ -215,7 +216,7 @@ func TestInvalidByzantineProposerOracleParent(t *testing.T) {
 // B - Y
 func TestInvalidByzantineProposerPreForkParent(t *testing.T) {
 	forkTime := time.Unix(0, 0) // enable ProBlks
-	coreVM, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
+	coreVM, _, _, _, proVM, gBlock, _ := initTestProposerVM(t, forkTime, 0)
 
 	xBlock := &snowman.TestBlock{
 		TestDecidable: choices.TestDecidable{
@@ -317,7 +318,7 @@ func TestInvalidByzantineProposerPreForkParent(t *testing.T) {
 // |     /
 // B - Y
 func TestBlockVerify_PostForkOption_FaultyParent(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 	proVM.Set(coreGenBlk.Timestamp())
 
 	xBlock := &TestOptionsBlock{
@@ -419,7 +420,7 @@ func TestBlockVerify_PostForkOption_FaultyParent(t *testing.T) {
 // O2.parent = A (original), O2.inner = first option of X (valid)
 // O3.parent = C (Oracle), O3.inner = first option of X (invalid parent)
 func TestBlockVerify_InvalidPostForkOption(t *testing.T) {
-	coreVM, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, _, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 	proVM.Set(coreGenBlk.Timestamp())
 
 	// create an Oracle pre-fork block X
@@ -621,13 +622,13 @@ func TestBlockVerify_InvalidPostForkOption(t *testing.T) {
 }
 
 func TestGetBlock_MutatedSignature(t *testing.T) {
-	coreVM, valState, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
+	coreVM, _, retrieve, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 
 	// Make sure that we will be sampled to perform the proposals.
-	valState.GetValidatorSetF = func(height uint64, subnetID ids.ID) (map[ids.ShortID]uint64, error) {
-		res := make(map[ids.ShortID]uint64)
-		res[proVM.ctx.NodeID] = uint64(10)
-		return res, nil
+	retrieve.GetValidatorsByBlockIDFunc = func(blockID ids.ID) (validators.Set, error) {
+		s := validators.NewSet()
+		_ = s.AddWeight(proVM.ctx.NodeID, 10)
+		return s, nil
 	}
 
 	proVM.Set(coreGenBlk.Timestamp())
