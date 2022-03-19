@@ -10,5 +10,4 @@ type RetrieverMock struct {
 
 func (m *RetrieverMock) GetValidatorsByBlockID(blockID ids.ID) (Set, error) {
 	return m.GetValidatorsByBlockIDFunc(blockID)
-
 }

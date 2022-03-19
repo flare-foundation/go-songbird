@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/math"
+	"math"
 
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -1465,7 +1465,6 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
-	//vdrs := validators.NewDefaultSet(constants.CostonID)
 	vdrs := validators.NewSet()
 	vdrs.AddWeight(id0, 1)
 	vdrs.AddWeight(id1, 1)
@@ -1915,7 +1914,6 @@ func TestPeerSignature(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	//vdrs := validators.NewDefaultSet(constants.CostonID)
 	vdrs := validators.NewSet()
 	vdrs.AddWeight(id2, math.MaxUint64)
 	beacons := validators.NewSet()

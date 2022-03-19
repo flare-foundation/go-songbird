@@ -5,10 +5,9 @@ import (
 )
 
 type UpdaterMock struct {
-	UpdateValidatorsF func(blockID ids.ID) error
+	UpdateValidatorsFunc func(blockID ids.ID) error
 }
 
 func (m *UpdaterMock) UpdateValidators(blockID ids.ID) error {
-	return m.UpdateValidatorsF(blockID)
-
+	return m.UpdateValidatorsFunc(blockID)
 }

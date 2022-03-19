@@ -117,14 +117,13 @@ func initTestProposerVM(
 		return res, nil
 	}
 
-	vmState := &validators.TestVMState{
-		T: t,
+	vmState := &validators.VMStateMock{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
 	updater := &validators.UpdaterMock{
-		UpdateValidatorsF: func(blockID ids.ID) error {
+		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
@@ -874,14 +873,13 @@ func TestExpiredBuildBlock(t *testing.T) {
 		}, nil
 	}
 
-	vmState := &validators.TestVMState{
-		T: t,
+	vmState := &validators.VMStateMock{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
 	updater := &validators.UpdaterMock{
-		UpdateValidatorsF: func(blockID ids.ID) error {
+		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
@@ -1170,14 +1168,13 @@ func TestInnerVMRollback(t *testing.T) {
 		}, nil
 	}
 
-	vmState := &validators.TestVMState{
-		T: t,
+	vmState := &validators.VMStateMock{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
 	updater := &validators.UpdaterMock{
-		UpdateValidatorsF: func(blockID ids.ID) error {
+		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}

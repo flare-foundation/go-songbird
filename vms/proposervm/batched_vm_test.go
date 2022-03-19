@@ -890,14 +890,13 @@ func initTestRemoteProposerVM(
 		res[ids.ShortID{3}] = uint64(7)
 		return res, nil
 	}
-	vmState := &validators.TestVMState{
-		T: t,
+	vmState := &validators.VMStateMock{
 		GetCurrentHeightF: func() (uint64, error) {
 			return defaultPChainHeight, nil
 		},
 	}
 	updater := &validators.UpdaterMock{
-		UpdateValidatorsF: func(blockID ids.ID) error {
+		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
