@@ -57,7 +57,6 @@ type VM struct {
 	hIndexer                indexer.HeightIndexer
 
 	proposer.Windower
-	validators.Updater
 	tree.Tree
 	scheduler.Scheduler
 	mockable.Clock
@@ -113,7 +112,6 @@ func (vm *VM) Initialize(
 	vm.db = versiondb.New(prefixDB)
 	vm.State = state.New(vm.db)
 	vm.Windower = proposer.New(ctx.ValidatorsRetriever, ctx.ChainID)
-	vm.Updater = ctx.ValidatorsUpdater
 	vm.Tree = tree.New()
 
 	indexerDB := versiondb.New(vm.db)
@@ -155,15 +153,17 @@ func (vm *VM) Initialize(
 		return err
 	}
 
-	if vm.isValidatorBridge() {
-		lastID, err := vm.LastAccepted()
+	if _, ok := vm.ChainVM.(validators.Retriever); ok {
+		acceptedID, err := vm.ChainVM.LastAccepted()
 		if err != nil {
-			return fmt.Errorf("could not get last accepted on initialization: %w", err)
+			return fmt.Errorf("could not get last accepted: %w", err)
 		}
-		err = vm.UpdateValidators(lastID)
+		err = vm.ctx.ValidatorsUpdater.UpdateValidators(acceptedID)
 		if err != nil {
-			return fmt.Errorf("could not update validators on initialization: %w", err)
+			return fmt.Errorf("could not update validators: %w", err)
 		}
+
+		vm.ctx.Log.Debug("initialized validators with accepted block (hash: %s)", acceptedID.Hex())
 	}
 
 	// check and possibly rebuild height index
@@ -381,11 +381,6 @@ func (vm *VM) repairAcceptedChain() error {
 		if err := vm.State.SetLastAccepted(lastAcceptedID); err != nil {
 			return err
 		}
-		if vm.isValidatorBridge() {
-			if err := vm.Updater.UpdateValidators(lastAcceptedID); err != nil {
-				return fmt.Errorf("could not update validators: %w", err)
-			}
-		}
 
 		// If the indexer checkpoint was previously pointing to the last
 		// accepted block, roll it back to the new last accepted block.
@@ -592,9 +587,4 @@ func (vm *VM) optimalPChainHeight(minPChainHeight uint64) (uint64, error) {
 	}
 	optimalHeight := currentPChainHeight - optimalHeightDelay
 	return math.Max64(optimalHeight, minPChainHeight), nil
-}
-
-func (vm *VM) isValidatorBridge() bool {
-	_, ok := vm.ChainVM.(validators.Retriever)
-	return ok
 }
