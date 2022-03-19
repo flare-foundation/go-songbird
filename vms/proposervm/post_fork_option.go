@@ -42,6 +42,12 @@ func (b *postForkOption) Accept() error {
 
 	delete(b.vm.verifiedBlocks, blkID)
 
+	// mark the inner block as accepted and all conflicting inner blocks as
+	// rejected
+	if err := b.vm.Tree.Accept(b.innerBlk); err != nil {
+		return err
+	}
+
 	innerID := b.innerBlk.ID()
 	if err := b.vm.ctx.ValidatorsUpdater.UpdateValidators(innerID); err != nil {
 		return err
@@ -49,9 +55,7 @@ func (b *postForkOption) Accept() error {
 
 	b.vm.ctx.Log.Debug("updated validators to post-fork option (hash: %x)", innerID)
 
-	// mark the inner block as accepted and all conflicting inner blocks as
-	// rejected
-	return b.vm.Tree.Accept(b.innerBlk)
+	return nil
 }
 
 func (b *postForkOption) Reject() error {
