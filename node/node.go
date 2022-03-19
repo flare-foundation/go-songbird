@@ -192,6 +192,12 @@ func (n *Node) initNetworking() error {
 	// Initialize empty validator set for now
 	n.validators = validators.NewSet()
 
+	// We add ourselves as validator with a weight of one here. This is a work-around
+	// for P-Chain bootstrapping issues with an empty validator set. Once we are past
+	// the P-Chain initialization, the C-Chain initialization will set the correct
+	// validator set, so the C-Chain will never run with this work-around anyway.
+	_ = n.validators.AddWeight(n.ID, 1)
+
 	// Configure benchlist
 	n.Config.BenchlistConfig.Validators = n.validators
 	n.Config.BenchlistConfig.Benchable = n.Config.ConsensusRouter
