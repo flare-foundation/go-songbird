@@ -9,10 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWindowerNoValidators(t *testing.T) {
