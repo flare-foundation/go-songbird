@@ -10,32 +10,7 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-type testRetriever struct {
-	m map[ids.ID]Set
-}
-
-var Counter = 0
-var GetValidatorsCallCounter = 0
-
-func NewTestRetriever() *testRetriever {
-	return &testRetriever{
-		m: make(map[ids.ID]Set),
-	}
-}
-
-func (c *testRetriever) GetValidators(blockID ids.ID) (Set, error) {
-	GetValidatorsCallCounter++
-	Counter = 0
-	if s, ok := c.m[blockID]; ok { //todo have a counter here
-		return s, nil
-	}
-	Counter++
-	c.m[blockID] = loadCostonValidators()
-	return c.m[blockID], nil
-}
-
 func TestCachingRetriever_GetValidators(t *testing.T) {
-	GetValidatorsCallCounter = 0
 	testBlockID := ids.ID{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -43,30 +18,54 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 		0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
 	}
 
-	//testBlockIDNonExistent := ids.ID{
-	//	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	//	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-	//	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	//	0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1E,
-	//}
+	t.Run("cache call count", func(t *testing.T) {
+		t.Parallel()
 
-	cr := NewCachingRetriever(NewTestRetriever())
-	set, err := cr.GetValidators(testBlockID)
-	assert.NoError(t, err)
-	assert.Equal(t, uint64(1000000), set.Weight())
-	assert.Equal(t, Counter, 1)
-	assert.Equal(t, GetValidatorsCallCounter, 1)
+		callsCount := 0
+		cacheCallCount := 0
+		validators := make(map[ids.ID]Set)
+		retrieverMock := &TestRetriever{
+			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
+				callsCount++
 
-	set, err = cr.GetValidators(testBlockID)
-	assert.NoError(t, err)
-	assert.Equal(t, uint64(1000000), set.Weight())
-	//assert.Equal(t, Counter, 0)
-	assert.Equal(t, GetValidatorsCallCounter, 1)
+				if set, ok := validators[blockID]; ok {
+					cacheCallCount++
+					return set, nil
+				}
+				validators[blockID] = loadCostonValidators()
+				return validators[blockID], nil
+			},
+		}
+		cr := NewCachingRetriever(retrieverMock)
+		set, err := cr.GetValidators(testBlockID)
+		assert.NoError(t, err)
+		assert.Equal(t, loadCostonValidators(), set)
+		assert.Equal(t, 1, callsCount)
+		assert.Equal(t, 0, cacheCallCount)
 
-	//set, err = cr.GetValidators(testBlockIDNonExistent)
-	//assert.NoError(t, err)
-	//assert.Equal(t, NewSet(), set)
-	//assert.Equal(t, Counter, 0)
+		set, err = cr.GetValidators(testBlockID)
+		assert.Equal(t, 1, callsCount)
+		assert.Equal(t, 0, cacheCallCount)
+		assert.Equal(t, uint64(1000000), set.Weight())
+
+	})
+
+	t.Run("error call", func(t *testing.T) {
+		validators := make(map[ids.ID]Set)
+		retrieverMock := &TestRetriever{
+			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
+				if blockID == testBlockID {
+					return nil, fmt.Errorf("Couldn't get validators")
+				}
+				validators[blockID] = loadCostonValidators()
+				return validators[blockID], nil
+			},
+		}
+		cr := NewCachingRetriever(retrieverMock)
+		_, err := cr.GetValidators(testBlockID)
+		assert.Error(t, err)
+
+	})
 }
 
 func loadCostonValidators() Set {
