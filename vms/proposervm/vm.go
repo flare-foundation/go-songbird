@@ -153,7 +153,7 @@ func (vm *VM) Initialize(
 		return err
 	}
 
-	if vm.isValidatorBridge() {
+	if _, ok := vm.ChainVM.(validators.Retriever); ok {
 		acceptedID, err := vm.ChainVM.LastAccepted()
 		if err != nil {
 			return fmt.Errorf("could not get last accepted: %w", err)
@@ -587,9 +587,4 @@ func (vm *VM) optimalPChainHeight(minPChainHeight uint64) (uint64, error) {
 	}
 	optimalHeight := currentPChainHeight - optimalHeightDelay
 	return math.Max64(optimalHeight, minPChainHeight), nil
-}
-
-func (vm *VM) isValidatorBridge() bool {
-	_, ok := vm.ChainVM.(validators.Retriever)
-	return ok
 }
