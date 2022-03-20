@@ -19,38 +19,43 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 		0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
 	}
 
-	t.Run("does not use cache when cache is not set", func(t *testing.T) {
+	t.Run("does not call underlying function if it exists in cache", func(t *testing.T) {
 		t.Parallel()
 
 		costonSet := loadCostonValidators(t)
 		callsCount := 0
-		cacheCallCount := 0
-		validators := make(map[ids.ID]Set)
 		retrieverMock := &TestRetriever{
 			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
 				callsCount++
-				assert.Equal(t, testBlockID, blockID)
-				if set, ok := validators[blockID]; ok {
-					cacheCallCount++
-					return set, nil
-				}
-				validators[blockID] = costonSet
-				return validators[blockID], nil
+				return costonSet, nil
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
+
 		set, err := cr.GetValidators(testBlockID)
 		require.NoError(t, err)
 		assert.Equal(t, costonSet, set)
 		assert.Equal(t, 1, callsCount)
-		assert.Equal(t, 0, cacheCallCount)
+		assert.Equal(t, uint64(1000000), set.Weight())
 
 		set, err = cr.GetValidators(testBlockID)
 		require.NoError(t, err)
 		assert.Equal(t, 1, callsCount)
-		assert.Equal(t, 0, cacheCallCount)
 		assert.Equal(t, uint64(1000000), set.Weight())
 
+	})
+
+	t.Run("Check expected blockID", func(t *testing.T) {
+		t.Parallel()
+		retrieverMock := &TestRetriever{
+			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
+				assert.Equal(t, testBlockID, blockID)
+				return nil, nil
+			},
+		}
+		cr := NewCachingRetriever(retrieverMock)
+		_, err := cr.GetValidators(testBlockID)
+		require.NoError(t, err)
 	})
 
 	t.Run("error call", func(t *testing.T) {
