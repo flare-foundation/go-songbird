@@ -115,6 +115,7 @@ func (b *postForkOption) buildChild() (Block, error) {
 		return nil, err
 	}
 	return b.postForkCommonComponents.buildChild(
+		b.innerBlk.Parent(),
 		b.ID(),
 		b.Timestamp(),
 		parentPChainHeight,

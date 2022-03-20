@@ -41,7 +41,7 @@ func (c *cachingRetriever) GetValidators(blockID ids.ID) (Set, error) {
 	}
 	set, err := c.retriever.GetValidators(blockID)
 	if err != nil {
-		return nil, fmt.Errorf("could not get validator set (block: %x): %w", blockID, err)
+		return nil, fmt.Errorf("could not get validator set (block: %s): %w", blockID.String(), err)
 	}
 	c.cache.Add(blockID, set)
 	return set, nil

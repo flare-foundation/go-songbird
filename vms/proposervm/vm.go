@@ -162,28 +162,6 @@ func (vm *VM) Initialize(
 		if err != nil {
 			return fmt.Errorf("could not update validators: %w", err)
 		}
-
-		block, err := vm.ChainVM.GetBlock(acceptedID)
-		if err != nil {
-			return fmt.Errorf("could not get accepted block: %w", err)
-		}
-		minDelay, err := vm.Windower.Delay(block.Height()+1, block.ID(), vm.ctx.NodeID)
-		if err != nil {
-			vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
-			// A nil error is returned here because it is possible that
-			// bootstrapping caused the last accepted block to move past the latest
-			// P-chain height. This will cause building blocks to return an error
-			// until the P-chain's height has advanced.
-			return nil
-		}
-		if minDelay < minBlockDelay {
-			minDelay = minBlockDelay
-		}
-
-		preferredTime := block.Timestamp()
-		nextStartTime := preferredTime.Add(minDelay)
-		vm.Scheduler.SetBuildBlockTime(nextStartTime)
-
 		vm.ctx.Log.Debug("initialized validators with accepted block (hash: %s)", acceptedID.Hex())
 	}
 
@@ -316,12 +294,13 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 		return vm.ChainVM.SetPreference(preferred)
 	}
 
-	if err := vm.ChainVM.SetPreference(blk.getInnerBlk().ID()); err != nil {
+	innerID := blk.getInnerBlk().ID()
+	if err := vm.ChainVM.SetPreference(innerID); err != nil {
 		return err
 	}
 
 	// reset scheduler
-	minDelay, err := vm.Windower.Delay(blk.Height()+1, preferred, vm.ctx.NodeID)
+	minDelay, err := vm.Windower.Delay(blk.Height()+1, innerID, vm.ctx.NodeID)
 	if err != nil {
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that
