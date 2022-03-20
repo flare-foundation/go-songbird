@@ -59,6 +59,7 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 	})
 
 	t.Run("error call", func(t *testing.T) {
+		t.Parallel()
 		retrieverMock := &TestRetriever{
 			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
 				return nil, fmt.Errorf("Couldn't get validators")
