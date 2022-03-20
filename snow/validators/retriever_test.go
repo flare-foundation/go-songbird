@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
@@ -18,32 +19,34 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 		0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
 	}
 
-	t.Run("cache call count", func(t *testing.T) {
+	t.Run("does not use cache when cache is not set", func(t *testing.T) {
 		t.Parallel()
 
+		costonSet := loadCostonValidators(t)
 		callsCount := 0
 		cacheCallCount := 0
 		validators := make(map[ids.ID]Set)
 		retrieverMock := &TestRetriever{
 			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
 				callsCount++
-
+				assert.Equal(t, testBlockID, blockID)
 				if set, ok := validators[blockID]; ok {
 					cacheCallCount++
 					return set, nil
 				}
-				validators[blockID] = loadCostonValidators()
+				validators[blockID] = costonSet
 				return validators[blockID], nil
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
 		set, err := cr.GetValidators(testBlockID)
-		assert.NoError(t, err)
-		assert.Equal(t, loadCostonValidators(), set)
+		require.NoError(t, err)
+		assert.Equal(t, costonSet, set)
 		assert.Equal(t, 1, callsCount)
 		assert.Equal(t, 0, cacheCallCount)
 
 		set, err = cr.GetValidators(testBlockID)
+		require.NoError(t, err)
 		assert.Equal(t, 1, callsCount)
 		assert.Equal(t, 0, cacheCallCount)
 		assert.Equal(t, uint64(1000000), set.Weight())
@@ -51,14 +54,9 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 	})
 
 	t.Run("error call", func(t *testing.T) {
-		validators := make(map[ids.ID]Set)
 		retrieverMock := &TestRetriever{
 			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
-				if blockID == testBlockID {
-					return nil, fmt.Errorf("Couldn't get validators")
-				}
-				validators[blockID] = loadCostonValidators()
-				return validators[blockID], nil
+				return nil, fmt.Errorf("Couldn't get validators")
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
@@ -68,7 +66,8 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 	})
 }
 
-func loadCostonValidators() Set {
+func loadCostonValidators(t *testing.T) Set {
+	t.Helper()
 	weight := uint64(200_000)
 	nodeIDs := []string{
 		"NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc",
@@ -81,11 +80,11 @@ func loadCostonValidators() Set {
 	for _, nodeID := range nodeIDs {
 		shortID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
 		if err != nil {
-			panic(fmt.Sprintf("invalid coston validator node ID: %s", nodeID))
+			require.NoError(t, err, fmt.Sprintf("invalid coston validator node ID: %s", nodeID))
 		}
 		err = set.AddWeight(shortID, weight)
 		if err != nil {
-			panic(fmt.Sprintf("could not add weight for validator (node: %s, weight: %d): %s", nodeID, weight, err))
+			require.NoError(t, err, fmt.Sprintf("could not add weight for validator (node: %s, weight: %d): %s", nodeID, weight, err))
 		}
 	}
 	return set
