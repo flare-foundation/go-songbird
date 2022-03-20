@@ -163,6 +163,27 @@ func (vm *VM) Initialize(
 			return fmt.Errorf("could not update validators: %w", err)
 		}
 
+		block, err := vm.ChainVM.GetBlock(acceptedID)
+		if err != nil {
+			return fmt.Errorf("could not get accepted block: %w", err)
+		}
+		minDelay, err := vm.Windower.Delay(block.Height()+1, block.ID(), vm.ctx.NodeID)
+		if err != nil {
+			vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
+			// A nil error is returned here because it is possible that
+			// bootstrapping caused the last accepted block to move past the latest
+			// P-chain height. This will cause building blocks to return an error
+			// until the P-chain's height has advanced.
+			return nil
+		}
+		if minDelay < minBlockDelay {
+			minDelay = minBlockDelay
+		}
+
+		preferredTime := block.Timestamp()
+		nextStartTime := preferredTime.Add(minDelay)
+		vm.Scheduler.SetBuildBlockTime(nextStartTime)
+
 		vm.ctx.Log.Debug("initialized validators with accepted block (hash: %s)", acceptedID.Hex())
 	}
 
