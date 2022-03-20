@@ -162,7 +162,6 @@ func (vm *VM) Initialize(
 		if err != nil {
 			return fmt.Errorf("could not update validators: %w", err)
 		}
-
 		vm.ctx.Log.Debug("initialized validators with accepted block (hash: %s)", acceptedID.Hex())
 	}
 
@@ -295,12 +294,13 @@ func (vm *VM) SetPreference(preferred ids.ID) error {
 		return vm.ChainVM.SetPreference(preferred)
 	}
 
-	if err := vm.ChainVM.SetPreference(blk.getInnerBlk().ID()); err != nil {
+	innerID := blk.getInnerBlk().ID()
+	if err := vm.ChainVM.SetPreference(innerID); err != nil {
 		return err
 	}
 
 	// reset scheduler
-	minDelay, err := vm.Windower.Delay(blk.Height()+1, preferred, vm.ctx.NodeID)
+	minDelay, err := vm.Windower.Delay(blk.Height()+1, innerID, vm.ctx.NodeID)
 	if err != nil {
 		vm.ctx.Log.Debug("failed to fetch the expected delay due to: %s", err)
 		// A nil error is returned here because it is possible that

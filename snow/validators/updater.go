@@ -29,7 +29,7 @@ type updater struct {
 func (u *updater) UpdateValidators(blockID ids.ID) error {
 	validators, err := u.retriever.GetValidators(blockID)
 	if err != nil {
-		return fmt.Errorf("could not get validators (block: %x): %w", blockID, err)
+		return fmt.Errorf("could not get validators for updating: %w", err)
 	}
 	err = u.validators.Set(validators.List())
 	if err != nil {

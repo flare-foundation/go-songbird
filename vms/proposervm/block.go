@@ -118,7 +118,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 
 		childHeight := child.Height()
 		proposerID := child.Proposer()
-		minDelay, err := p.vm.Windower.Delay(childHeight, expectedInnerParentID, proposerID)
+		minDelay, err := p.vm.Windower.Delay(childHeight, innerParentID, proposerID)
 		if err != nil {
 			return err
 		}
@@ -143,6 +143,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 
 // Return the child (a *postForkBlock) of this block
 func (p *postForkCommonComponents) buildChild(
+	innerParentID ids.ID,
 	parentID ids.ID,
 	parentTimestamp time.Time,
 	parentPChainHeight uint64,
@@ -164,7 +165,7 @@ func (p *postForkCommonComponents) buildChild(
 	if delay < proposer.MaxDelay {
 		parentHeight := p.innerBlk.Height()
 		proposerID := p.vm.ctx.NodeID
-		minDelay, err := p.vm.Windower.Delay(parentHeight+1, parentID, proposerID)
+		minDelay, err := p.vm.Windower.Delay(parentHeight+1, innerParentID, proposerID)
 		if err != nil {
 			return nil, err
 		}

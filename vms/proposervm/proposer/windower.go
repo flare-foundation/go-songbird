@@ -57,7 +57,7 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 
 	validators, err := w.retriever.GetValidators(parentID)
 	if err != nil {
-		return 0, fmt.Errorf("could not get validators: %w", err)
+		return 0, fmt.Errorf("could not get validators for windowing: %w", err)
 	}
 
 	// convert the list of validators to a slice
