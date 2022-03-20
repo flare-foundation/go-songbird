@@ -34,11 +34,11 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 		u := NewUpdater(loadCostonValidators(t), cr)
 
 		err := u.UpdateValidators(testBlockID)
-
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, 1, callsCount)
 
 		set, err := cr.GetValidators(testBlockID)
+		require.NoError(t, err)
 		assert.Equal(t, costonSet, set)
 		assert.Equal(t, 1, callsCount)
 	})

@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	errCurrentHeight   = errors.New("unexpectedly called GetCurrentHeight")
-	errGetValidatorSet = errors.New("unexpectedly called GetValidatorSet")
+	errCurrentHeight = errors.New("unexpectedly called GetCurrentHeight")
 )
 
 type TestState struct {
