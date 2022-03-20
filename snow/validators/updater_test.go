@@ -19,7 +19,7 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 	}
 	costonSet := loadCostonValidators(t)
 
-	t.Run("Check if updater updates properly by using the underlying retriever", func(t *testing.T) {
+	t.Run("nominal case", func(t *testing.T) {
 		t.Parallel()
 
 		callsCount := 0
@@ -43,7 +43,7 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 		assert.Equal(t, 1, callsCount)
 	})
 
-	t.Run("GetValidators returns error check", func(t *testing.T) {
+	t.Run("handles failure to get validators", func(t *testing.T) {
 		t.Parallel()
 
 		retrieverMock := &TestRetriever{
@@ -55,7 +55,6 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 		u := NewUpdater(NewSet(), cr)
 
 		err := u.UpdateValidators(testBlockID)
-
 		require.Error(t, err)
 	})
 

@@ -25,7 +25,7 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 		costonSet := loadCostonValidators(t)
 		callsCount := 0
 		retrieverMock := &TestRetriever{
-			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
+			GetValidatorsByBlockIDFunc: func(_ ids.ID) (Set, error) {
 				callsCount++
 				return costonSet, nil
 			},
@@ -45,8 +45,9 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 
 	})
 
-	t.Run("Check expected blockID", func(t *testing.T) {
+	t.Run("check expected blockID", func(t *testing.T) {
 		t.Parallel()
+
 		retrieverMock := &TestRetriever{
 			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
 				assert.Equal(t, testBlockID, blockID)
@@ -58,22 +59,23 @@ func TestCachingRetriever_GetValidators(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("error call", func(t *testing.T) {
+	t.Run("handles failure to retrieve validators", func(t *testing.T) {
 		t.Parallel()
+
 		retrieverMock := &TestRetriever{
-			GetValidatorsByBlockIDFunc: func(blockID ids.ID) (Set, error) {
+			GetValidatorsByBlockIDFunc: func(_ ids.ID) (Set, error) {
 				return nil, fmt.Errorf("Couldn't get validators")
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
 		_, err := cr.GetValidators(testBlockID)
 		assert.Error(t, err)
-
 	})
 }
 
 func loadCostonValidators(t *testing.T) Set {
 	t.Helper()
+
 	weight := uint64(200_000)
 	nodeIDs := []string{
 		"NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc",
@@ -85,13 +87,10 @@ func loadCostonValidators(t *testing.T) Set {
 	set := NewSet()
 	for _, nodeID := range nodeIDs {
 		shortID, err := ids.ShortFromPrefixedString(nodeID, constants.NodeIDPrefix)
-		if err != nil {
-			require.NoError(t, err, fmt.Sprintf("invalid coston validator node ID: %s", nodeID))
-		}
+		require.NoError(t, err)
+
 		err = set.AddWeight(shortID, weight)
-		if err != nil {
-			require.NoError(t, err, fmt.Sprintf("could not add weight for validator (node: %s, weight: %d): %s", nodeID, weight, err))
-		}
+		require.NoError(t, err)
 	}
 	return set
 }
