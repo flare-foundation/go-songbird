@@ -33,7 +33,7 @@ func (u *updater) UpdateValidators(blockID ids.ID) error {
 	}
 	err = u.validators.Set(validators.List())
 	if err != nil {
-		return fmt.Errorf("could not set validator set: %w", err)
+		return fmt.Errorf("could not set validators: %w", err)
 	}
 	return nil
 }
