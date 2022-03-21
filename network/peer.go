@@ -518,7 +518,6 @@ func (p *peer) sendGetVersion() {
 func (p *peer) sendVersion() {
 	p.net.stateLock.RLock()
 	myIP := p.net.currentIP.IP()
-	compatibility := p.net.compatibility()
 	myVersionTime, myVersionSig, err := p.net.getVersion(myIP)
 	if err != nil {
 		p.net.stateLock.RUnlock()
@@ -530,7 +529,7 @@ func (p *peer) sendVersion() {
 		p.net.dummyNodeID,
 		p.net.clock.Unix(),
 		myIP,
-		compatibility.Version().String(),
+		p.net.versionCompatibility.Version().String(),
 		myVersionTime,
 		myVersionSig,
 		whitelistedSubnets.List(),
@@ -650,8 +649,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		return
 	}
 
-	compatibilities := p.net.compatibilities()
-	if version.Before(compatibilities, peerVersion) {
+	if p.net.versionCompatibility.Version().Before(peerVersion) {
 		if p.net.config.Beacons.Contains(p.nodeID) {
 			p.net.log.Info(
 				"beacon %s%s at %s attempting to connect with newer version %s. You may want to update your client",
@@ -665,7 +663,7 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 		}
 	}
 
-	if err := version.Compatible(compatibilities, (peerVersion)); err != nil {
+	if err := p.net.versionCompatibility.Compatible(peerVersion); err != nil {
 		p.net.log.Verbo("peer %s%s at %s version (%s) not compatible: %s", constants.NodeIDPrefix, p.nodeID, p.getIP(), peerVersion, err)
 		p.discardIP()
 		return
@@ -854,14 +852,13 @@ func (p *peer) handlePong(msg message.InboundMessage) {
 		return
 	}
 
-	compatibilities := p.net.compatibilities()
 	peerVersion := p.versionStruct.GetValue().(version.Application)
-	if err := version.Compatible(compatibilities, peerVersion); err != nil {
+	if err := p.net.versionCompatibility.Compatible(peerVersion); err != nil {
 
 		// If we have not yet attempted to reset the peer's version before, and his currently registered
 		// version is compatible with our legacy version, we allow resetting of the peer's version by
 		// requesting his version a second time, but only once.
-		if !p.resetVersion.GetValue() && p.net.legacyCompatibility.Compatible(peerVersion) == nil {
+		if !p.resetVersion.GetValue() && p.net.versionCompatibility.Compatible(peerVersion) == nil {
 			p.net.log.Debug("requesting version reset from peer %s%s at %s", constants.NodeIDPrefix, p.nodeID, p.getIP())
 			p.resetVersion.SetValue(true)
 			p.sendGetVersion()
