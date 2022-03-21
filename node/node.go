@@ -551,7 +551,7 @@ func (n *Node) addDefaultVMAliases() error {
 
 // Create the chainManager and register the following VMs:
 // AVM, Simple Payments DAG, Simple Payments Chain, and Platform VM
-// Assumes n.DBManager, n.vdrs all initialized (non-nil)
+// Assumes n.DBManager, n.validators all initialized (non-nil)
 func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 	createAVMTx, err := genesis.VMGenesis(n.Config.GenesisBytes, constants.AVMID)
 	if err != nil {
