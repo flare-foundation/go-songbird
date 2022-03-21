@@ -154,15 +154,15 @@ func (vm *VM) Initialize(
 	}
 
 	if _, ok := vm.ChainVM.(validators.Retriever); ok {
-		acceptedID, err := vm.ChainVM.LastAccepted()
+		lastAcceptedID, err := vm.ChainVM.LastAccepted()
 		if err != nil {
 			return fmt.Errorf("could not get last accepted: %w", err)
 		}
-		err = vm.ctx.ValidatorsUpdater.UpdateValidators(acceptedID)
+		err = vm.ctx.ValidatorsUpdater.UpdateValidators(lastAcceptedID)
 		if err != nil {
 			return fmt.Errorf("could not update validators: %w", err)
 		}
-		vm.ctx.Log.Debug("initialized validators with accepted block (hash: %s)", acceptedID.Hex())
+		vm.ctx.Log.Debug("initialized validators with last accepted block (hash: %s)", lastAcceptedID.Hex())
 	}
 
 	// check and possibly rebuild height index
