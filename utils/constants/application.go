@@ -5,9 +5,6 @@ package constants
 
 // Const variables to be exported
 const (
-	LegacyPlatformName = "avalanche"
-	LegacyAppName      = "avalanchego"
-
 	PlatformName = "flare"
 	AppName      = "flare"
 )

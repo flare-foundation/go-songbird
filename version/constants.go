@@ -9,12 +9,6 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-// NOTE: We are doing a three-phase deploy to get rid of legacy Avalanche
-// versioning and to transition to Flare versioning.
-// 1. Roll out upgrade with hard-coded Flare versioning support.
-// 2. Roll out upgrade sending Flare application name and version numbers.
-// 3. Roll out upgrade removing hard-coded Flare versioning support.
-
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
@@ -59,6 +53,12 @@ var (
 		constants.SongbirdID: time.Date(2022, time.March, 7, 16, 0, 0, 0, time.UTC),
 	}
 	ApricotPhase5DefaultTime = time.Date(2022, time.February, 11, 15, 0, 0, 0, time.UTC)
+
+	StateConnectorTimes = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+	}
+	StateConnectorDefaultTime = time.Date(2022, time.February, 12, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
@@ -112,15 +112,21 @@ func GetApricotPhase5Time(networkID uint32) time.Time {
 	}
 	return ApricotPhase5DefaultTime
 }
+func GetStateConnectorTime(networkID uint32) time.Time {
+	if upgradeTime, exists := StateConnectorTimes[networkID]; exists {
+		return upgradeTime
+	}
+	return StateConnectorDefaultTime
+}
 
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetApricotPhase5Time(networkID),
+		GetStateConnectorTime(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
-		GetApricotPhase0Time(networkID),
+		GetApricotPhase3Time(networkID),
 		PrevMinimumUnmaskedVersion,
 	)
 }
