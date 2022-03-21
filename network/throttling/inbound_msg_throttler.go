@@ -5,7 +5,7 @@ package throttling
 
 import (
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -38,7 +38,7 @@ func NewInboundMsgThrottler(
 	log logging.Logger,
 	namespace string,
 	registerer prometheus.Registerer,
-	vdrs validators.Set,
+	vdrs validation.Set,
 	config InboundMsgThrottlerConfig,
 ) (InboundMsgThrottler, error) {
 	byteThrottler, err := newInboundMsgByteThrottler(

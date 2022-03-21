@@ -9,7 +9,7 @@ import (
 	stdmath "math"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/math"
 )
 
@@ -49,7 +49,7 @@ type bootstrapper struct {
 	Halter
 
 	// Holds the beacons that were sampled for the accepted frontier
-	sampledBeacons validators.Set
+	sampledBeacons validation.Set
 	// IDs of validators we should request an accepted frontier from
 	pendingSendAcceptedFrontier ids.ShortSet
 	// IDs of validators we requested an accepted frontier from but haven't
@@ -263,7 +263,7 @@ func (b *bootstrapper) Startup() error {
 		return err
 	}
 
-	b.sampledBeacons = validators.NewSet()
+	b.sampledBeacons = validation.NewSet()
 	err = b.sampledBeacons.Set(beacons)
 	if err != nil {
 		return err

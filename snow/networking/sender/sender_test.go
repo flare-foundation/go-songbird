@@ -21,7 +21,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/handler"
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/version"
@@ -52,7 +52,7 @@ func TestSenderContext(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	benchlist := benchlist.NewNoBenchlist()
@@ -139,7 +139,7 @@ func TestTimeout(t *testing.T) {
 }
 
 func TestReliableMessages(t *testing.T) {
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.ShortID{1}, 1)
 	assert.NoError(t, err)
 	benchlist := benchlist.NewNoBenchlist()
@@ -233,7 +233,7 @@ func TestReliableMessages(t *testing.T) {
 
 func TestReliableMessagesToMyself(t *testing.T) {
 	benchlist := benchlist.NewNoBenchlist()
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	tm := timeout.Manager{}

@@ -20,7 +20,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
@@ -57,9 +57,9 @@ func initTestProposerVM(
 	minPChainHeight uint64,
 ) (
 	*block.TestVM,
-	*validators.TestState,
-	*validators.TestRetriever,
-	*validators.TestUpdater,
+	*validation.TestState,
+	*validation.TestRetriever,
+	*validation.TestUpdater,
 	*VM,
 	*snowman.TestBlock,
 	manager.Manager,
@@ -106,14 +106,14 @@ func initTestProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, minPChainHeight, false)
 
-	valState := &validators.TestState{
+	valState := &validation.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			_ = s.AddWeight(proVM.ctx.NodeID, 10)
 			_ = s.AddWeight(ids.ShortID{1}, 5)
 			_ = s.AddWeight(ids.ShortID{2}, 6)
@@ -121,7 +121,7 @@ func initTestProposerVM(
 			return s, nil
 		},
 	}
-	updater := &validators.TestUpdater{
+	updater := &validation.TestUpdater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
@@ -851,19 +851,19 @@ func TestExpiredBuildBlock(t *testing.T) {
 
 	proVM := New(coreVM, time.Time{}, 0, false)
 
-	valState := &validators.TestState{
+	valState := &validation.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
 
-	updater := &validators.TestUpdater{
+	updater := &validation.TestUpdater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			_ = s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
 		},
@@ -1136,19 +1136,19 @@ func TestInnerVMRollback(t *testing.T) {
 		BytesV:     []byte{0},
 	}
 
-	valState := &validators.TestState{
+	valState := &validation.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
 
-	updater := &validators.TestUpdater{
+	updater := &validation.TestUpdater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			_ = s.AddWeight(ids.ShortID{1}, 100)
 			return s, nil
 		},
@@ -1308,8 +1308,8 @@ func TestInnerVMRollback(t *testing.T) {
 func TestBuildBlockDuringWindow(t *testing.T) {
 	coreVM, _, retrieve, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0) // enable ProBlks
 
-	retrieve.GetValidatorsByBlockIDFunc = func(blockID ids.ID) (validators.Set, error) {
-		s := validators.NewSet()
+	retrieve.GetValidatorsByBlockIDFunc = func(blockID ids.ID) (validation.Set, error) {
+		s := validation.NewSet()
 		_ = s.AddWeight(proVM.ctx.NodeID, 10)
 		return s, nil
 	}

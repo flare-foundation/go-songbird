@@ -38,7 +38,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/appsender"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
 	"github.com/flare-foundation/flare/vms/components/chain"
@@ -654,7 +654,7 @@ func (vm *VMClient) Disconnected(nodeID ids.ShortID) error {
 	return err
 }
 
-func (vm *VMClient) GetValidators(blockID ids.ID) (validators.Set, error) {
+func (vm *VMClient) GetValidators(blockID ids.ID) (validation.Set, error) {
 	res, err := vm.client.FetchValidators(context.Background(), &vmproto.FetchValidatorsRequest{
 		BlkId: blockID[:],
 	})
@@ -664,7 +664,7 @@ func (vm *VMClient) GetValidators(blockID ids.ID) (validators.Set, error) {
 	if len(res.ValidatorIds) != len(res.Weights) {
 		return nil, fmt.Errorf("mismatch between validators and weights (%d != %d)", len(res.ValidatorIds), len(res.Weights))
 	}
-	validators := validators.NewSet()
+	validators := validation.NewSet()
 	for i, validatorId := range res.ValidatorIds {
 		validatorID, err := ids.ToShortID(validatorId)
 		if err != nil {

@@ -36,7 +36,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/timeout"
 	"github.com/flare-foundation/flare/snow/platform"
 	"github.com/flare-foundation/flare/snow/triggers"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/vms"
@@ -111,14 +111,14 @@ type ChainParameters struct {
 	VMAlias     string   // The ID of the vm this chain is running
 	FxAliases   []string // The IDs of the feature extensions this chain is running
 
-	CustomBeacons validators.Set // Should only be set if the default beacons can't be used.
+	CustomBeacons validation.Set // Should only be set if the default beacons can't be used.
 }
 
 type chain struct {
 	Name    string
 	Engine  common.Engine
 	Handler handler.Handler
-	Beacons validators.Set
+	Beacons validation.Set
 }
 
 // ChainConfig is configuration settings for the current execution.
@@ -142,7 +142,7 @@ type ManagerConfig struct {
 	Router                      router.Router    // Routes incoming messages to the appropriate chain
 	Net                         network.Network  // Sends consensus messages to other validators
 	ConsensusParams             avcon.Parameters // The consensus parameters (alpha, beta, etc.) for new chains
-	Validators                  validators.Set   // Validators validating on this chain
+	Validators                  validation.Set   // Validators validating on this chain
 	NodeID                      ids.ShortID      // The ID of this node
 	NetworkID                   uint32           // ID of the network this node is connected to
 	Server                      *server.Server   // Handles HTTP API calls
@@ -498,8 +498,8 @@ func (m *manager) unblockChains() {
 func (m *manager) createAvalancheChain(
 	ctx *snow.ConsensusContext,
 	genesisData []byte,
-	vdrs,
-	beacons validators.Set,
+	validators validation.Set,
+	beacons validation.Set,
 	vm vertex.DAGVM,
 	fxs []*common.Fx,
 	consensusParams avcon.Parameters,
@@ -584,7 +584,7 @@ func (m *manager) createAvalancheChain(
 	handler, err := handler.New(
 		m.MsgCreator,
 		ctx,
-		vdrs,
+		validators,
 		msgChan,
 		sb.afterBootstrapped(),
 		m.ConsensusGossipFrequency,
@@ -595,7 +595,7 @@ func (m *manager) createAvalancheChain(
 
 	commonCfg := common.Config{
 		Ctx:                            ctx,
-		Validators:                     vdrs,
+		Validators:                     validators,
 		Beacons:                        beacons,
 		SampleK:                        sampleK,
 		StartupAlpha:                   (3*bootstrapWeight + 3) / 4,
@@ -645,7 +645,7 @@ func (m *manager) createAvalancheChain(
 		VM:            bootstrapperConfig.VM,
 		Manager:       vtxManager,
 		Sender:        bootstrapperConfig.Sender,
-		Validators:    vdrs,
+		Validators:    validators,
 		Params:        consensusParams,
 		Consensus:     &avcon.Topological{},
 	}
@@ -688,8 +688,8 @@ func (m *manager) createAvalancheChain(
 func (m *manager) createSnowmanChain(
 	ctx *snow.ConsensusContext,
 	genesisData []byte,
-	vdrs,
-	beacons validators.Set,
+	validators validation.Set,
+	beacons validation.Set,
 	vm block.ChainVM,
 	fxs []*common.Fx,
 	consensusParams snowball.Parameters,
@@ -752,10 +752,10 @@ func (m *manager) createSnowmanChain(
 	// called by the EVM every time the last accepted block changes in order to
 	// propagate validator changes across all components.
 	// We wrap the retriever into a caching retriever to improve performance.
-	retriever, ok := vm.(validators.Retriever)
+	retriever, ok := vm.(validation.Retriever)
 	if ok {
-		ctx.ValidatorsRetriever = validators.NewCachingRetriever(retriever)
-		ctx.ValidatorsUpdater = validators.NewUpdater(m.Validators, ctx.ValidatorsRetriever)
+		ctx.ValidatorsRetriever = validation.NewCachingRetriever(retriever)
+		ctx.ValidatorsUpdater = validation.NewUpdater(m.Validators, ctx.ValidatorsRetriever)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it
@@ -792,7 +792,7 @@ func (m *manager) createSnowmanChain(
 	handler, err := handler.New(
 		m.MsgCreator,
 		ctx,
-		vdrs,
+		validators,
 		msgChan,
 		sb.afterBootstrapped(),
 		m.ConsensusGossipFrequency,
@@ -803,7 +803,7 @@ func (m *manager) createSnowmanChain(
 
 	commonCfg := common.Config{
 		Ctx:                            ctx,
-		Validators:                     vdrs,
+		Validators:                     validators,
 		Beacons:                        beacons,
 		SampleK:                        sampleK,
 		StartupAlpha:                   (3*bootstrapWeight + 3) / 4,
@@ -851,7 +851,7 @@ func (m *manager) createSnowmanChain(
 		AllGetsServer: snowGetHandler,
 		VM:            bootstrapCfg.VM,
 		Sender:        bootstrapCfg.Sender,
-		Validators:    vdrs,
+		Validators:    validators,
 		Params:        consensusParams,
 		Consensus:     &smcon.Topological{},
 	}

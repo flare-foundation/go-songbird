@@ -6,7 +6,7 @@ package common
 import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // DefaultConfigTest returns a test configuration
@@ -19,8 +19,8 @@ func DefaultConfigTest() Config {
 
 	return Config{
 		Ctx:                            snow.DefaultConsensusContextTest(),
-		Validators:                     validators.NewSet(),
-		Beacons:                        validators.NewSet(),
+		Validators:                     validation.NewSet(),
+		Beacons:                        validation.NewSet(),
 		Sender:                         &SenderTest{},
 		Bootstrapable:                  &BootstrapableTest{},
 		Subnet:                         subnet,

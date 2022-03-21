@@ -24,7 +24,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
@@ -58,7 +58,7 @@ var (
 	errStartAfterEndTime = errors.New("start time is after the end time")
 
 	_ block.ChainVM        = &VM{}
-	_ validators.Connector = &VM{}
+	_ validation.Connector = &VM{}
 	_ secp256k1fx.VM       = &VM{}
 	_ Fx                   = &secp256k1fx.Fx{}
 )
@@ -437,12 +437,12 @@ func (vm *VM) CreateStaticHandlers() (map[string]*common.HTTPHandler, error) {
 	}, nil
 }
 
-// Connected implements validators.Connector
+// Connected implements validation.Connector
 func (vm *VM) Connected(vdrID ids.ShortID, nodeVersion version.Application) error {
 	return vm.uptimeManager.Connect(vdrID)
 }
 
-// Disconnected implements validators.Connector
+// Disconnected implements validation.Connector
 func (vm *VM) Disconnected(vdrID ids.ShortID) error {
 	if err := vm.uptimeManager.Disconnect(vdrID); err != nil {
 		return err

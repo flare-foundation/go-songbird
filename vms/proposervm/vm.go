@@ -18,7 +18,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
@@ -153,7 +153,7 @@ func (vm *VM) Initialize(
 		return err
 	}
 
-	if _, ok := vm.ChainVM.(validators.Retriever); ok {
+	if _, ok := vm.ChainVM.(validation.Retriever); ok {
 		lastAcceptedID, err := vm.ChainVM.LastAccepted()
 		if err != nil {
 			return fmt.Errorf("could not get last accepted: %w", err)

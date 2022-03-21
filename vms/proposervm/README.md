@@ -30,7 +30,7 @@ Option blocks are not signed, as they are deterministically generated from their
 
 ### Snowman++ proposers selection mechanism
 
-For a given block, Snowman++ randomly selects a list of proposers. Block proposers are selected from the subnet's validators. Snowman++ extracts the list of a given subnet's validators from the P-Chain. Let a block have a height `H` and P-Chain height `P` recorded in its header. The proposers list for next block is generated independently but reproducibly by each node as follows:
+For a given block, Snowman++ randomly selects a list of proposers. Block proposers are selected from the subnet's validation. Snowman++ extracts the list of a given subnet's validators from the P-Chain. Let a block have a height `H` and P-Chain height `P` recorded in its header. The proposers list for next block is generated independently but reproducibly by each node as follows:
 
 - Subnet validators active at block `P` are retrieved from P-chain.
 - Validators are canonically sorted by their `nodeID`.

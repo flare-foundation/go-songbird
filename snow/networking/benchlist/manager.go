@@ -10,7 +10,7 @@ import (
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 var errUnknownValidators = errors.New("unknown validator set for provided chain")
@@ -41,7 +41,7 @@ type Manager interface {
 // Config defines the configuration for a benchlist
 type Config struct {
 	Benchable              Benchable      `json:"-"`
-	Validators             validators.Set `json:"-"`
+	Validators             validation.Set `json:"-"`
 	StakingEnabled         bool           `json:"-"`
 	Threshold              int            `json:"threshold"`
 	MinimumFailingDuration time.Duration  `json:"minimumFailingDuration"`

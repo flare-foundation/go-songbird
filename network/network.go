@@ -31,7 +31,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/networking/sender"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/formatting"
@@ -245,9 +245,9 @@ type Config struct {
 	TLSKey crypto.Signer `json:"-"`
 	// WhitelistedSubnets of the node
 	WhitelistedSubnets ids.Set        `json:"whitelistedSubnets"`
-	Beacons            validators.Set `json:"beacons"`
+	Beacons            validation.Set `json:"beacons"`
 	// Current validators in the Avalanche network
-	Validators        validators.Set    `json:"validators"`
+	Validators        validation.Set    `json:"validators"`
 	UptimeCalculator  uptime.Calculator `json:"-"`
 	UptimeMetricFreq  time.Duration     `json:"uptimeMetricFreq"`
 	UptimeRequirement float64           `json:"uptimeRequirement"`
@@ -389,7 +389,7 @@ func (n *network) Accept(ctx *snow.ConsensusContext, containerID ids.ID, contain
 func (n *network) selectPeersForGossip(subnetID ids.ID, validatorOnly bool, numValidatorsToSample, numNonValidatorsToSample int) ([]*peer, error) {
 	n.stateLock.RLock()
 	// Gossip the message to numNonValidatorsToSample random nodes in the
-	// network. If this is a validator only subnet, selects only validators.
+	// network. If this is a validator only subnet, selects only validation.
 	peersAll, err := n.peers.sample(subnetID, validatorOnly, numNonValidatorsToSample)
 	if err != nil {
 		n.log.Debug("failed to sample %d peers: %s", numNonValidatorsToSample, err)

@@ -34,7 +34,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/sender"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/formatting"
@@ -322,7 +322,7 @@ func defaultVM() (*VM, database.Database, *common.SenderTest) {
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		TxFee:                  defaultTxFee,
 		CreateSubnetTxFee:      100 * defaultTxFee,
 		CreateBlockchainTxFee:  100 * defaultTxFee,
@@ -401,7 +401,7 @@ func GenesisVMWithArgs(t *testing.T, args *BuildGenesisArgs) ([]byte, chan commo
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		TxFee:                  defaultTxFee,
 		MinValidatorStake:      defaultMinValidatorStake,
@@ -1707,7 +1707,7 @@ func TestRestartPartiallyAccepted(t *testing.T) {
 	firstDB := db.NewPrefixDBManager([]byte{})
 	firstVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1789,7 +1789,7 @@ func TestRestartPartiallyAccepted(t *testing.T) {
 
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1829,7 +1829,7 @@ func TestRestartFullyAccepted(t *testing.T) {
 	firstDB := db.NewPrefixDBManager([]byte{})
 	firstVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1906,7 +1906,7 @@ func TestRestartFullyAccepted(t *testing.T) {
 
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1952,7 +1952,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -1996,7 +1996,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 	advanceTimePreference := options[0]
 
 	peerID := ids.ShortID{1, 2, 3, 4, 5, 4, 3, 2, 1}
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	if err := vdrs.AddWeight(peerID, 1); err != nil {
 		t.Fatal(err)
 	}
@@ -2214,7 +2214,7 @@ func TestUnverifiedParent(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,
@@ -2369,7 +2369,7 @@ func TestUnverifiedParentPanic(t *testing.T) {
 
 	vm := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 		MinStakeDuration:       defaultMinStakingDuration,
 		MaxStakeDuration:       defaultMaxStakingDuration,

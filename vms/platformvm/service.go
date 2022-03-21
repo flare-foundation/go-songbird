@@ -638,7 +638,7 @@ type GetCurrentValidatorsArgs struct {
 	// If omitted, defaults to primary network
 	SubnetID ids.ID `json:"subnetID"`
 	// NodeIDs of validators to request. If [NodeIDs]
-	// is empty, it fetches all current validators. If
+	// is empty, it fetches all current validation. If
 	// some nodeIDs are not currently validators, they
 	// will be omitted from the response.
 	NodeIDs []string `json:"nodeIDs"`
@@ -809,7 +809,7 @@ type GetPendingValidatorsArgs struct {
 	// If omitted, defaults to primary network
 	SubnetID ids.ID `json:"subnetID"`
 	// NodeIDs of validators to request. If [NodeIDs]
-	// is empty, it fetches all pending validators. If
+	// is empty, it fetches all pending validation. If
 	// some requested nodeIDs are not pending validators,
 	// they are omitted from the response.
 	NodeIDs []string `json:"nodeIDs"`

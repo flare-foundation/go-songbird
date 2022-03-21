@@ -13,7 +13,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/vms/proposervm/block"
 	"github.com/flare-foundation/flare/vms/proposervm/proposer"
 )
@@ -625,8 +625,8 @@ func TestGetBlock_MutatedSignature(t *testing.T) {
 	coreVM, _, retrieve, _, proVM, coreGenBlk, _ := initTestProposerVM(t, time.Time{}, 0)
 
 	// Make sure that we will be sampled to perform the proposals.
-	retrieve.GetValidatorsByBlockIDFunc = func(blockID ids.ID) (validators.Set, error) {
-		s := validators.NewSet()
+	retrieve.GetValidatorsByBlockIDFunc = func(blockID ids.ID) (validation.Set, error) {
+		s := validation.NewSet()
 		_ = s.AddWeight(proVM.ctx.NodeID, 10)
 		return s, nil
 	}

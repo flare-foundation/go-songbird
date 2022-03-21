@@ -15,7 +15,7 @@ import (
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 func TestHandlerDropsTimedOutMessages(t *testing.T) {
@@ -27,7 +27,7 @@ func TestHandlerDropsTimedOutMessages(t *testing.T) {
 
 	ctx := snow.DefaultConsensusContextTest()
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	vdr0 := ids.GenerateTestShortID()
 	err = vdrs.AddWeight(vdr0, 1)
 	assert.NoError(t, err)
@@ -98,7 +98,7 @@ func TestHandlerClosesOnError(t *testing.T) {
 	closed := make(chan struct{}, 1)
 	ctx := snow.DefaultConsensusContextTest()
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
@@ -164,7 +164,7 @@ func TestHandlerClosesOnError(t *testing.T) {
 func TestHandlerDropsGossipDuringBootstrapping(t *testing.T) {
 	closed := make(chan struct{}, 1)
 	ctx := snow.DefaultConsensusContextTest()
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
@@ -222,7 +222,7 @@ func TestHandlerDispatchInternal(t *testing.T) {
 	calledNotify := make(chan struct{}, 1)
 	ctx := snow.DefaultConsensusContextTest()
 	msgFromVMChan := make(chan common.Message)
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()

@@ -15,7 +15,7 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/version"
@@ -392,7 +392,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -427,7 +427,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .21,
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -591,7 +591,7 @@ func TestUptimeDisallowedAfterNeverConnecting(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewSet(),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 

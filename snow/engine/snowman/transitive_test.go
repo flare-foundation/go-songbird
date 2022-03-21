@@ -17,7 +17,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/engine/snowman/bootstrap"
 	snowgetter "github.com/flare-foundation/flare/snow/engine/snowman/getter"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/stretchr/testify/assert"
@@ -38,10 +38,10 @@ func (dh *dummyHandler) onDoneBootstrapping(lastReqID uint32) error {
 	return dh.startEngineF(lastReqID)
 }
 
-func setup(t *testing.T) (ids.ShortID, validators.Set, *common.SenderTest, *block.TestVM, *Transitive, snowman.Block) {
+func setup(t *testing.T) (ids.ShortID, validation.Set, *common.SenderTest, *block.TestVM, *Transitive, snowman.Block) {
 	bootCfg, engCfg := DefaultConfigs()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -428,7 +428,7 @@ func TestEngineMultipleQuery(t *testing.T) {
 		MaxItemProcessingTime: 1,
 	}
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -932,7 +932,7 @@ func TestVoteCanceling(t *testing.T) {
 		MaxItemProcessingTime: 1,
 	}
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1069,7 +1069,7 @@ func TestVoteCanceling(t *testing.T) {
 func TestEngineNoQuery(t *testing.T) {
 	bootCfg, engCfg := DefaultConfigs()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.WeightTracker = wt
 
@@ -1138,7 +1138,7 @@ func TestEngineNoQuery(t *testing.T) {
 func TestEngineNoRepollQuery(t *testing.T) {
 	bootCfg, engCfg := DefaultConfigs()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.WeightTracker = wt
 
@@ -1823,7 +1823,7 @@ func TestEngineAggressivePolling(t *testing.T) {
 
 	engCfg.Params.ConcurrentRepolls = 2
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1958,7 +1958,7 @@ func TestEngineDoubleChit(t *testing.T) {
 		MaxItemProcessingTime: 1,
 	}
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -2111,7 +2111,7 @@ func TestEngineBuildBlockLimit(t *testing.T) {
 	engCfg.Params.Alpha = 1
 	engCfg.Params.OptimalProcessing = 1
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt

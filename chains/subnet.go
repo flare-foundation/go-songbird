@@ -26,7 +26,7 @@ type Subnet interface {
 }
 
 type SubnetConfig struct {
-	// ValidatorOnly indicates that this Subnet's Chains are available to only subnet validators.
+	// ValidatorOnly indicates that this Subnet's Chains are available to only subnet validation.
 	ValidatorOnly       bool                 `json:"validatorOnly"`
 	ConsensusParameters avalanche.Parameters `json:"consensusParameters"`
 }

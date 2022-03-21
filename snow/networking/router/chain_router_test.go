@@ -18,14 +18,14 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/handler"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/version"
 )
 
 func TestShutdown(t *testing.T) {
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	benchlist := benchlist.NewNoBenchlist()
@@ -114,7 +114,7 @@ func TestShutdown(t *testing.T) {
 
 func TestShutdownTimesOut(t *testing.T) {
 	nodeID := ids.ShortEmpty
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	benchlist := benchlist.NewNoBenchlist()
@@ -261,7 +261,7 @@ func TestRouterTimeout(t *testing.T) {
 	)
 
 	ctx := snow.DefaultConsensusContextTest()
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err = vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 
@@ -374,7 +374,7 @@ func TestRouterClearTimeouts(t *testing.T) {
 
 	// Create bootstrapper, engine and handler
 	ctx := snow.DefaultConsensusContextTest()
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	err = vdrs.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 
@@ -486,7 +486,7 @@ func TestValidatorOnlyMessageDrops(t *testing.T) {
 
 	ctx := snow.DefaultConsensusContextTest()
 	ctx.SetValidatorOnly()
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	vID := ids.GenerateTestShortID()
 	err = vdrs.AddWeight(vID, 1)
 	assert.NoError(t, err)
@@ -560,7 +560,7 @@ func TestValidatorOnlyMessageDrops(t *testing.T) {
 	assert.Equal(t, 1, chainRouter.timedRequests.Len())
 
 	// remove it from validators
-	err = vdrs.Set(validators.NewSet().List())
+	err = vdrs.Set(validation.NewSet().List())
 	assert.NoError(t, err)
 
 	inMsg = mc.InboundPut(ctx.ChainID, reqID, ids.GenerateTestID(), nil, nID)

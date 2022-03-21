@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 func TestWindowerNoValidators(t *testing.T) {
@@ -21,10 +21,10 @@ func TestWindowerNoValidators(t *testing.T) {
 	chainID := ids.GenerateTestID()
 	nodeID := ids.GenerateTestShortID()
 
-	noValidators := validators.NewSet()
+	noValidators := validation.NewSet()
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
 			return noValidators, nil
 		},
 	}
@@ -43,9 +43,9 @@ func TestWindowerRepeatedValidator(t *testing.T) {
 	validatorID := ids.GenerateTestShortID()
 	nonValidatorID := ids.GenerateTestShortID()
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			_ = s.AddWeight(validatorID, 10)
 			return s, nil
 		},
@@ -71,9 +71,9 @@ func TestWindowerChangeByHeight(t *testing.T) {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			for _, id := range validatorIDs {
 				_ = s.AddWeight(id, 1)
 			}
@@ -129,9 +129,9 @@ func TestWindowerChangeByChain(t *testing.T) {
 		validatorIDs[i] = ids.ShortID{byte(i + 1)}
 	}
 
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			for _, id := range validatorIDs {
 				_ = s.AddWeight(id, 1)
 			}

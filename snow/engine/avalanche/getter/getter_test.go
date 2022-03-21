@@ -13,13 +13,13 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/avalanche"
 	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 var errUnknownVertex = errors.New("unknown vertex")
 
 func testSetup(t *testing.T) (*vertex.TestManager, *common.SenderTest, common.Config) {
-	peers := validators.NewSet()
+	peers := validation.NewSet()
 	peer := ids.GenerateTestShortID()
 	if err := peers.AddWeight(peer, 1); err != nil {
 		t.Fatal(err)

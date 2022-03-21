@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/stretchr/testify/assert"
 )
@@ -107,7 +107,7 @@ func TestPeersDataSample(t *testing.T) {
 	data.initialize()
 	trackedSubnetIDs := ids.Set{}
 	trackedSubnetIDs.Add(constants.PrimaryNetworkID)
-	networkWithValidators := &network{config: &Config{Validators: validators.NewSet()}}
+	networkWithValidators := &network{config: &Config{Validators: validation.NewSet()}}
 	// Case: Empty
 	peers, err := data.sample(constants.PrimaryNetworkID, false, 0)
 	assert.NoError(t, err)

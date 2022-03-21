@@ -10,7 +10,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ import (
 func TestQueue(t *testing.T) {
 	assert := assert.New(t)
 	cpuTracker := &tracker.MockTimeTracker{}
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	vdr1ID, vdr2ID := ids.GenerateTestShortID(), ids.GenerateTestShortID()
 	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
 	assert.NoError(vdrs.AddWeight(vdr2ID, 1))

@@ -26,7 +26,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
@@ -347,9 +347,9 @@ func TestNewDefaultNetwork(t *testing.T) {
 		closed:  make(chan struct{}),
 	}
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id, math.MaxUint64)
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 	metrics := prometheus.NewRegistry()
 	msgCreator, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
@@ -427,10 +427,10 @@ func TestEstablishConnection(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	var (
 		wg0 sync.WaitGroup
@@ -566,10 +566,10 @@ func TestDoubleTrack(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	var (
 		wg0 sync.WaitGroup
@@ -706,11 +706,11 @@ func TestDoubleClose(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
 
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	var (
 		wg0 sync.WaitGroup
@@ -852,10 +852,10 @@ func TestTrackConnected(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	var (
 		wg0 sync.WaitGroup
@@ -993,10 +993,10 @@ func TestTrackConnectedRace(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
 	assert.NoError(t, err)
@@ -1169,12 +1169,12 @@ func TestPeerAliasesTicker(t *testing.T) {
 		},
 	}
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
 	_ = vdrs.AddWeight(id2, 1)
 
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	var (
 		wg0     sync.WaitGroup
@@ -1464,11 +1464,11 @@ func TestPeerAliasesDisconnect(t *testing.T) {
 	)
 	id2 := ids.ShortID(hashing.ComputeHash160Array([]byte(ip2.IP().String())))
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
 	_ = vdrs.AddWeight(id2, 1)
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	listener0 := &testListener{
 		addr: &net.TCPAddr{
@@ -1913,9 +1913,9 @@ func TestPeerSignature(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id2, math.MaxUint64) // id2 is a validator
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2341,11 +2341,11 @@ func TestDontFinishHandshakeOnIncompatibleVersion(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id1, 1)
 	_ = vdrs.AddWeight(id0, 1)
 
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	metrics0 := prometheus.NewRegistry()
 	msgCreator0, err := message.NewCreator(metrics0, true /*compressionEnabled*/, "dummyNamespace" /*parentNamespace*/)
@@ -2484,11 +2484,11 @@ func TestPeerTrackedSubnets(t *testing.T) {
 	caller0.outbounds[ip1.IP().String()] = listener1
 	caller1.outbounds[ip0.IP().String()] = listener0
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id0, 1)
 	_ = vdrs.AddWeight(id1, 1)
 
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	var (
 		wg0 sync.WaitGroup
@@ -2660,9 +2660,9 @@ func TestPeerGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id2, math.MaxUint64) // id2 is a validator
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -2896,9 +2896,9 @@ func TestAppGossip(t *testing.T) {
 	caller0.outbounds[ip2.IP().String()] = listener2
 	caller1.outbounds[ip2.IP().String()] = listener2
 
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	_ = vdrs.AddWeight(id2, math.MaxUint64) // id2 is a validator
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 
 	allPeers := ids.ShortSet{}
 	allPeers.Add(id0, id1, id2)
@@ -3099,7 +3099,7 @@ func addPeerToNetwork(targetNetwork *network, peerToAdd *peer, isValidator bool)
 
 func clearPeersData(targetNetwork *network) {
 	targetNetwork.peers.reset()
-	targetNetwork.config.Validators = validators.NewSet()
+	targetNetwork.config.Validators = validation.NewSet()
 }
 
 func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {
@@ -3114,8 +3114,8 @@ func isIPDescIn(targetIP utils.IPDesc, ipDescList []utils.IPCertDesc) bool {
 func newDefaultNetwork(
 	id ids.ShortID,
 	ip utils.DynamicIPDesc,
-	vdrs validators.Set,
-	beacons validators.Set,
+	vdrs validation.Set,
+	beacons validation.Set,
 	tlsKey crypto.Signer,
 	subnetSet ids.Set,
 	tlsConfig *tls.Config,
@@ -3161,8 +3161,8 @@ func newDefaultNetwork(
 func newTestNetwork(id ids.ShortID,
 	ip utils.DynamicIPDesc,
 	versionCompatibility version.Compatibility,
-	vdrs validators.Set,
-	beacons validators.Set,
+	vdrs validation.Set,
+	beacons validation.Set,
 	tlsKey crypto.Signer,
 	subnetSet ids.Set,
 	tlsConfig *tls.Config,

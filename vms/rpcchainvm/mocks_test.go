@@ -16,12 +16,12 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/version"
 )
 
 type ChainVMMock struct {
-	GetValidatorsFunc func(blockID ids.ID) (validators.Set, error)
+	GetValidatorsFunc func(blockID ids.ID) (validation.Set, error)
 
 	AppRequestFunc           func(nodeID ids.ShortID, requestID uint32, deadline time.Time, request []byte) error
 	AppRequestFailedFunc     func(nodeID ids.ShortID, requestID uint32) error
@@ -43,7 +43,7 @@ type ChainVMMock struct {
 	LastAcceptedFunc         func() (ids.ID, error)
 }
 
-func (c ChainVMMock) GetValidators(blockID ids.ID) (validators.Set, error) {
+func (c ChainVMMock) GetValidators(blockID ids.ID) (validation.Set, error) {
 	return c.GetValidatorsFunc(blockID)
 }
 

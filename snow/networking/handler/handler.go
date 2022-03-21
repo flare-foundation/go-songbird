@@ -14,7 +14,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/networking/tracker"
 	"github.com/flare-foundation/flare/snow/networking/worker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/utils/uptime"
@@ -61,7 +61,7 @@ type handler struct {
 	ctx *snow.ConsensusContext
 	mc  message.Creator
 	// The validator set that validates this chain
-	validators validators.Set
+	validators validation.Set
 	// Receives messages from the VM
 	msgFromVMChan   <-chan common.Message
 	preemptTimeouts chan struct{}
@@ -97,7 +97,7 @@ type handler struct {
 func New(
 	mc message.Creator,
 	ctx *snow.ConsensusContext,
-	validators validators.Set,
+	validators validation.Set,
 	msgFromVMChan <-chan common.Message,
 	preemptTimeouts chan struct{},
 	gossipFrequency time.Duration,

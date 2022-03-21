@@ -18,8 +18,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	coreth "github.com/flare-foundation/coreth/plugin/evm"
-
 	"github.com/flare-foundation/flare/api/admin"
 	"github.com/flare-foundation/flare/api/auth"
 	"github.com/flare-foundation/flare/api/health"
@@ -45,7 +43,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/timeout"
 	"github.com/flare-foundation/flare/snow/triggers"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/hashing"
@@ -128,10 +126,10 @@ type Node struct {
 	Net              network.Network
 
 	// this node's initial connections to the network
-	beacons validators.Set
+	beacons validation.Set
 
 	// current validators of the network
-	validators validators.Set
+	validators validation.Set
 
 	// Handles HTTP API calls
 	APIServer server.Server
@@ -190,7 +188,7 @@ func (n *Node) initNetworking() error {
 	tlsConfig := network.TLSConfig(n.Config.StakingTLSCert)
 
 	// Initialize empty validator set for now
-	n.validators = validators.NewSet()
+	n.validators = validation.NewSet()
 
 	// We add ourselves as validator with a weight of one here. This is a work-around
 	// for P-Chain bootstrapping issues with an empty validator set. Once we are past
@@ -273,7 +271,7 @@ func (n *Node) initNetworking() error {
 
 type insecureValidatorManager struct {
 	router.Router
-	validators validators.Set
+	validators validation.Set
 	weight     uint64
 }
 
@@ -292,7 +290,7 @@ func (i *insecureValidatorManager) Disconnected(vdrID ids.ShortID) {
 type beaconManager struct {
 	router.Router
 	timer          *timer.Timer
-	beacons        validators.Set
+	beacons        validation.Set
 	requiredWeight uint64
 	totalWeight    uint64
 }
@@ -411,7 +409,7 @@ func (n *Node) initDatabase(dbManager manager.Manager) error {
 
 // Set the node IDs of the peers this node should first connect to
 func (n *Node) initBeacons() error {
-	n.beacons = validators.NewSet()
+	n.beacons = validation.NewSet()
 	for _, peerID := range n.Config.BootstrapIDs {
 		if err := n.beacons.AddWeight(peerID, 1); err != nil {
 			return err
@@ -678,7 +676,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		n.Config.VMManager.RegisterFactory(secp256k1fx.ID, &secp256k1fx.Factory{}),
 		n.Config.VMManager.RegisterFactory(nftfx.ID, &nftfx.Factory{}),
 		n.Config.VMManager.RegisterFactory(propertyfx.ID, &propertyfx.Factory{}),
-		n.Config.VMManager.RegisterFactory(constants.EVMID, &coreth.Factory{}),
+		// n.Config.VMManager.RegisterFactory(constants.EVMID, &coreth.Factory{}),
 		rpcchainvm.RegisterPlugins(n.Config.PluginDir, n.Config.VMManager),
 	)
 	if errs.Errored() {

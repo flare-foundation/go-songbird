@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/sampler"
 	"github.com/flare-foundation/flare/utils/wrappers"
@@ -36,12 +36,12 @@ type Windower interface {
 // windower interfaces with P-Chain and it is responsible for calculating the
 // delay for the block submission window of a given validator
 type windower struct {
-	retriever validators.Retriever
+	retriever validation.Retriever
 	nonce     uint64
 	sampler   sampler.WeightedWithoutReplacement
 }
 
-func New(retriever validators.Retriever, chainID ids.ID) Windower {
+func New(retriever validation.Retriever, chainID ids.ID) Windower {
 	w := wrappers.Packer{Bytes: chainID[:]}
 	return &windower{
 		retriever: retriever,

@@ -5,7 +5,7 @@ package platformvm
 
 import (
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // A Subnet is a set of validators that are validating a set of blockchains
@@ -15,5 +15,5 @@ type Subnet interface {
 	ID() ids.ID
 
 	// Validators returns the validators that compose this subnet
-	Validators() []validators.Validator
+	Validators() []validation.Validator
 }

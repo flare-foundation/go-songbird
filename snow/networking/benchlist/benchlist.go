@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
@@ -99,7 +99,7 @@ type benchlist struct {
 	benchable Benchable
 
 	// Validator set of the network
-	vdrs validators.Set
+	validators validation.Set
 
 	// Validator ID --> Consecutive failure information
 	// [streaklock] must be held when touching [failureStreaks]
@@ -132,7 +132,7 @@ func NewBenchlist(
 	chainID ids.ID,
 	log logging.Logger,
 	benchable Benchable,
-	validators validators.Set,
+	validators validation.Set,
 	threshold int,
 	minimumFailingDuration,
 	duration time.Duration,
@@ -148,7 +148,7 @@ func NewBenchlist(
 		failureStreaks:         make(map[ids.ShortID]failureStreak),
 		benchlistSet:           ids.ShortSet{},
 		benchable:              benchable,
-		vdrs:                   validators,
+		validators:             validators,
 		threshold:              threshold,
 		minimumFailingDuration: minimumFailingDuration,
 		duration:               duration,
@@ -190,7 +190,7 @@ func (b *benchlist) remove(validator *benchData) {
 
 	// Update metrics
 	b.metrics.numBenched.Set(float64(b.benchedQueue.Len()))
-	benchedStake, err := b.vdrs.SubsetWeight(b.benchlistSet)
+	benchedStake, err := b.validators.SubsetWeight(b.benchlistSet)
 	if err != nil {
 		// This should never happen
 		b.log.Error("couldn't get benched stake: %s", err)
@@ -282,17 +282,17 @@ func (b *benchlist) RegisterFailure(validatorID ids.ShortID) {
 // Assumes [b.lock] is held
 // Assumes [validatorID] is not already benched
 func (b *benchlist) bench(validatorID ids.ShortID) {
-	benchedStake, err := b.vdrs.SubsetWeight(b.benchlistSet)
+	benchedStake, err := b.validators.SubsetWeight(b.benchlistSet)
 	if err != nil {
 		// This should never happen
 		b.log.Error("couldn't get benched stake: %s. Resetting benchlist", err)
 		return
 	}
 
-	validatorStake, isVdr := b.vdrs.GetWeight(validatorID)
+	validatorStake, isVdr := b.validators.GetWeight(validatorID)
 	if !isVdr {
 		// We might want to bench a non-validator because they don't respond to
-		// my Get requests, but we choose to only bench validators.
+		// my Get requests, but we choose to only bench validation.
 		return
 	}
 
@@ -303,7 +303,7 @@ func (b *benchlist) bench(validatorID ids.ShortID) {
 		return
 	}
 
-	totalStake := b.vdrs.Weight()
+	totalStake := b.validators.Weight()
 	maxBenchedStake := float64(totalStake) * b.maxPortion
 
 	if float64(newBenchedStake) > maxBenchedStake {

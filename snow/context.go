@@ -15,7 +15,7 @@ import (
 	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/platform"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
 )
@@ -63,8 +63,8 @@ type Context struct {
 
 	// snowman++ attributes
 	PlatformVMState     platform.VMState     // state of platform VM
-	ValidatorsRetriever validators.Retriever // retrieves validators from EVM
-	ValidatorsUpdater   validators.Updater   // updates validators across components
+	ValidatorsRetriever validation.Retriever // retrieves validators from EVM
+	ValidatorsUpdater   validation.Updater   // updates validators across components
 
 	StakingLeafSigner crypto.Signer     // block signer
 	StakingCertLeaf   *x509.Certificate // block certificate
@@ -84,7 +84,7 @@ type ConsensusContext struct {
 	// Non-zero iff this chain is executing transactions.
 	executing utils.AtomicBool
 
-	// Indicates this chain is available to only validators.
+	// Indicates this chain is available to only validation.
 	validatorOnly utils.AtomicBool
 }
 

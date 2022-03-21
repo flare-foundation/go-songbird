@@ -19,7 +19,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/version"
@@ -878,18 +878,18 @@ func initTestRemoteProposerVM(
 
 	proVM := New(coreVM, proBlkStartTime, 0, false)
 
-	valState := &validators.TestState{
+	valState := &validation.TestState{
 		T: t,
 	}
 	valState.GetCurrentHeightF = func() (uint64, error) { return defaultPChainHeight, nil }
-	updater := &validators.TestUpdater{
+	updater := &validation.TestUpdater{
 		UpdateValidatorsFunc: func(blockID ids.ID) error {
 			return nil
 		},
 	}
-	retriever := &validators.TestRetriever{
-		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validators.Set, error) {
-			s := validators.NewSet()
+	retriever := &validation.TestRetriever{
+		GetValidatorsByBlockIDFunc: func(blockID ids.ID) (validation.Set, error) {
+			s := validation.NewSet()
 			_ = s.AddWeight(proVM.ctx.NodeID, 10)
 			_ = s.AddWeight(ids.ShortID{1}, 5)
 			_ = s.AddWeight(ids.ShortID{2}, 6)

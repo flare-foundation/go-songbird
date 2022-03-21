@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +21,7 @@ func TestInboundMsgByteThrottler(t *testing.T) {
 		AtLargeAllocSize:    1024,
 		NodeMaxAtLargeBytes: 1024,
 	}
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	vdr1ID := ids.GenerateTestShortID()
 	vdr2ID := ids.GenerateTestShortID()
 	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
@@ -238,7 +238,7 @@ func TestSybilMsgThrottlerMaxNonVdr(t *testing.T) {
 		AtLargeAllocSize:    100,
 		NodeMaxAtLargeBytes: 10,
 	}
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	vdr1ID := ids.GenerateTestShortID()
 	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
 	throttler, err := newInboundMsgByteThrottler(
@@ -297,7 +297,7 @@ func TestSybilMsgThrottlerFIFO(t *testing.T) {
 		AtLargeAllocSize:    1024,
 		NodeMaxAtLargeBytes: 1024,
 	}
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	vdr1ID := ids.GenerateTestShortID()
 	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
 	nonVdrNodeID := ids.GenerateTestShortID()

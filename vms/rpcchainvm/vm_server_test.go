@@ -13,7 +13,7 @@ import (
 
 	"github.com/flare-foundation/flare/api/proto/vmproto"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 func TestVMServer_FetchValidators(t *testing.T) {
@@ -26,7 +26,7 @@ func TestVMServer_FetchValidators(t *testing.T) {
 
 	// Generate fake validator set.
 	validIDs := generateValidIDs(5)
-	set := validators.NewSet()
+	set := validation.NewSet()
 	for i := range validIDs {
 		id, _ := ids.ToShortID(validIDs[i])
 		err := set.AddWeight(id, 5)
@@ -36,7 +36,7 @@ func TestVMServer_FetchValidators(t *testing.T) {
 	tests := []struct {
 		name             string
 		blockID          []byte
-		set              validators.Set
+		set              validation.Set
 		retrieverFailure bool
 		wantErr          require.ErrorAssertionFunc
 	}{
@@ -50,7 +50,7 @@ func TestVMServer_FetchValidators(t *testing.T) {
 		{
 			name:             "empty validator list",
 			blockID:          testBlockID[:],
-			set:              validators.NewSet(),
+			set:              validation.NewSet(),
 			retrieverFailure: false,
 			wantErr:          require.NoError,
 		},
@@ -80,7 +80,7 @@ func TestVMServer_FetchValidators(t *testing.T) {
 			// either return an error if test.retrieverFailure is set to true,
 			// or return the test set otherwise.
 			chainVMMock := ChainVMMock{
-				GetValidatorsFunc: func(gotID ids.ID) (validators.Set, error) {
+				GetValidatorsFunc: func(gotID ids.ID) (validation.Set, error) {
 					assert.Equal(t, testBlockID, gotID)
 
 					if test.retrieverFailure {

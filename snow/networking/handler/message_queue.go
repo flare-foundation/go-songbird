@@ -11,7 +11,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
@@ -48,7 +48,7 @@ type messageQueue struct {
 
 	log logging.Logger
 	// Validator set for the chain associated with this
-	vdrs validators.Set
+	vdrs validation.Set
 	// Tracks CPU utilization of each node
 	cpuTracker tracker.TimeTracker
 
@@ -62,7 +62,7 @@ type messageQueue struct {
 
 func NewMessageQueue(
 	log logging.Logger,
-	vdrs validators.Set,
+	vdrs validation.Set,
 	cpuTracker tracker.TimeTracker,
 	metricsNamespace string,
 	metricsRegisterer prometheus.Registerer,

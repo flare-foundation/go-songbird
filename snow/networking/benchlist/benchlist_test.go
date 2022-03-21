@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/wrappers"
 )
@@ -21,12 +21,12 @@ var minimumFailingDuration = 5 * time.Minute
 
 // Test that validators are properly added to the bench
 func TestBenchlistAdd(t *testing.T) {
-	vdrs := validators.NewSet()
-	vdr0 := validators.GenerateRandomValidator(50)
-	vdr1 := validators.GenerateRandomValidator(50)
-	vdr2 := validators.GenerateRandomValidator(50)
-	vdr3 := validators.GenerateRandomValidator(50)
-	vdr4 := validators.GenerateRandomValidator(50)
+	vdrs := validation.NewSet()
+	vdr0 := validation.GenerateRandomValidator(50)
+	vdr1 := validation.GenerateRandomValidator(50)
+	vdr2 := validation.GenerateRandomValidator(50)
+	vdr3 := validation.GenerateRandomValidator(50)
+	vdr4 := validation.GenerateRandomValidator(50)
 
 	errs := wrappers.Errs{}
 	errs.Add(
@@ -165,12 +165,12 @@ func TestBenchlistAdd(t *testing.T) {
 
 // Test that the benchlist won't bench more than the maximum portion of stake
 func TestBenchlistMaxStake(t *testing.T) {
-	vdrs := validators.NewSet()
-	vdr0 := validators.GenerateRandomValidator(1000)
-	vdr1 := validators.GenerateRandomValidator(1000)
-	vdr2 := validators.GenerateRandomValidator(1000)
-	vdr3 := validators.GenerateRandomValidator(2000)
-	vdr4 := validators.GenerateRandomValidator(100)
+	vdrs := validation.NewSet()
+	vdr0 := validation.GenerateRandomValidator(1000)
+	vdr1 := validation.GenerateRandomValidator(1000)
+	vdr2 := validation.GenerateRandomValidator(1000)
+	vdr3 := validation.GenerateRandomValidator(2000)
+	vdr4 := validation.GenerateRandomValidator(100)
 	// Total weight is 5100
 
 	errs := wrappers.Errs{}
@@ -209,7 +209,7 @@ func TestBenchlistMaxStake(t *testing.T) {
 	b.clock.Set(now)
 
 	// Register [threshold-1] failures for 3 validators
-	for _, vdr := range []validators.Validator{vdr0, vdr1, vdr2} {
+	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
 		for i := 0; i < threshold-1; i++ {
 			b.RegisterFailure(vdr.ID())
 		}
@@ -222,7 +222,7 @@ func TestBenchlistMaxStake(t *testing.T) {
 	b.lock.Unlock()
 
 	// Register another failure for all three
-	for _, vdr := range []validators.Validator{vdr0, vdr1, vdr2} {
+	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
 		b.RegisterFailure(vdr.ID())
 	}
 
@@ -297,12 +297,12 @@ func TestBenchlistMaxStake(t *testing.T) {
 
 // Test validators are removed from the bench correctly
 func TestBenchlistRemove(t *testing.T) {
-	vdrs := validators.NewSet()
-	vdr0 := validators.GenerateRandomValidator(1000)
-	vdr1 := validators.GenerateRandomValidator(1000)
-	vdr2 := validators.GenerateRandomValidator(1000)
-	vdr3 := validators.GenerateRandomValidator(1000)
-	vdr4 := validators.GenerateRandomValidator(1000)
+	vdrs := validation.NewSet()
+	vdr0 := validation.GenerateRandomValidator(1000)
+	vdr1 := validation.GenerateRandomValidator(1000)
+	vdr2 := validation.GenerateRandomValidator(1000)
+	vdr3 := validation.GenerateRandomValidator(1000)
+	vdr4 := validation.GenerateRandomValidator(1000)
 	// Total weight is 5100
 
 	errs := wrappers.Errs{}
@@ -351,7 +351,7 @@ func TestBenchlistRemove(t *testing.T) {
 	b.lock.Unlock()
 
 	// Register [threshold-1] failures for 3 validators
-	for _, vdr := range []validators.Validator{vdr0, vdr1, vdr2} {
+	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
 		for i := 0; i < threshold-1; i++ {
 			b.RegisterFailure(vdr.ID())
 		}
@@ -363,7 +363,7 @@ func TestBenchlistRemove(t *testing.T) {
 	b.lock.Lock()
 	b.clock.Set(now)
 	b.lock.Unlock()
-	for _, vdr := range []validators.Validator{vdr0, vdr1, vdr2} {
+	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
 		b.RegisterFailure(vdr.ID())
 	}
 

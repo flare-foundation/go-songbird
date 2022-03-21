@@ -12,7 +12,7 @@ import (
 
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 
 	safemath "github.com/flare-foundation/flare/utils/math"
@@ -48,7 +48,7 @@ type currentStakerChainState interface {
 	Apply(InternalState)
 
 	// Return the current validator set of [subnetID].
-	ValidatorSet(subnetID ids.ID) (validators.Set, error)
+	ValidatorSet(subnetID ids.ID) (validation.Set, error)
 }
 
 // currentStakerChainStateImpl is a copy on write implementation for versioning
@@ -285,15 +285,15 @@ func (cs *currentStakerChainStateImpl) Apply(is InternalState) {
 	cs.deletedStakers = nil
 }
 
-func (cs *currentStakerChainStateImpl) ValidatorSet(subnetID ids.ID) (validators.Set, error) {
+func (cs *currentStakerChainStateImpl) ValidatorSet(subnetID ids.ID) (validation.Set, error) {
 	if subnetID == constants.PrimaryNetworkID {
 		return cs.primaryValidatorSet()
 	}
 	return cs.subnetValidatorSet(subnetID)
 }
 
-func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validators.Set, error) {
-	vdrs := validators.NewSet()
+func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validation.Set, error) {
+	vdrs := validation.NewSet()
 
 	var err error
 	for nodeID, vdr := range cs.validatorsByNodeID {
@@ -310,8 +310,8 @@ func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validators.Set, er
 	return vdrs, nil
 }
 
-func (cs *currentStakerChainStateImpl) subnetValidatorSet(subnetID ids.ID) (validators.Set, error) {
-	vdrs := validators.NewSet()
+func (cs *currentStakerChainStateImpl) subnetValidatorSet(subnetID ids.ID) (validation.Set, error) {
+	vdrs := validation.NewSet()
 
 	for nodeID, vdr := range cs.validatorsByNodeID {
 		subnetVDR, exists := vdr.subnets[subnetID]

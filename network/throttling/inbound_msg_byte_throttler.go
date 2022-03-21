@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/linkedhashmap"
 	"github.com/flare-foundation/flare/utils/logging"
@@ -23,7 +23,7 @@ func newInboundMsgByteThrottler(
 	log logging.Logger,
 	namespace string,
 	registerer prometheus.Registerer,
-	vdrs validators.Set,
+	vdrs validation.Set,
 	config MsgByteThrottlerConfig,
 ) (*inboundMsgByteThrottler, error) {
 	t := &inboundMsgByteThrottler{
