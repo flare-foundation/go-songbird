@@ -742,6 +742,7 @@ func (m *manager) createSnowmanChain(
 			return nil, fmt.Errorf("first VM should implement `platform.VMState`")
 		}
 		m.platformVMState = platformVMState
+		ctx.PlatformVMState = platformVMState
 	}
 
 	// If the VM here is a validators retriever, then we are initializing the
@@ -753,8 +754,8 @@ func (m *manager) createSnowmanChain(
 	// We wrap the retriever into a caching retriever to improve performance.
 	retriever, ok := vm.(validators.Retriever)
 	if ok {
-		ctx.Context.ValidatorsRetriever = validators.NewCachingRetriever(retriever)
-		ctx.Context.ValidatorsUpdater = validators.NewUpdater(m.Validators, ctx.Context.ValidatorsRetriever)
+		ctx.ValidatorsRetriever = validators.NewCachingRetriever(retriever)
+		ctx.ValidatorsUpdater = validators.NewUpdater(m.Validators, ctx.ValidatorsRetriever)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it

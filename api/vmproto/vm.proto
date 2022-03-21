@@ -237,6 +237,6 @@ service VM {
     
     rpc VerifyHeightIndex(google.protobuf.Empty) returns (VerifyHeightIndexResponse);
     rpc GetBlockIDAtHeight(GetBlockIDAtHeightRequest) returns (GetBlockIDAtHeightResponse);
- 
+
     rpc FetchValidators(FetchValidatorsRequest) returns (FetchValidatorsResponse);
 }
