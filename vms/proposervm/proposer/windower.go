@@ -76,8 +76,11 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 	// canonically sort validators
 	// Note: validators are sorted by ID, sorting by weight would not create a
 	// canonically sorted list
+	sort.Slice(weights, func(i int, j int) bool {
+		return bytes.Compare(validatorIDs[i][:], validatorIDs[j][:]) < 0
+	})
 	sort.Slice(validatorIDs, func(i int, j int) bool {
-		return bytes.Compare(validatorIDs[i][:], validatorIDs[j][:]) == -1
+		return bytes.Compare(validatorIDs[i][:], validatorIDs[j][:]) < 0
 	})
 
 	if err := w.sampler.Initialize(weights); err != nil {
