@@ -18,6 +18,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	coreth "github.com/flare-foundation/coreth/plugin/evm"
+
 	"github.com/flare-foundation/flare/api/admin"
 	"github.com/flare-foundation/flare/api/auth"
 	"github.com/flare-foundation/flare/api/health"
@@ -676,7 +678,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		n.Config.VMManager.RegisterFactory(secp256k1fx.ID, &secp256k1fx.Factory{}),
 		n.Config.VMManager.RegisterFactory(nftfx.ID, &nftfx.Factory{}),
 		n.Config.VMManager.RegisterFactory(propertyfx.ID, &propertyfx.Factory{}),
-		// n.Config.VMManager.RegisterFactory(constants.EVMID, &coreth.Factory{}),
+		n.Config.VMManager.RegisterFactory(constants.EVMID, &coreth.Factory{}),
 		rpcchainvm.RegisterPlugins(n.Config.PluginDir, n.Config.VMManager),
 	)
 	if errs.Errored() {
