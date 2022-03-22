@@ -21,13 +21,13 @@ go mod download
 
 GROCKS_DIR=$(ls $HOME/go/pkg/mod/github.com/xrpdevs/)
 
-cd "$HOME/go/pkg/mod/github.com/xrpdevs/$GROCKS_DIR/"
-
 if [ -z ${ROCKSDBALLOWED+x} ]; then
   echo "Building for LevelDB"
 else
+  cd "$HOME/go/pkg/mod/github.com/xrpdevs/$GROCKS_DIR/"
   echo "Building rocksdb from source, this could take some time. You must be able to use sudo to install rocksdb."
-  sh "$FLARE_PATH/scripts/build_rocksdb.sh"
+  echo "NOTE: Building RocksDB is memory intensive, please make sure you have at least 16GB RAM (or RAM + Swap)"
+  make -j 16
 fi
 
 cd "$FLARE_PATH"
