@@ -38,7 +38,6 @@ fi
 cd "$FLARE_PATH"
 
 
-
 # Build flare
 "$FLARE_PATH"/scripts/build_flare.sh
 
