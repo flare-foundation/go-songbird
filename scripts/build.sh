@@ -19,7 +19,7 @@ go mod download
 
 # only use the latest rocksdb in the /xrpdevs/ namespace in the go package cache
 
-GROCKS_DIR="$HOME/go/pkg/mod/github.com/xrpdevs/$(ls -t $HOME/go/pkg/mod/github.com/xrpdevs/ | grep grocksdb | head -1)"
+GROCKS_DIR="$(ls -t $HOME/go/pkg/mod/github.com/xrpdevs/ | grep grocksdb | head -1)"
 
 if [ -z ${ROCKSDBALLOWED+x} ]; then
   echo "Building for LevelDB"
