@@ -32,7 +32,7 @@ else
   cat _build.sh | sed 's/sudo//g' >build.sh
   make -j 16
   export CGO_CFLAGS="-I$GROCKS_DIR/dist/include"
-  export CGO_LDFLAGS="-L$GROCKS_DIR/dist/lib -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd"
+  export CGO_LDFLAGS="-L$GROCKS_DIR/dist/lib -lrocksdb -lstdc++ -lm -lz -lsnappy -llz4 -lzstd -lpthread"
 fi
 
 cd "$FLARE_PATH"
