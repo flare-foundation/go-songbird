@@ -27,7 +27,8 @@ else
   cd "$HOME/go/pkg/mod/github.com/xrpdevs/$GROCKS_DIR/"
   echo "Building rocksdb from source, this could take some time. You must be able to use sudo to install rocksdb."
   echo "NOTE: Building RocksDB is memory intensive, please make sure you have at least 16GB RAM (or RAM + Swap)"
-
+  echo build.sh | sed 's/sudo//g' >build_mod.sh
+  mv build_mod.sh build.sh
   make -j 16
 fi
 
