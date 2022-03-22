@@ -1,0 +1,40 @@
+// Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
+// See the file LICENSE for licensing terms.
+
+package main
+
+import (
+	"github.com/hashicorp/go-plugin"
+
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/testing/mock/chainvm"
+	"github.com/flare-foundation/flare/vms/rpcchainvm"
+)
+
+func main() {
+	mock := chainvm.ChainVMMock{
+		GetValidatorsFunc: func(_ ids.ID) (validation.Set, error) {
+			// FIXME: Make this controllable instead of hardcoded.
+			set := validation.NewSet()
+			for i := 0; i < 10; i++ {
+				_ = set.AddWeight(fakeShortID(i), uint64(i))
+			}
+			return set, nil
+		},
+	}
+
+	plugin.Serve(&plugin.ServeConfig{
+		HandshakeConfig: rpcchainvm.Handshake,
+		Plugins: map[string]plugin.Plugin{
+			"vm": rpcchainvm.New(&mock),
+		},
+
+		// A non-nil value here enables gRPC serving for this plugin...
+		GRPCServer: plugin.DefaultGRPCServer,
+	})
+}
+
+func fakeShortID(i int) ids.ShortID {
+	return ids.ShortID{byte(i), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+}
