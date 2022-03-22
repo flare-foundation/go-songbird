@@ -4,7 +4,6 @@
 package proposer
 
 import (
-	"bytes"
 	"fmt"
 	"sort"
 	"time"
@@ -51,6 +50,7 @@ func New(retriever validation.Retriever, chainID ids.ID) Windower {
 }
 
 func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID) (time.Duration, error) {
+
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
@@ -60,11 +60,17 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 		return 0, fmt.Errorf("could not get validators for windowing: %w", err)
 	}
 
-	// convert the list of validators to a slice
+	// canonically sort validators
+	// Note: validators are sorted by ID, sorting by weight would not create a
+	// canonically sorted list
+	validatorList := validators.List()
+	sort.Sort(sortByID(validatorList))
+
+	// Then, create slices of weights and IDs for sampling.
 	totalWeight := uint64(0)
-	validatorIDs := make([]ids.ShortID, 0, validators.Len())
-	weights := make([]uint64, 0, validators.Len())
-	for _, validator := range validators.List() {
+	validatorIDs := make([]ids.ShortID, 0, len(validatorList))
+	weights := make([]uint64, 0, len(validatorList))
+	for _, validator := range validatorList {
 		totalWeight, err = math.Add64(totalWeight, validator.Weight())
 		if err != nil {
 			return 0, err
@@ -72,16 +78,6 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 		validatorIDs = append(validatorIDs, validator.ID())
 		weights = append(weights, validator.Weight())
 	}
-
-	// canonically sort validators
-	// Note: validators are sorted by ID, sorting by weight would not create a
-	// canonically sorted list
-	sort.Slice(weights, func(i int, j int) bool {
-		return bytes.Compare(validatorIDs[i][:], validatorIDs[j][:]) < 0
-	})
-	sort.Slice(validatorIDs, func(i int, j int) bool {
-		return bytes.Compare(validatorIDs[i][:], validatorIDs[j][:]) < 0
-	})
 
 	if err := w.sampler.Initialize(weights); err != nil {
 		return 0, err
@@ -108,5 +104,6 @@ func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID
 		}
 		delay += WindowDuration
 	}
+
 	return delay, nil
 }
