@@ -9,29 +9,15 @@ import (
 	"github.com/flare-foundation/flare/utils/constants"
 )
 
-// NOTE: We are doing a three-phase deploy to get rid of legacy Avalanche
-// versioning and to transition to Flare versioning.
-// 1. Roll out upgrade with hard-coded Flare versioning support.
-// 2. Roll out upgrade sending Flare application name and version numbers.
-// 3. Roll out upgrade removing hard-coded Flare versioning support.
-
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
-	Current                      = NewDefaultVersion(0, 5, 2)
+	Current                      = NewDefaultVersion(0, 6, 0)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 5, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 4, 0)
-	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 2, 0)
-	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 1, 0)
-
-	// Legacy versioning constants.
-	Legacy                      = NewDefaultVersion(1, 7, 5)
-	LegacyApp                   = NewDefaultApplication(constants.LegacyPlatformName, Legacy.Major(), Legacy.Minor(), Legacy.Patch())
-	LegacyCompatibleVersion     = NewDefaultApplication(constants.LegacyPlatformName, 1, 7, 0)
-	PrevLegacyCompatibleVersion = NewDefaultApplication(constants.LegacyPlatformName, 1, 5, 0)
-	LegacyUnmaskedVersion       = NewDefaultApplication(constants.LegacyPlatformName, 1, 1, 0)
-	PrevLegacyUnmaskedVersion   = NewDefaultApplication(constants.LegacyPlatformName, 1, 0, 0)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 
 	VersionParser = NewDefaultApplicationParser()
 
@@ -67,6 +53,12 @@ var (
 		constants.SongbirdID: time.Date(2022, time.March, 7, 16, 0, 0, 0, time.UTC),
 	}
 	ApricotPhase5DefaultTime = time.Date(2022, time.February, 11, 15, 0, 0, 0, time.UTC)
+
+	StateConnectorTimes = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+	}
+	StateConnectorDefaultTime = time.Date(2022, time.February, 12, 15, 0, 0, 0, time.UTC)
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
@@ -120,27 +112,21 @@ func GetApricotPhase5Time(networkID uint32) time.Time {
 	}
 	return ApricotPhase5DefaultTime
 }
+func GetStateConnectorTime(networkID uint32) time.Time {
+	if upgradeTime, exists := StateConnectorTimes[networkID]; exists {
+		return upgradeTime
+	}
+	return StateConnectorDefaultTime
+}
 
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetApricotPhase5Time(networkID),
+		GetStateConnectorTime(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
-		GetApricotPhase0Time(networkID),
+		GetApricotPhase3Time(networkID),
 		PrevMinimumUnmaskedVersion,
-	)
-}
-
-func GetLegacyCompatibility(networkID uint32) Compatibility {
-	return NewCompatibility(
-		LegacyApp,
-		LegacyCompatibleVersion,
-		GetApricotPhase5Time(networkID),
-		PrevLegacyCompatibleVersion,
-		LegacyUnmaskedVersion,
-		GetApricotPhase0Time(networkID),
-		PrevLegacyUnmaskedVersion,
 	)
 }
