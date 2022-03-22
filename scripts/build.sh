@@ -15,8 +15,6 @@ source "$FLARE_PATH"/scripts/constants.sh
 echo "Downloading dependencies..."
 go mod download
 
-#go get github.com/flare-foundation/flare/database/rocksdb
-
 #build rocksdb from source, replacing broken grocksdb build script
 
 GROCKS_DIR=$(ls $HOME/go/pkg/mod/github.com/xrpdevs/)
