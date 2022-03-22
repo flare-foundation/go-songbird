@@ -3,7 +3,7 @@
 mkdir -p ./db/node1 ./db/node2 ./db/node3 ./db/node4 ./db/node5 ./db/node6
 mkdir -p ./logs/node1 ./logs/node2 ./logs/node3 ./logs/node4 ./logs/node5 ./logs/node6
 
-export CUSTOM_VALIDATORS="NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc,NodeID-AQghDJTU3zuQj73itPtfTZz6CxsTQVD3R,NodeID-EkH8wyEshzEQBToAdR7Fexxcj9rrmEEHZ"
+export CUSTOM_VALIDATORS="NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg,NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu,NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu"
 
 printf "Launching node 1 at 127.0.0.1:9650\n"
 ./build/flare --network-id=local \
@@ -14,8 +14,8 @@ printf "Launching node 1 at 127.0.0.1:9650\n"
     --db-dir=./db/node1 \
     --bootstrap-ips= \
     --bootstrap-ids= \
-    --staking-tls-cert-file=./scripts/keys/NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc.crt \
-    --staking-tls-key-file=./scripts/keys/NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc.key \
+    --staking-tls-cert-file=./scripts/keys/NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg.crt \
+    --staking-tls-key-file=./scripts/keys/NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg.key \
     --db-type=leveldb \
     --log-level=debug 2>&1 > ./logs/node1/console.log &
 NODE_1_PID=`echo $!`
@@ -29,9 +29,9 @@ printf "Launching node 2 at 127.0.0.1:9660\n"
     --log-dir=./logs/node2 \
     --db-dir=./db/node2 \
     --bootstrap-ips=127.0.0.1:9651 \
-    --bootstrap-ids=NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc \
-    --staking-tls-cert-file=./scripts/keys/NodeID-AQghDJTU3zuQj73itPtfTZz6CxsTQVD3R.crt \
-    --staking-tls-key-file=./scripts/keys/NodeID-AQghDJTU3zuQj73itPtfTZz6CxsTQVD3R.key \
+    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg \
+    --staking-tls-cert-file=./scripts/keys/NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu.crt \
+    --staking-tls-key-file=./scripts/keys/NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu.key \
     --db-type=leveldb \
     --log-level=debug 2>&1 > ./logs/node2/console.log &
 NODE_2_PID=`echo $!`
@@ -45,9 +45,9 @@ printf "Launching node 3 at 127.0.0.1:9670\n"
     --log-dir=./logs/node3 \
     --db-dir=./db/node3 \
     --bootstrap-ips=127.0.0.1:9651 \
-    --bootstrap-ids=NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc \
-    --staking-tls-cert-file=./scripts/keys/NodeID-EkH8wyEshzEQBToAdR7Fexxcj9rrmEEHZ.crt \
-    --staking-tls-key-file=./scripts/keys/NodeID-EkH8wyEshzEQBToAdR7Fexxcj9rrmEEHZ.key \
+    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg \
+    --staking-tls-cert-file=./scripts/keys/NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu.crt \
+    --staking-tls-key-file=./scripts/keys/NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu.key \
     --db-type=leveldb \
     --log-level=debug 2>&1 > ./logs/node3/console.log &
 NODE_3_PID=`echo $!`
@@ -61,9 +61,9 @@ printf "Launching node 4 at 127.0.0.1:9680\n"
     --log-dir=./logs/node4 \
     --db-dir=./db/node4 \
     --bootstrap-ips=127.0.0.1:9651 \
-    --bootstrap-ids=NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc \
-    --staking-tls-cert-file=./scripts/keys/NodeID-FPAwqHjs8Mw8Cuki5bkm3vSVisZr8t2Lu.crt \
-    --staking-tls-key-file=./scripts/keys/NodeID-FPAwqHjs8Mw8Cuki5bkm3vSVisZr8t2Lu.key \
+    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg \
+    --staking-tls-cert-file=./scripts/keys/NodeID-MFrZFVCXPv5iCn6M9K6XduxGTYp891xXZ.crt \
+    --staking-tls-key-file=./scripts/keys/NodeID-MFrZFVCXPv5iCn6M9K6XduxGTYp891xXZ.key \
     --db-type=leveldb \
     --log-level=debug 2>&1 > ./logs/node4/console.log &
 NODE_4_PID=`echo $!`
@@ -77,9 +77,9 @@ printf "Launching node 5 at 127.0.0.1:9690\n"
     --log-dir=./logs/node5 \
     --db-dir=./db/node5 \
     --bootstrap-ips=127.0.0.1:9651 \
-    --bootstrap-ids=NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc \
-    --staking-tls-cert-file=./scripts/keys/NodeID-HaZ4HpanjndqSuN252chFsTysmdND5meA.crt \
-    --staking-tls-key-file=./scripts/keys/NodeID-HaZ4HpanjndqSuN252chFsTysmdND5meA.key \
+    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg \
+    --staking-tls-cert-file=./scripts/keys/NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN.crt \
+    --staking-tls-key-file=./scripts/keys/NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN.key \
     --db-type=leveldb \
     --log-level=debug 2>&1 > ./logs/node5/console.log &
 NODE_5_PID=`echo $!`
@@ -93,9 +93,9 @@ printf "Launching node 6 at 127.0.0.1:9690\n"
     --log-dir=./logs/node6 \
     --db-dir=./db/node6 \
     --bootstrap-ips=127.0.0.1:9651 \
-    --bootstrap-ids=NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc \
-    --staking-tls-cert-file=./scripts/keys/NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu.crt \
-    --staking-tls-key-file=./scripts/keys/NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu.key \
+    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg \
+    --staking-tls-cert-file=./scripts/keys/NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5.crt \
+    --staking-tls-key-file=./scripts/keys/NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5.key \
     --db-type=leveldb \
     --log-level=debug 2>&1 > ./logs/node6/console.log &
 NODE_6_PID=`echo $!`

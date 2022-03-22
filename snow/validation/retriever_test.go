@@ -79,9 +79,9 @@ func loadCostonValidators(t *testing.T) Set {
 	weight := uint64(200_000)
 	nodeIDs := []string{
 		"NodeID-5dDZXn99LCkDoEi6t9gTitZuQmhokxQTc",
+		"NodeID-AQghDJTU3zuQj73itPtfTZz6CxsTQVD3R",
 		"NodeID-EkH8wyEshzEQBToAdR7Fexxcj9rrmEEHZ",
 		"NodeID-FPAwqHjs8Mw8Cuki5bkm3vSVisZr8t2Lu",
-		"NodeID-AQghDJTU3zuQj73itPtfTZz6CxsTQVD3R",
 		"NodeID-HaZ4HpanjndqSuN252chFsTysmdND5meA",
 	}
 	set := NewSet()
