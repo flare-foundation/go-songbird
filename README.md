@@ -22,8 +22,7 @@ If you plan to build Flare from source, you will also need the following softwar
 - [gcc](https://gcc.gnu.org/)
 - g++
 
-If you want to use RocksDB, you will need sudo and cmake (and be permitted to use sudo) the sudo requirement is because
-the rocksdb libraries are installed in /lib/ or /usr/local/lib depending on platform.
+If you want to use RocksDB, you will need to have cmake installed as it is required by the RocksDB build scripts.
 
 ### Native Install
 
