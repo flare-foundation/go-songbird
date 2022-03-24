@@ -13,20 +13,20 @@ type Updater interface {
 	UpdateValidators(blockID ids.ID) error
 }
 
-func NewUpdater(validators Set, retriever Retriever) Updater {
-	u := updater{
+func NewRetrievingUpdater(validators Set, retriever Retriever) *RetrievingUpdater {
+	u := RetrievingUpdater{
 		validators: validators,
 		retriever:  retriever,
 	}
 	return &u
 }
 
-type updater struct {
+type RetrievingUpdater struct {
 	validators Set
 	retriever  Retriever
 }
 
-func (u *updater) UpdateValidators(blockID ids.ID) error {
+func (u *RetrievingUpdater) UpdateValidators(blockID ids.ID) error {
 	validators, err := u.retriever.GetValidators(blockID)
 	if err != nil {
 		return fmt.Errorf("could not get validators for updating: %w", err)

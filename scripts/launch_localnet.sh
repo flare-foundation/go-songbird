@@ -85,7 +85,7 @@ printf "Launching node 5 at 127.0.0.1:9690\n"
 NODE_5_PID=`echo $!`
 sleep 1
 
-printf "Launching node 6 at 127.0.0.1:9690\n"
+printf "Launching node 6 at 127.0.0.1:9700\n"
 ./build/flare --network-id=local \
     --public-ip=127.0.0.1 \
     --http-port=9700 \

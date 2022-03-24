@@ -10,7 +10,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 )
 
-func TestUpdaterFromDefaultSet(t *testing.T) {
+func TestNewRetrievingUpdater(t *testing.T) {
 	testBlockID := ids.ID{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -31,7 +31,7 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
-		u := NewUpdater(loadCostonValidators(t), cr)
+		u := NewRetrievingUpdater(loadCostonValidators(t), cr)
 
 		err := u.UpdateValidators(testBlockID)
 		require.NoError(t, err)
@@ -52,10 +52,9 @@ func TestUpdaterFromDefaultSet(t *testing.T) {
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
-		u := NewUpdater(NewSet(), cr)
+		u := NewRetrievingUpdater(NewSet(), cr)
 
 		err := u.UpdateValidators(testBlockID)
 		require.Error(t, err)
 	})
-
 }

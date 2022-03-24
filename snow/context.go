@@ -84,7 +84,7 @@ type ConsensusContext struct {
 	// Non-zero iff this chain is executing transactions.
 	executing utils.AtomicBool
 
-	// Indicates this chain is available to only validation.
+	// Indicates this chain is available to only validators.
 	validatorOnly utils.AtomicBool
 }
 

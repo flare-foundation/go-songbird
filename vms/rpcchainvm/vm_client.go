@@ -659,7 +659,7 @@ func (vm *VMClient) GetValidators(blockID ids.ID) (validation.Set, error) {
 		BlkId: blockID[:],
 	})
 	if err != nil {
-		return nil, fmt.Errorf("could not get load validators response: %w", err)
+		return nil, fmt.Errorf("could not get fetch validators: %w", err)
 	}
 	if len(res.ValidatorIds) != len(res.Weights) {
 		return nil, fmt.Errorf("mismatch between validators and weights (%d != %d)", len(res.ValidatorIds), len(res.Weights))

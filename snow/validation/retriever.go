@@ -6,8 +6,9 @@ package validation
 import (
 	"fmt"
 
-	"github.com/flare-foundation/flare/ids"
 	lru "github.com/hashicorp/golang-lru"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 const (
@@ -18,15 +19,15 @@ type Retriever interface {
 	GetValidators(blockID ids.ID) (Set, error)
 }
 
-type cachingRetriever struct {
+type CachingRetriever struct {
 	retriever Retriever
 	cache     *lru.Cache
 }
 
-func NewCachingRetriever(retriever Retriever) Retriever {
+func NewCachingRetriever(retriever Retriever) *CachingRetriever {
 
 	cache, _ := lru.New(validatorSetsCacheSize)
-	c := cachingRetriever{
+	c := CachingRetriever{
 		retriever: retriever,
 		cache:     cache,
 	}
@@ -34,7 +35,7 @@ func NewCachingRetriever(retriever Retriever) Retriever {
 	return &c
 }
 
-func (c *cachingRetriever) GetValidators(blockID ids.ID) (Set, error) {
+func (c *CachingRetriever) GetValidators(blockID ids.ID) (Set, error) {
 	entry, ok := c.cache.Get(blockID)
 	if ok {
 		return entry.(Set), nil
