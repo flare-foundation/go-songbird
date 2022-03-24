@@ -20,7 +20,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
@@ -67,7 +67,7 @@ func TestEngineShutdown(t *testing.T) {
 func TestEngineAdd(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -173,7 +173,7 @@ func TestEngineAdd(t *testing.T) {
 func TestEngineQuery(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -296,9 +296,9 @@ func TestEngineQuery(t *testing.T) {
 		}
 		*queried = true
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if vtx0.ID() != vtxID {
@@ -391,9 +391,9 @@ func TestEngineQuery(t *testing.T) {
 		}
 		*queried = true
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if vtx1.ID() != vtxID {
@@ -464,7 +464,7 @@ func TestEngineQuery(t *testing.T) {
 func TestEngineMultipleQuery(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -568,9 +568,9 @@ func TestEngineMultipleQuery(t *testing.T) {
 		}
 		*queried = true
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr0, vdr1, vdr2)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr0, vdr1, vdr2)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if vtx0.ID() != vtxID {
@@ -657,7 +657,7 @@ func TestEngineMultipleQuery(t *testing.T) {
 func TestEngineBlockedIssue(t *testing.T) {
 	_, _, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	engCfg.Validators = vals
 
 	vdr := ids.GenerateTestShortID()
@@ -738,7 +738,7 @@ func TestEngineBlockedIssue(t *testing.T) {
 func TestEngineAbandonResponse(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -820,7 +820,7 @@ func TestEngineAbandonResponse(t *testing.T) {
 func TestEngineScheduleRepoll(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -923,7 +923,7 @@ func TestEngineRejectDoubleSpendTx(t *testing.T) {
 	sender.Default(true)
 	sender.CantSendGetAcceptedFrontier = false
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1031,7 +1031,7 @@ func TestEngineRejectDoubleSpendIssuedTx(t *testing.T) {
 	sender.Default(true)
 	sender.CantSendGetAcceptedFrontier = false
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1147,7 +1147,7 @@ func TestEngineIssueRepoll(t *testing.T) {
 	bootCfg.Sender = sender
 	engCfg.Sender = sender
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1194,10 +1194,10 @@ func TestEngineIssueRepoll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sender.SendPullQueryF = func(vdrs ids.ShortSet, _ uint32, vtxID ids.ID) {
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !vdrs.Equals(vdrSet) {
+	sender.SendPullQueryF = func(validators ids.ShortSet, _ uint32, vtxID ids.ID) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !validators.Equals(set) {
 			t.Fatalf("Wrong query recipients")
 		}
 		if vtxID != gVtx.ID() && vtxID != mVtx.ID() {
@@ -1224,7 +1224,7 @@ func TestEngineReissue(t *testing.T) {
 	bootCfg.Sender = sender
 	engCfg.Sender = sender
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1413,7 +1413,7 @@ func TestEngineLargeIssue(t *testing.T) {
 	bootCfg.Sender = sender
 	engCfg.Sender = sender
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1527,7 +1527,7 @@ func TestEngineGetVertex(t *testing.T) {
 	sender.CantSendGetAcceptedFrontier = false
 	engCfg.Sender = sender
 
-	vdr := validators.GenerateRandomValidator(1)
+	vdr := validation.GenerateRandomValidator(1)
 
 	manager := vertex.NewTestManager(t)
 	manager.Default(true)
@@ -1586,7 +1586,7 @@ func TestEngineGetVertex(t *testing.T) {
 func TestEngineInsufficientValidators(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1663,7 +1663,7 @@ func TestEngineInsufficientValidators(t *testing.T) {
 func TestEnginePushGossip(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1757,7 +1757,7 @@ func TestEnginePushGossip(t *testing.T) {
 func TestEngineSingleQuery(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1835,7 +1835,7 @@ func TestEngineSingleQuery(t *testing.T) {
 func TestEngineParentBlockingInsert(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -1946,7 +1946,7 @@ func TestEngineParentBlockingInsert(t *testing.T) {
 func TestEngineBlockingChitRequest(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -2074,7 +2074,7 @@ func TestEngineBlockingChitRequest(t *testing.T) {
 func TestEngineBlockingChitResponse(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -2166,9 +2166,9 @@ func TestEngineBlockingChitResponse(t *testing.T) {
 	queryRequestID := new(uint32)
 	sender.SendPushQueryF = func(inVdrs ids.ShortSet, requestID uint32, vtxID ids.ID, vtx []byte) {
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if issuedVtx.ID() != vtxID {
@@ -2213,7 +2213,7 @@ func TestEngineBlockingChitResponse(t *testing.T) {
 func TestEngineMissingTx(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -2305,9 +2305,9 @@ func TestEngineMissingTx(t *testing.T) {
 	queryRequestID := new(uint32)
 	sender.SendPushQueryF = func(inVdrs ids.ShortSet, requestID uint32, vtxID ids.ID, vtx []byte) {
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if issuedVtx.ID() != vtxID {
@@ -2352,7 +2352,7 @@ func TestEngineMissingTx(t *testing.T) {
 func TestEngineIssueBlockingTx(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -2422,7 +2422,7 @@ func TestEngineIssueBlockingTx(t *testing.T) {
 func TestEngineReissueAbortedVertex(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -2558,7 +2558,7 @@ func TestEngineReissueAbortedVertex(t *testing.T) {
 func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Beacons = vals
 	bootCfg.Validators = vals
@@ -2645,11 +2645,11 @@ func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 
 	requested := new(bool)
 	requestID := new(uint32)
-	sender.SendGetAcceptedFrontierF = func(vdrs ids.ShortSet, reqID uint32) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedFrontierF = func(validators ids.ShortSet, reqID uint32) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -2689,11 +2689,11 @@ func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 	acceptedFrontier := []ids.ID{vtxID0}
 
 	*requested = false
-	sender.SendGetAcceptedF = func(vdrs ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedF = func(validators ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		if !ids.Equals(acceptedFrontier, proposedAccepted) {
@@ -2795,11 +2795,11 @@ func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 			t.Fatalf("Returned wrong chits")
 		}
 	}
-	sender.SendPushQueryF = func(vdrs ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
-		if vdrs.Len() != 1 {
+	sender.SendPushQueryF = func(validators ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 
@@ -2834,7 +2834,7 @@ func TestEngineReBootstrapFails(t *testing.T) {
 	bootCfg.RetryBootstrap = true
 	bootCfg.RetryBootstrapWarnFrequency = 4
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Beacons = vals
 	bootCfg.Validators = vals
@@ -2894,7 +2894,7 @@ func TestEngineReBootstrapFails(t *testing.T) {
 
 	requested := new(bool)
 	requestID := new(uint32)
-	sender.SendGetAcceptedFrontierF = func(vdrs ids.ShortSet, reqID uint32) {
+	sender.SendGetAcceptedFrontierF = func(validators ids.ShortSet, reqID uint32) {
 		// instead of triggering the timeout here, we'll just invoke the GetAcceptedFrontierFailed func
 		//
 		// s.router.GetAcceptedFrontierFailed(vID, s.ctx.ChainID, requestID)
@@ -2908,10 +2908,10 @@ func TestEngineReBootstrapFails(t *testing.T) {
 		// -------> return b.AcceptedFrontier(validatorID, requestID, nil)
 
 		// ensure the request is made to the correct validators
-		if vdrs.Len() != 1 {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -2938,11 +2938,11 @@ func TestEngineReBootstrapFails(t *testing.T) {
 
 	// reset requested
 	*requested = false
-	sender.SendGetAcceptedF = func(vdrs ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedF = func(validators ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -2995,7 +2995,7 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 	bootCfg.RetryBootstrap = true
 	bootCfg.RetryBootstrapWarnFrequency = 4
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Beacons = vals
 	bootCfg.Validators = vals
@@ -3082,11 +3082,11 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 
 	requested := new(bool)
 	requestID := new(uint32)
-	sender.SendGetAcceptedFrontierF = func(vdrs ids.ShortSet, reqID uint32) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedFrontierF = func(validators ids.ShortSet, reqID uint32) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -3134,11 +3134,11 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 	acceptedFrontier := []ids.ID{vtxID0}
 
 	*requested = false
-	sender.SendGetAcceptedF = func(vdrs ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedF = func(validators ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		if !ids.Equals(acceptedFrontier, proposedAccepted) {
@@ -3241,11 +3241,11 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 			t.Fatalf("Returned wrong chits")
 		}
 	}
-	sender.SendPushQueryF = func(vdrs ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
-		if vdrs.Len() != 1 {
+	sender.SendPushQueryF = func(validators ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 
@@ -3277,7 +3277,7 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 func TestEngineUndeclaredDependencyDeadlock(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -3386,7 +3386,7 @@ func TestEngineUndeclaredDependencyDeadlock(t *testing.T) {
 func TestEnginePartiallyValidVertex(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -3531,7 +3531,7 @@ func TestEngineGossip(t *testing.T) {
 func TestEngineInvalidVertexIgnoredFromUnexpectedPeer(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -3685,7 +3685,7 @@ func TestEngineInvalidVertexIgnoredFromUnexpectedPeer(t *testing.T) {
 func TestEnginePushQueryRequestIDConflict(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -3841,7 +3841,7 @@ func TestEngineAggressivePolling(t *testing.T) {
 	engCfg.Params.ConcurrentRepolls = 3
 	engCfg.Params.BetaRogue = 3
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -3962,7 +3962,7 @@ func TestEngineDuplicatedIssuance(t *testing.T) {
 	bootCfg.Sender = sender
 	engCfg.Sender = sender
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -4074,7 +4074,7 @@ func TestEngineDoubleChit(t *testing.T) {
 	engCfg.Params.Alpha = 2
 	engCfg.Params.K = 2
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -4208,7 +4208,7 @@ func TestEngineDoubleChit(t *testing.T) {
 func TestEngineBubbleVotes(t *testing.T) {
 	_, bootCfg, engCfg := DefaultConfig()
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -4371,7 +4371,7 @@ func TestEngineIssue(t *testing.T) {
 	bootCfg.Sender = sender
 	engCfg.Sender = sender
 
-	vals := validators.NewSet()
+	vals := validation.NewSet()
 	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
 	bootCfg.Validators = vals
 	bootCfg.WeightTracker = wt
@@ -4525,7 +4525,7 @@ func TestAbandonTx(t *testing.T) {
 	bootCfg.Sender = sender
 	engCfg.Sender = sender
 
-	engCfg.Validators = validators.NewSet()
+	engCfg.Validators = validation.NewSet()
 	vdr := ids.GenerateTestShortID()
 	if err := engCfg.Validators.AddWeight(vdr, 1); err != nil {
 		t.Fatal(err)

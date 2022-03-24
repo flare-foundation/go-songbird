@@ -5,7 +5,7 @@ package tracker
 
 import (
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/math"
 )
 
@@ -17,7 +17,7 @@ type WeightTracker interface {
 	EnoughConnectedWeight() bool
 }
 
-func NewWeightTracker(beacons validators.Set, startupAlpha uint64) WeightTracker {
+func NewWeightTracker(beacons validation.Set, startupAlpha uint64) WeightTracker {
 	return &weightTracker{
 		beacons:      beacons,
 		startupAlpha: startupAlpha,
@@ -25,7 +25,7 @@ func NewWeightTracker(beacons validators.Set, startupAlpha uint64) WeightTracker
 }
 
 type weightTracker struct {
-	beacons               validators.Set
+	beacons               validation.Set
 	startupAlpha          uint64
 	weight                uint64
 	enoughConnectedWeight bool

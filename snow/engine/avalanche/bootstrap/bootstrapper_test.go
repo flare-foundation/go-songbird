@@ -19,7 +19,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/queue"
 	"github.com/flare-foundation/flare/snow/engine/common/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 
 	avagetter "github.com/flare-foundation/flare/snow/engine/avalanche/getter"
 )
@@ -32,7 +32,7 @@ var (
 func newConfig(t *testing.T) (Config, ids.ShortID, *common.SenderTest, *vertex.TestManager, *vertex.TestVM) {
 	ctx := snow.DefaultConsensusContextTest()
 
-	peers := validators.NewSet()
+	peers := validation.NewSet()
 	db := memdb.New()
 	sender := &common.SenderTest{T: t}
 	manager := vertex.NewTestManager(t)

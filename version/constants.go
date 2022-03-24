@@ -12,10 +12,10 @@ import (
 // These are globals that describe network upgrades and node versions
 var (
 	// Flare versioning constants.
-	Current                      = NewDefaultVersion(0, 6, 1)
+	Current                      = NewDefaultVersion(0, 7, 0)
 	CurrentApp                   = NewDefaultApplication(constants.PlatformName, Current.Major(), Current.Minor(), Current.Patch())
-	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
-	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
+	MinimumCompatibleVersion     = NewDefaultApplication(constants.PlatformName, 0, 7, 0)
+	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 
@@ -62,6 +62,12 @@ var (
 
 	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
 	ApricotPhase4DefaultMinPChainHeight = uint64(0)
+
+	FlareHardFork1Times = map[uint32]time.Time{
+		constants.CostonID:   time.Date(2022, time.March, 23, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+	}
+	FlareHardFork1DefaultTime = time.Date(2022, time.March, 20, 18, 0, 0, 0, time.UTC)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
@@ -119,11 +125,18 @@ func GetStateConnectorTime(networkID uint32) time.Time {
 	return StateConnectorDefaultTime
 }
 
+func GetFlareHardFork1Time(networkID uint32) time.Time {
+	if upgradeTime, exists := FlareHardFork1Times[networkID]; exists {
+		return upgradeTime
+	}
+	return FlareHardFork1DefaultTime
+}
+
 func GetCompatibility(networkID uint32) Compatibility {
 	return NewCompatibility(
 		CurrentApp,
 		MinimumCompatibleVersion,
-		GetStateConnectorTime(networkID),
+		GetFlareHardFork1Time(networkID),
 		PrevMinimumCompatibleVersion,
 		MinimumUnmaskedVersion,
 		GetApricotPhase3Time(networkID),

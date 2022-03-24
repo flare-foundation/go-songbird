@@ -8,7 +8,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/avalanche"
 	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // Config wraps all the parameters needed for an avalanche engine
@@ -18,7 +18,7 @@ type Config struct {
 	VM         vertex.DAGVM
 	Manager    vertex.Manager
 	Sender     common.Sender
-	Validators validators.Set
+	Validators validation.Set
 
 	Params    avalanche.Parameters
 	Consensus avalanche.Consensus

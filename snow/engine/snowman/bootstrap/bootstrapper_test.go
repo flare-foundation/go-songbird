@@ -21,7 +21,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common/tracker"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	snowgetter "github.com/flare-foundation/flare/snow/engine/snowman/getter"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 var errUnknownBlock = errors.New("unknown block")
@@ -29,7 +29,7 @@ var errUnknownBlock = errors.New("unknown block")
 func newConfig(t *testing.T) (Config, ids.ShortID, *common.SenderTest, *block.TestVM) {
 	ctx := snow.DefaultConsensusContextTest()
 
-	peers := validators.NewSet()
+	peers := validation.NewSet()
 	db := memdb.New()
 	sender := &common.SenderTest{}
 	vm := &block.TestVM{}

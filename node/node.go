@@ -45,7 +45,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/timeout"
 	"github.com/flare-foundation/flare/snow/triggers"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/hashing"
@@ -75,7 +75,6 @@ var (
 	errCNotCreated     = errors.New("C-Chain not created")
 	errNotBootstrapped = errors.New("primary subnet has not finished bootstrapping")
 	errShuttingDown    = errors.New("server shutting down")
-	errNoValidators    = errors.New("no validators defined for network")
 )
 
 // Node is an instance of an Avalanche node.
@@ -129,10 +128,10 @@ type Node struct {
 	Net              network.Network
 
 	// this node's initial connections to the network
-	beacons validators.Set
+	beacons validation.Set
 
 	// current validators of the network
-	vdrs validators.Manager
+	validators validation.Set
 
 	// Handles HTTP API calls
 	APIServer server.Server
@@ -190,15 +189,17 @@ func (n *Node) initNetworking() error {
 
 	tlsConfig := network.TLSConfig(n.Config.StakingTLSCert)
 
-	// Initialize validator manager and primary network's validator set
-	n.vdrs = validators.NewManager(n.Config.NetworkID)
-	networkValidators, ok := n.vdrs.GetValidators()
-	if !ok {
-		return errNoValidators
-	}
+	// Initialize empty validator set for now
+	n.validators = validation.NewSet()
+
+	// We add ourselves as validator with a weight of one here. This is a work-around
+	// for P-Chain bootstrapping issues with an empty validator set. Once we are past
+	// the P-Chain initialization, the C-Chain initialization will set the correct
+	// validator set, so the C-Chain will never run with this work-around anyway.
+	_ = n.validators.AddWeight(n.ID, 1)
 
 	// Configure benchlist
-	n.Config.BenchlistConfig.Validators = n.vdrs
+	n.Config.BenchlistConfig.Validators = n.validators
 	n.Config.BenchlistConfig.Benchable = n.Config.ConsensusRouter
 	n.Config.BenchlistConfig.StakingEnabled = n.Config.EnableStaking
 	n.benchlistManager = benchlist.NewManager(&n.Config.BenchlistConfig)
@@ -207,13 +208,13 @@ func (n *Node) initNetworking() error {
 
 	consensusRouter := n.Config.ConsensusRouter
 	if !n.Config.EnableStaking {
-		if err := networkValidators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
+		if err := n.validators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
 			return err
 		}
 		consensusRouter = &insecureValidatorManager{
-			Router: consensusRouter,
-			vdrs:   networkValidators,
-			weight: n.Config.DisabledStakingWeight,
+			Router:     consensusRouter,
+			validators: n.validators,
+			weight:     n.Config.DisabledStakingWeight,
 		}
 	}
 
@@ -249,7 +250,7 @@ func (n *Node) initNetworking() error {
 	n.Config.NetworkConfig.MyNodeID = n.ID
 	n.Config.NetworkConfig.MyIP = n.Config.IP
 	n.Config.NetworkConfig.NetworkID = n.Config.NetworkID
-	n.Config.NetworkConfig.Validators = n.vdrs
+	n.Config.NetworkConfig.Validators = n.validators
 	n.Config.NetworkConfig.Beacons = n.beacons
 	n.Config.NetworkConfig.TLSConfig = tlsConfig
 	n.Config.NetworkConfig.TLSKey = tlsKey
@@ -272,26 +273,26 @@ func (n *Node) initNetworking() error {
 
 type insecureValidatorManager struct {
 	router.Router
-	vdrs   validators.Set
-	weight uint64
+	validators validation.Set
+	weight     uint64
 }
 
 func (i *insecureValidatorManager) Connected(vdrID ids.ShortID, nodeVersion version.Application) {
-	_ = i.vdrs.AddWeight(vdrID, i.weight)
+	_ = i.validators.AddWeight(vdrID, i.weight)
 	i.Router.Connected(vdrID, nodeVersion)
 }
 
 func (i *insecureValidatorManager) Disconnected(vdrID ids.ShortID) {
 	// Shouldn't error unless the set previously had an error, which should
 	// never happen as described above
-	_ = i.vdrs.RemoveWeight(vdrID, i.weight)
+	_ = i.validators.RemoveWeight(vdrID, i.weight)
 	i.Router.Disconnected(vdrID)
 }
 
 type beaconManager struct {
 	router.Router
 	timer          *timer.Timer
-	beacons        validators.Set
+	beacons        validation.Set
 	requiredWeight uint64
 	totalWeight    uint64
 }
@@ -410,7 +411,7 @@ func (n *Node) initDatabase(dbManager manager.Manager) error {
 
 // Set the node IDs of the peers this node should first connect to
 func (n *Node) initBeacons() error {
-	n.beacons = validators.NewSet()
+	n.beacons = validation.NewSet()
 	for _, peerID := range n.Config.BootstrapIDs {
 		if err := n.beacons.AddWeight(peerID, 1); err != nil {
 			return err
@@ -550,7 +551,7 @@ func (n *Node) addDefaultVMAliases() error {
 
 // Create the chainManager and register the following VMs:
 // AVM, Simple Payments DAG, Simple Payments Chain, and Platform VM
-// Assumes n.DBManager, n.vdrs all initialized (non-nil)
+// Assumes n.DBManager, n.validators all initialized (non-nil)
 func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 	createAVMTx, err := genesis.VMGenesis(n.Config.GenesisBytes, constants.AVMID)
 	if err != nil {
@@ -614,7 +615,7 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		Router:                                  n.Config.ConsensusRouter,
 		Net:                                     n.Net,
 		ConsensusParams:                         n.Config.ConsensusParams,
-		Validators:                              n.vdrs,
+		Validators:                              n.validators,
 		NodeID:                                  n.ID,
 		NetworkID:                               n.Config.NetworkID,
 		Server:                                  &n.APIServer,
@@ -645,21 +646,12 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 		ResetProposerVMHeightIndex:              n.Config.ResetProposerVMHeightIndex,
 	})
 
-	vdrs := n.vdrs
-
-	// If staking is disabled, ignore updates to Subnets' validator sets
-	// Instead of updating node's validator manager, platform chain makes changes
-	// to its own local validator manager (which isn't used for sampling)
-	if !n.Config.EnableStaking {
-		vdrs = validators.NewManager(n.Config.NetworkID)
-	}
-
 	// Register the VMs that Avalanche supports
 	errs := wrappers.Errs{}
 	errs.Add(
 		n.Config.VMManager.RegisterFactory(constants.PlatformVMID, &platformvm.Factory{
 			Chains:                 n.chainManager,
-			Validators:             vdrs,
+			Validators:             n.validators,
 			UptimeLockedCalculator: n.uptimeCalculator,
 			StakingEnabled:         n.Config.EnableStaking,
 			WhitelistedSubnets:     n.Config.WhitelistedSubnets,
@@ -892,7 +884,6 @@ func (n *Node) initInfoAPI() error {
 
 	n.Log.Info("initializing info API")
 
-	validators, _ := n.vdrs.GetValidators()
 	service, err := info.NewService(
 		info.Parameters{
 			Version:               version.CurrentApp,
@@ -908,7 +899,7 @@ func (n *Node) initInfoAPI() error {
 		n.Config.VMManager,
 		n.Net,
 		version.NewDefaultApplicationParser(),
-		validators,
+		n.validators,
 	)
 	if err != nil {
 		return err

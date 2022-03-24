@@ -1,7 +1,7 @@
 // Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
-package validators
+package validation
 
 import (
 	"fmt"
@@ -104,15 +104,15 @@ type set struct {
 }
 
 // Set implements the Set interface.
-func (s *set) Set(vdrs []Validator) error {
+func (s *set) Set(validators []Validator) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	return s.set(vdrs)
+	return s.set(validators)
 }
 
-func (s *set) set(vdrs []Validator) error {
-	lenVdrs := len(vdrs)
+func (s *set) set(validators []Validator) error {
+	lenVdrs := len(validators)
 	// If the underlying arrays are much larger than necessary, resize them to
 	// allow garbage collection of unused memory
 	if cap(s.vdrSlice) > len(s.vdrSlice)*maxExcessCapacityFactor {
@@ -132,7 +132,7 @@ func (s *set) set(vdrs []Validator) error {
 	s.totalWeight = 0
 	s.initialized = false
 
-	for _, vdr := range vdrs {
+	for _, vdr := range validators {
 		vdrID := vdr.ID()
 		if s.contains(vdrID) {
 			continue
@@ -202,7 +202,7 @@ func (s *set) addWeight(vdrID ids.ShortID, weight uint64) error {
 
 	newTotalWeight, err := safemath.Add64(s.totalWeight, weight)
 	if err != nil {
-		return nil
+		return err
 	}
 	s.totalWeight = newTotalWeight
 	s.initialized = false

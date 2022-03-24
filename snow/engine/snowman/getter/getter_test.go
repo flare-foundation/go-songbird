@@ -13,7 +13,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"gotest.tools/assert"
 )
 
@@ -22,7 +22,7 @@ var errUnknownBlock = errors.New("unknown block")
 func testSetup(t *testing.T) (*block.TestVM, *common.SenderTest, common.Config) {
 	ctx := snow.DefaultConsensusContextTest()
 
-	peers := validators.NewSet()
+	peers := validation.NewSet()
 	sender := &common.SenderTest{}
 	vm := &block.TestVM{}
 

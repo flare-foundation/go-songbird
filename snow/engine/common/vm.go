@@ -7,7 +7,7 @@ import (
 	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // VM describes the interface that all consensus VMs must implement
@@ -19,7 +19,7 @@ type VM interface {
 	health.Checker
 
 	// Connector represents a handler that is called on connection connect/disconnect
-	validators.Connector
+	validation.Connector
 
 	// Initialize this VM.
 	// [ctx]: Metadata about this VM.

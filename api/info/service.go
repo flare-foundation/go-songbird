@@ -14,7 +14,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/network"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
@@ -35,7 +35,7 @@ type Info struct {
 	chainManager  chains.Manager
 	vmManager     vms.Manager
 	versionParser version.ApplicationParser
-	validators    validators.Set
+	validators    validation.Set
 }
 
 type Parameters struct {
@@ -56,7 +56,7 @@ func NewService(
 	vmManager vms.Manager,
 	network network.Network,
 	versionParser version.ApplicationParser,
-	validators validators.Set,
+	validators validation.Set,
 ) (*common.HTTPHandler, error) {
 	newServer := rpc.NewServer()
 	codec := json.NewCodec()

@@ -9,7 +9,7 @@ import (
 	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // Engine describes the standard interface of a consensus engine
@@ -371,7 +371,7 @@ type AppHandler interface {
 // they occur.
 type InternalHandler interface {
 	// Notify this engine of peer changes.
-	validators.Connector
+	validation.Connector
 
 	// Notify this engine that a registered timeout has fired.
 	Timeout() error

@@ -4,11 +4,12 @@
 package proposer
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/sampler"
 	"github.com/flare-foundation/flare/utils/wrappers"
@@ -25,8 +26,8 @@ var _ Windower = &windower{}
 
 type Windower interface {
 	Delay(
-		chainHeight,
-		pChainHeight uint64,
+		height uint64,
+		parentID ids.ID,
 		validatorID ids.ShortID,
 	) (time.Duration, error)
 }
@@ -34,69 +35,60 @@ type Windower interface {
 // windower interfaces with P-Chain and it is responsible for calculating the
 // delay for the block submission window of a given validator
 type windower struct {
-	state       validators.State
-	subnetID    ids.ID
-	chainSource uint64
-	sampler     sampler.WeightedWithoutReplacement
+	retriever validation.Retriever
+	nonce     uint64
+	sampler   sampler.WeightedWithoutReplacement
 }
 
-func New(state validators.State, subnetID, chainID ids.ID) Windower {
+func New(retriever validation.Retriever, chainID ids.ID) Windower {
 	w := wrappers.Packer{Bytes: chainID[:]}
 	return &windower{
-		state:       state,
-		subnetID:    subnetID,
-		chainSource: w.UnpackLong(),
-		sampler:     sampler.NewDeterministicWeightedWithoutReplacement(),
+		retriever: retriever,
+		nonce:     w.UnpackLong(),
+		sampler:   sampler.NewDeterministicWeightedWithoutReplacement(),
 	}
 }
 
-func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.ShortID) (time.Duration, error) {
+func (w *windower) Delay(height uint64, parentID ids.ID, validatorID ids.ShortID) (time.Duration, error) {
+
 	if validatorID == ids.ShortEmpty {
 		return MaxDelay, nil
 	}
 
-	// get the validator set by the p-chain height
-	validatorsMap, err := w.state.GetValidatorSet(pChainHeight, w.subnetID)
+	validators, err := w.retriever.GetValidators(parentID)
 	if err != nil {
-		return 0, err
-	}
-
-	// convert the map of validators to a slice
-	validators := make(validatorsSlice, 0, len(validatorsMap))
-	weight := uint64(0)
-	for k, v := range validatorsMap {
-		validators = append(validators, validatorData{
-			id:     k,
-			weight: v,
-		})
-		newWeight, err := math.Add64(weight, v)
-		if err != nil {
-			return 0, err
-		}
-		weight = newWeight
+		return 0, fmt.Errorf("could not get validators for windowing: %w", err)
 	}
 
 	// canonically sort validators
 	// Note: validators are sorted by ID, sorting by weight would not create a
 	// canonically sorted list
-	sort.Sort(validators)
+	validatorList := validators.List()
+	sort.Sort(sortByID(validatorList))
 
-	// convert the slice of validators to a slice of weights
-	validatorWeights := make([]uint64, len(validators))
-	for i, v := range validators {
-		validatorWeights[i] = v.weight
+	// Then, create slices of weights and IDs for sampling.
+	totalWeight := uint64(0)
+	validatorIDs := make([]ids.ShortID, 0, len(validatorList))
+	weights := make([]uint64, 0, len(validatorList))
+	for _, validator := range validatorList {
+		totalWeight, err = math.Add64(totalWeight, validator.Weight())
+		if err != nil {
+			return 0, err
+		}
+		validatorIDs = append(validatorIDs, validator.ID())
+		weights = append(weights, validator.Weight())
 	}
 
-	if err := w.sampler.Initialize(validatorWeights); err != nil {
+	if err := w.sampler.Initialize(weights); err != nil {
 		return 0, err
 	}
 
 	numToSample := MaxWindows
-	if weight < uint64(numToSample) {
-		numToSample = int(weight)
+	if totalWeight < uint64(numToSample) {
+		numToSample = int(totalWeight)
 	}
 
-	seed := chainHeight ^ w.chainSource
+	seed := height ^ w.nonce
 	w.sampler.Seed(int64(seed))
 
 	indices, err := w.sampler.Sample(numToSample)
@@ -106,11 +98,12 @@ func (w *windower) Delay(chainHeight, pChainHeight uint64, validatorID ids.Short
 
 	delay := time.Duration(0)
 	for _, index := range indices {
-		nodeID := validators[index].id
+		nodeID := validatorIDs[index]
 		if nodeID == validatorID {
 			return delay, nil
 		}
 		delay += WindowDuration
 	}
+
 	return delay, nil
 }

@@ -27,23 +27,23 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	// add poll for request 1
-	transitive.polls.Add(1, vdrs)
+	transitive.polls.Add(1, validators)
 
-	vdrs = ids.ShortBag{}
-	vdrs.Add(
+	validators = ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr3,
 	)
 
 	// add poll for request 2
-	transitive.polls.Add(2, vdrs)
+	transitive.polls.Add(2, validators)
 
 	// expect 2 pending polls
 	assert.Equal(t, 2, transitive.polls.Len())
@@ -119,32 +119,32 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	// add poll for request 1
-	transitive.polls.Add(1, vdrs)
+	transitive.polls.Add(1, validators)
 
-	vdrs = ids.ShortBag{}
-	vdrs.Add(
+	validators = ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr3,
 	)
 
 	// add poll for request 2
-	transitive.polls.Add(2, vdrs)
+	transitive.polls.Add(2, validators)
 
-	vdrs = ids.ShortBag{}
-	vdrs.Add(
+	validators = ids.ShortBag{}
+	validators.Add(
 		vdr2,
 		vdr3,
 	)
 
 	// add poll for request 3
-	transitive.polls.Add(3, vdrs)
+	transitive.polls.Add(3, validators)
 
 	// expect 3 pending polls
 	assert.Equal(t, 3, transitive.polls.Len())
@@ -254,32 +254,32 @@ func TestSharedDependency(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	// add poll for request 1
-	transitive.polls.Add(1, vdrs)
+	transitive.polls.Add(1, validators)
 
-	vdrs = ids.ShortBag{}
-	vdrs.Add(
+	validators = ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr3,
 	)
 
 	// add poll for request 2
-	transitive.polls.Add(2, vdrs)
+	transitive.polls.Add(2, validators)
 
-	vdrs = ids.ShortBag{}
-	vdrs.Add(
+	validators = ids.ShortBag{}
+	validators.Add(
 		vdr2,
 		vdr3,
 	)
 
 	// add poll for request 3
-	transitive.polls.Add(3, vdrs)
+	transitive.polls.Add(3, validators)
 
 	// expect 3 pending polls
 	assert.Equal(t, 3, transitive.polls.Len())

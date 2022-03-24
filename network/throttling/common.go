@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 )
 
@@ -23,7 +23,7 @@ type commonMsgThrottler struct {
 	log  logging.Logger
 	lock sync.Mutex
 	// Primary network validator set
-	vdrs validators.Set
+	validators validation.Set
 	// Max number of bytes that can be taken from the
 	// at-large byte allocation by a given node.
 	nodeMaxAtLargeBytes uint64
