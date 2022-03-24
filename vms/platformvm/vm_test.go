@@ -1996,11 +1996,11 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 	advanceTimePreference := options[0]
 
 	peerID := ids.ShortID{1, 2, 3, 4, 5, 4, 3, 2, 1}
-	vdrs := validation.NewSet()
-	if err := vdrs.AddWeight(peerID, 1); err != nil {
+	validators := validation.NewSet()
+	if err := validators.AddWeight(peerID, 1); err != nil {
 		t.Fatal(err)
 	}
-	beacons := vdrs
+	beacons := validators
 
 	timeoutManager := timeout.Manager{}
 	benchlist := benchlist.NewNoBenchlist()
@@ -2061,7 +2061,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 	consensus := &smcon.Topological{}
 	commonCfg := common.Config{
 		Ctx:                            consensusCtx,
-		Validators:                     vdrs,
+		Validators:                     validators,
 		Beacons:                        beacons,
 		SampleK:                        beacons.Len(),
 		StartupAlpha:                   (beacons.Weight() + 1) / 2,
@@ -2088,7 +2088,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 	handler, err := handler.New(
 		mc,
 		bootstrapConfig.Ctx,
-		vdrs,
+		validators,
 		msgChan,
 		nil,
 		time.Hour,
@@ -2111,7 +2111,7 @@ func TestBootstrapPartiallyAccepted(t *testing.T) {
 		AllGetsServer: snowGetHandler,
 		VM:            bootstrapConfig.VM,
 		Sender:        bootstrapConfig.Sender,
-		Validators:    vdrs,
+		Validators:    validators,
 		Params: snowball.Parameters{
 			K:                     1,
 			Alpha:                 1,

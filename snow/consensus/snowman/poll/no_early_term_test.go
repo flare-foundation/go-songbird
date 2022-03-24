@@ -14,11 +14,11 @@ func TestNoEarlyTermResults(t *testing.T) {
 
 	vdr1 := ids.ShortID{1} // k = 1
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(vdr1)
+	validators := ids.ShortBag{}
+	validators.Add(vdr1)
 
 	factory := NewNoEarlyTermFactory()
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, vtxID)
 	if !poll.Finished() {
@@ -41,14 +41,14 @@ func TestNoEarlyTermString(t *testing.T) {
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2} // k = 2
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	factory := NewNoEarlyTermFactory()
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, vtxID)
 
@@ -67,14 +67,14 @@ func TestNoEarlyTermDropsDuplicatedVotes(t *testing.T) {
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2} // k = 2
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	factory := NewNoEarlyTermFactory()
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, vtxID)
 	if poll.Finished() {

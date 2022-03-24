@@ -296,9 +296,9 @@ func TestEngineQuery(t *testing.T) {
 		}
 		*queried = true
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if vtx0.ID() != vtxID {
@@ -391,9 +391,9 @@ func TestEngineQuery(t *testing.T) {
 		}
 		*queried = true
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if vtx1.ID() != vtxID {
@@ -568,9 +568,9 @@ func TestEngineMultipleQuery(t *testing.T) {
 		}
 		*queried = true
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr0, vdr1, vdr2)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr0, vdr1, vdr2)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if vtx0.ID() != vtxID {
@@ -1194,10 +1194,10 @@ func TestEngineIssueRepoll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sender.SendPullQueryF = func(vdrs ids.ShortSet, _ uint32, vtxID ids.ID) {
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !vdrs.Equals(vdrSet) {
+	sender.SendPullQueryF = func(validators ids.ShortSet, _ uint32, vtxID ids.ID) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !validators.Equals(set) {
 			t.Fatalf("Wrong query recipients")
 		}
 		if vtxID != gVtx.ID() && vtxID != mVtx.ID() {
@@ -2166,9 +2166,9 @@ func TestEngineBlockingChitResponse(t *testing.T) {
 	queryRequestID := new(uint32)
 	sender.SendPushQueryF = func(inVdrs ids.ShortSet, requestID uint32, vtxID ids.ID, vtx []byte) {
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if issuedVtx.ID() != vtxID {
@@ -2305,9 +2305,9 @@ func TestEngineMissingTx(t *testing.T) {
 	queryRequestID := new(uint32)
 	sender.SendPushQueryF = func(inVdrs ids.ShortSet, requestID uint32, vtxID ids.ID, vtx []byte) {
 		*queryRequestID = requestID
-		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr)
-		if !inVdrs.Equals(vdrSet) {
+		set := ids.ShortSet{}
+		set.Add(vdr)
+		if !inVdrs.Equals(set) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
 		if issuedVtx.ID() != vtxID {
@@ -2645,11 +2645,11 @@ func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 
 	requested := new(bool)
 	requestID := new(uint32)
-	sender.SendGetAcceptedFrontierF = func(vdrs ids.ShortSet, reqID uint32) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedFrontierF = func(validators ids.ShortSet, reqID uint32) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -2689,11 +2689,11 @@ func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 	acceptedFrontier := []ids.ID{vtxID0}
 
 	*requested = false
-	sender.SendGetAcceptedF = func(vdrs ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedF = func(validators ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		if !ids.Equals(acceptedFrontier, proposedAccepted) {
@@ -2795,11 +2795,11 @@ func TestEngineBootstrappingIntoConsensus(t *testing.T) {
 			t.Fatalf("Returned wrong chits")
 		}
 	}
-	sender.SendPushQueryF = func(vdrs ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
-		if vdrs.Len() != 1 {
+	sender.SendPushQueryF = func(validators ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 
@@ -2894,7 +2894,7 @@ func TestEngineReBootstrapFails(t *testing.T) {
 
 	requested := new(bool)
 	requestID := new(uint32)
-	sender.SendGetAcceptedFrontierF = func(vdrs ids.ShortSet, reqID uint32) {
+	sender.SendGetAcceptedFrontierF = func(validators ids.ShortSet, reqID uint32) {
 		// instead of triggering the timeout here, we'll just invoke the GetAcceptedFrontierFailed func
 		//
 		// s.router.GetAcceptedFrontierFailed(vID, s.ctx.ChainID, requestID)
@@ -2908,10 +2908,10 @@ func TestEngineReBootstrapFails(t *testing.T) {
 		// -------> return b.AcceptedFrontier(validatorID, requestID, nil)
 
 		// ensure the request is made to the correct validators
-		if vdrs.Len() != 1 {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -2938,11 +2938,11 @@ func TestEngineReBootstrapFails(t *testing.T) {
 
 	// reset requested
 	*requested = false
-	sender.SendGetAcceptedF = func(vdrs ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedF = func(validators ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -3082,11 +3082,11 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 
 	requested := new(bool)
 	requestID := new(uint32)
-	sender.SendGetAcceptedFrontierF = func(vdrs ids.ShortSet, reqID uint32) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedFrontierF = func(validators ids.ShortSet, reqID uint32) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		*requested = true
@@ -3134,11 +3134,11 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 	acceptedFrontier := []ids.ID{vtxID0}
 
 	*requested = false
-	sender.SendGetAcceptedF = func(vdrs ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
-		if vdrs.Len() != 1 {
+	sender.SendGetAcceptedF = func(validators ids.ShortSet, reqID uint32, proposedAccepted []ids.ID) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 		if !ids.Equals(acceptedFrontier, proposedAccepted) {
@@ -3241,11 +3241,11 @@ func TestEngineReBootstrappingIntoConsensus(t *testing.T) {
 			t.Fatalf("Returned wrong chits")
 		}
 	}
-	sender.SendPushQueryF = func(vdrs ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
-		if vdrs.Len() != 1 {
+	sender.SendPushQueryF = func(validators ids.ShortSet, _ uint32, vtxID ids.ID, vtx []byte) {
+		if validators.Len() != 1 {
 			t.Fatalf("Should have requested from the validators")
 		}
-		if !vdrs.Contains(vdr) {
+		if !validators.Contains(vdr) {
 			t.Fatalf("Should have requested from %s", vdr)
 		}
 

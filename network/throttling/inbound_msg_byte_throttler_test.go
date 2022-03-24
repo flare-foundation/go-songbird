@@ -21,17 +21,17 @@ func TestInboundMsgByteThrottler(t *testing.T) {
 		AtLargeAllocSize:    1024,
 		NodeMaxAtLargeBytes: 1024,
 	}
-	vdrs := validation.NewSet()
+	validators := validation.NewSet()
 	vdr1ID := ids.GenerateTestShortID()
 	vdr2ID := ids.GenerateTestShortID()
-	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
-	assert.NoError(vdrs.AddWeight(vdr2ID, 1))
+	assert.NoError(validators.AddWeight(vdr1ID, 1))
+	assert.NoError(validators.AddWeight(vdr2ID, 1))
 
 	throttler, err := newInboundMsgByteThrottler(
 		&logging.Log{},
 		"",
 		prometheus.NewRegistry(),
-		vdrs,
+		validators,
 		config,
 	)
 	assert.NoError(err)
@@ -42,7 +42,7 @@ func TestInboundMsgByteThrottler(t *testing.T) {
 	assert.Equal(config.AtLargeAllocSize, throttler.remainingAtLargeBytes)
 	assert.NotNil(throttler.nodeToVdrBytesUsed)
 	assert.NotNil(throttler.log)
-	assert.NotNil(throttler.vdrs)
+	assert.NotNil(throttler.validators)
 	assert.NotNil(throttler.metrics)
 
 	// Take from at-large allocation.
@@ -238,14 +238,14 @@ func TestSybilMsgThrottlerMaxNonVdr(t *testing.T) {
 		AtLargeAllocSize:    100,
 		NodeMaxAtLargeBytes: 10,
 	}
-	vdrs := validation.NewSet()
+	validators := validation.NewSet()
 	vdr1ID := ids.GenerateTestShortID()
-	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
+	assert.NoError(validators.AddWeight(vdr1ID, 1))
 	throttler, err := newInboundMsgByteThrottler(
 		&logging.Log{},
 		"",
 		prometheus.NewRegistry(),
-		vdrs,
+		validators,
 		config,
 	)
 	assert.NoError(err)
@@ -297,9 +297,9 @@ func TestSybilMsgThrottlerFIFO(t *testing.T) {
 		AtLargeAllocSize:    1024,
 		NodeMaxAtLargeBytes: 1024,
 	}
-	vdrs := validation.NewSet()
+	validators := validation.NewSet()
 	vdr1ID := ids.GenerateTestShortID()
-	assert.NoError(vdrs.AddWeight(vdr1ID, 1))
+	assert.NoError(validators.AddWeight(vdr1ID, 1))
 	nonVdrNodeID := ids.GenerateTestShortID()
 
 	maxVdrBytes := config.VdrAllocSize + config.AtLargeAllocSize
@@ -314,7 +314,7 @@ func TestSybilMsgThrottlerFIFO(t *testing.T) {
 			&logging.Log{},
 			"",
 			prometheus.NewRegistry(),
-			vdrs,
+			validators,
 			config,
 		)
 		assert.NoError(err)

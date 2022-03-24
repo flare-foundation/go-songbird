@@ -17,11 +17,11 @@ func TestEarlyTermNoTraversalResults(t *testing.T) {
 
 	vdr1 := ids.ShortID{1} // k = 1
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(vdr1)
+	validators := ids.ShortBag{}
+	validators.Add(vdr1)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, votes)
 	if !poll.Finished() {
@@ -47,14 +47,14 @@ func TestEarlyTermNoTraversalString(t *testing.T) {
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2} // k = 2
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, votes)
 
@@ -76,14 +76,14 @@ func TestEarlyTermNoTraversalDropsDuplicatedVotes(t *testing.T) {
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2} // k = 2
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, votes)
 	if poll.Finished() {
@@ -111,8 +111,8 @@ func TestEarlyTermNoTraversalTerminatesEarly(t *testing.T) {
 	vdr4 := ids.ShortID{4}
 	vdr5 := ids.ShortID{5} // k = 5
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 		vdr3,
@@ -121,7 +121,7 @@ func TestEarlyTermNoTraversalTerminatesEarly(t *testing.T) {
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, votes)
 	if poll.Finished() {
@@ -155,14 +155,14 @@ func TestEarlyTermNoTraversalForSharedAncestor(t *testing.T) {
 	vdr3 := ids.ShortID{3}
 	vdr4 := ids.ShortID{4}
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(vdr1)
-	vdrs.Add(vdr2)
-	vdrs.Add(vdr3)
-	vdrs.Add(vdr4)
+	validators := ids.ShortBag{}
+	validators.Add(vdr1)
+	validators.Add(vdr2)
+	validators.Add(vdr3)
+	validators.Add(vdr4)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, []ids.ID{vtxB})
 	if poll.Finished() {
@@ -189,15 +189,15 @@ func TestEarlyTermNoTraversalWithFastDrops(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3} // k = 3
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 		vdr3,
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
-	poll := factory.New(vdrs)
+	poll := factory.New(validators)
 
 	poll.Vote(vdr1, nil)
 	if poll.Finished() {

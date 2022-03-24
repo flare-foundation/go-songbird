@@ -23,13 +23,13 @@ func newInboundMsgByteThrottler(
 	log logging.Logger,
 	namespace string,
 	registerer prometheus.Registerer,
-	vdrs validation.Set,
+	validators validation.Set,
 	config MsgByteThrottlerConfig,
 ) (*inboundMsgByteThrottler, error) {
 	t := &inboundMsgByteThrottler{
 		commonMsgThrottler: commonMsgThrottler{
 			log:                    log,
-			vdrs:                   vdrs,
+			validators:             validators,
 			maxVdrBytes:            config.VdrAllocSize,
 			remainingVdrBytes:      config.VdrAllocSize,
 			remainingAtLargeBytes:  config.AtLargeAllocSize,
@@ -115,9 +115,9 @@ func (t *inboundMsgByteThrottler) Acquire(msgSize uint64, nodeID ids.ShortID) {
 	// Take as many bytes as we can from [nodeID]'s validator allocation.
 	// Calculate [nodeID]'s validator allocation size based on its weight
 	vdrAllocationSize := uint64(0)
-	weight, isVdr := t.vdrs.GetWeight(nodeID)
+	weight, isVdr := t.validators.GetWeight(nodeID)
 	if isVdr && weight != 0 {
-		vdrAllocationSize = uint64(float64(t.maxVdrBytes) * float64(weight) / float64(t.vdrs.Weight()))
+		vdrAllocationSize = uint64(float64(t.maxVdrBytes) * float64(weight) / float64(t.validators.Weight()))
 	}
 	vdrBytesAlreadyUsed := t.nodeToVdrBytesUsed[nodeID]
 	// [vdrBytesAllowed] is the number of bytes this node

@@ -23,7 +23,7 @@ type commonMsgThrottler struct {
 	log  logging.Logger
 	lock sync.Mutex
 	// Primary network validator set
-	vdrs validation.Set
+	validators validation.Set
 	// Max number of bytes that can be taken from the
 	// at-large byte allocation by a given node.
 	nodeMaxAtLargeBytes uint64

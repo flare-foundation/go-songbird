@@ -20,8 +20,8 @@ type noEarlyTermFactory struct{}
 // termination
 func NewNoEarlyTermFactory() Factory { return noEarlyTermFactory{} }
 
-func (noEarlyTermFactory) New(vdrs ids.ShortBag) Poll {
-	return &noEarlyTermPoll{polled: vdrs}
+func (noEarlyTermFactory) New(validators ids.ShortBag) Poll {
+	return &noEarlyTermPoll{polled: validators}
 }
 
 // noEarlyTermPoll finishes when all polled validators either respond to the

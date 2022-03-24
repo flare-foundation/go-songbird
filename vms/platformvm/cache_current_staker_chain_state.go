@@ -293,37 +293,37 @@ func (cs *currentStakerChainStateImpl) ValidatorSet(subnetID ids.ID) (validation
 }
 
 func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validation.Set, error) {
-	vdrs := validation.NewSet()
+	validators := validation.NewSet()
 
 	var err error
 	for nodeID, vdr := range cs.validatorsByNodeID {
-		vdrWeight := vdr.addValidatorTx.Validator.Wght
-		vdrWeight, err = safemath.Add64(vdrWeight, vdr.delegatorWeight)
+		weight := vdr.addValidatorTx.Validator.Wght
+		weight, err = safemath.Add64(weight, vdr.delegatorWeight)
 		if err != nil {
 			return nil, err
 		}
-		if err := vdrs.AddWeight(nodeID, vdrWeight); err != nil {
+		if err := validators.AddWeight(nodeID, weight); err != nil {
 			return nil, err
 		}
 	}
 
-	return vdrs, nil
+	return validators, nil
 }
 
 func (cs *currentStakerChainStateImpl) subnetValidatorSet(subnetID ids.ID) (validation.Set, error) {
-	vdrs := validation.NewSet()
+	validators := validation.NewSet()
 
 	for nodeID, vdr := range cs.validatorsByNodeID {
 		subnetVDR, exists := vdr.subnets[subnetID]
 		if !exists {
 			continue
 		}
-		if err := vdrs.AddWeight(nodeID, subnetVDR.Validator.Wght); err != nil {
+		if err := validators.AddWeight(nodeID, subnetVDR.Validator.Wght); err != nil {
 			return nil, err
 		}
 	}
 
-	return vdrs, nil
+	return validators, nil
 }
 
 func (cs *currentStakerChainStateImpl) GetStaker(txID ids.ID) (tx *Tx, reward uint64, err error) {

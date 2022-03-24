@@ -270,8 +270,8 @@ func (b *bootstrapper) Startup() error {
 	}
 
 	b.pendingSendAcceptedFrontier.Clear()
-	for _, vdr := range beacons {
-		vdrID := vdr.ID()
+	for _, validator := range beacons {
+		vdrID := validator.ID()
 		b.pendingSendAcceptedFrontier.Add(vdrID)
 	}
 
@@ -280,8 +280,8 @@ func (b *bootstrapper) Startup() error {
 	b.acceptedFrontierSet.Clear()
 
 	b.pendingSendAccepted.Clear()
-	for _, vdr := range b.Beacons.List() {
-		vdrID := vdr.ID()
+	for _, validator := range b.Beacons.List() {
+		vdrID := validator.ID()
 		b.pendingSendAccepted.Add(vdrID)
 	}
 
@@ -321,37 +321,37 @@ func (b *bootstrapper) Restart(reset bool) error {
 // Ask up to [MaxOutstandingBootstrapRequests] bootstrap validators to send
 // their accepted frontier with the current accepted frontier
 func (b *bootstrapper) sendGetAcceptedFrontiers() {
-	vdrs := ids.NewShortSet(1)
+	validators := ids.NewShortSet(1)
 	for b.pendingSendAcceptedFrontier.Len() > 0 && b.pendingReceiveAcceptedFrontier.Len() < MaxOutstandingBootstrapRequests {
-		vdr, _ := b.pendingSendAcceptedFrontier.Pop()
+		validator, _ := b.pendingSendAcceptedFrontier.Pop()
 		// Add the validator to the set to send the messages to
-		vdrs.Add(vdr)
+		validators.Add(validator)
 		// Add the validator to send pending receipt set
-		b.pendingReceiveAcceptedFrontier.Add(vdr)
+		b.pendingReceiveAcceptedFrontier.Add(validator)
 	}
 
-	if vdrs.Len() > 0 {
-		b.Sender.SendGetAcceptedFrontier(vdrs, b.Config.SharedCfg.RequestID)
+	if validators.Len() > 0 {
+		b.Sender.SendGetAcceptedFrontier(validators, b.Config.SharedCfg.RequestID)
 	}
 }
 
 // Ask up to [MaxOutstandingBootstrapRequests] bootstrap validators to send
 // their filtered accepted frontier
 func (b *bootstrapper) sendGetAccepted() {
-	vdrs := ids.NewShortSet(1)
+	validators := ids.NewShortSet(1)
 	for b.pendingSendAccepted.Len() > 0 && b.pendingReceiveAccepted.Len() < MaxOutstandingBootstrapRequests {
-		vdr, _ := b.pendingSendAccepted.Pop()
+		validator, _ := b.pendingSendAccepted.Pop()
 		// Add the validator to the set to send the messages to
-		vdrs.Add(vdr)
+		validators.Add(validator)
 		// Add the validator to send pending receipt set
-		b.pendingReceiveAccepted.Add(vdr)
+		b.pendingReceiveAccepted.Add(validator)
 	}
 
-	if vdrs.Len() > 0 {
+	if validators.Len() > 0 {
 		b.Ctx.Log.Debug("sent %d more GetAccepted messages with %d more to send",
-			vdrs.Len(),
+			validators.Len(),
 			b.pendingSendAccepted.Len(),
 		)
-		b.Sender.SendGetAccepted(vdrs, b.Config.SharedCfg.RequestID, b.acceptedFrontier)
+		b.Sender.SendGetAccepted(validators, b.Config.SharedCfg.RequestID, b.acceptedFrontier)
 	}
 }

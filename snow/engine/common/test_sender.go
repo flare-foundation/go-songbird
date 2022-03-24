@@ -157,9 +157,9 @@ func (s *SenderTest) SendAncestors(vdr ids.ShortID, requestID uint32, vtxs [][]b
 // SendPushQuery calls SendPushQueryF if it was initialized. If it wasn't
 // initialized and this function shouldn't be called and testing was
 // initialized, then testing will fail.
-func (s *SenderTest) SendPushQuery(vdrs ids.ShortSet, requestID uint32, vtxID ids.ID, vtx []byte) {
+func (s *SenderTest) SendPushQuery(validators ids.ShortSet, requestID uint32, vtxID ids.ID, vtx []byte) {
 	if s.SendPushQueryF != nil {
-		s.SendPushQueryF(vdrs, requestID, vtxID, vtx)
+		s.SendPushQueryF(validators, requestID, vtxID, vtx)
 	} else if s.CantSendPushQuery && s.T != nil {
 		s.T.Fatalf("Unexpectedly called SendPushQuery")
 	}
@@ -168,9 +168,9 @@ func (s *SenderTest) SendPushQuery(vdrs ids.ShortSet, requestID uint32, vtxID id
 // SendPullQuery calls SendPullQueryF if it was initialized. If it wasn't
 // initialized and this function shouldn't be called and testing was
 // initialized, then testing will fail.
-func (s *SenderTest) SendPullQuery(vdrs ids.ShortSet, requestID uint32, vtxID ids.ID) {
+func (s *SenderTest) SendPullQuery(validators ids.ShortSet, requestID uint32, vtxID ids.ID) {
 	if s.SendPullQueryF != nil {
-		s.SendPullQueryF(vdrs, requestID, vtxID)
+		s.SendPullQueryF(validators, requestID, vtxID)
 	} else if s.CantSendPullQuery && s.T != nil {
 		s.T.Fatalf("Unexpectedly called SendPullQuery")
 	}

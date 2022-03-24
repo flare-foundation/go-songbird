@@ -27,15 +27,15 @@ func TestHandlerDropsTimedOutMessages(t *testing.T) {
 
 	ctx := snow.DefaultConsensusContextTest()
 
-	vdrs := validation.NewSet()
-	vdr0 := ids.GenerateTestShortID()
-	err = vdrs.AddWeight(vdr0, 1)
+	validators := validation.NewSet()
+	validator0 := ids.GenerateTestShortID()
+	err = validators.AddWeight(validator0, 1)
 	assert.NoError(t, err)
 
 	handlerIntf, err := New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -98,8 +98,8 @@ func TestHandlerClosesOnError(t *testing.T) {
 	closed := make(chan struct{}, 1)
 	ctx := snow.DefaultConsensusContextTest()
 
-	vdrs := validation.NewSet()
-	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
 	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
@@ -108,7 +108,7 @@ func TestHandlerClosesOnError(t *testing.T) {
 	handlerIntf, err := New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -164,8 +164,8 @@ func TestHandlerClosesOnError(t *testing.T) {
 func TestHandlerDropsGossipDuringBootstrapping(t *testing.T) {
 	closed := make(chan struct{}, 1)
 	ctx := snow.DefaultConsensusContextTest()
-	vdrs := validation.NewSet()
-	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
 	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
@@ -174,7 +174,7 @@ func TestHandlerDropsGossipDuringBootstrapping(t *testing.T) {
 	handlerIntf, err := New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		1,
@@ -222,8 +222,8 @@ func TestHandlerDispatchInternal(t *testing.T) {
 	calledNotify := make(chan struct{}, 1)
 	ctx := snow.DefaultConsensusContextTest()
 	msgFromVMChan := make(chan common.Message)
-	vdrs := validation.NewSet()
-	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
 	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
@@ -232,7 +232,7 @@ func TestHandlerDispatchInternal(t *testing.T) {
 	handler, err := New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		msgFromVMChan,
 		nil,
 		time.Second,

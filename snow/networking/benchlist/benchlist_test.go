@@ -21,20 +21,20 @@ var minimumFailingDuration = 5 * time.Minute
 
 // Test that validators are properly added to the bench
 func TestBenchlistAdd(t *testing.T) {
-	vdrs := validation.NewSet()
-	vdr0 := validation.GenerateRandomValidator(50)
-	vdr1 := validation.GenerateRandomValidator(50)
-	vdr2 := validation.GenerateRandomValidator(50)
-	vdr3 := validation.GenerateRandomValidator(50)
-	vdr4 := validation.GenerateRandomValidator(50)
+	validators := validation.NewSet()
+	validator0 := validation.GenerateRandomValidator(50)
+	validator1 := validation.GenerateRandomValidator(50)
+	validator2 := validation.GenerateRandomValidator(50)
+	validator3 := validation.GenerateRandomValidator(50)
+	validator4 := validation.GenerateRandomValidator(50)
 
 	errs := wrappers.Errs{}
 	errs.Add(
-		vdrs.AddWeight(vdr0.ID(), vdr0.Weight()),
-		vdrs.AddWeight(vdr1.ID(), vdr1.Weight()),
-		vdrs.AddWeight(vdr2.ID(), vdr2.Weight()),
-		vdrs.AddWeight(vdr3.ID(), vdr3.Weight()),
-		vdrs.AddWeight(vdr4.ID(), vdr4.Weight()),
+		validators.AddWeight(validator0.ID(), validator0.Weight()),
+		validators.AddWeight(validator1.ID(), validator1.Weight()),
+		validators.AddWeight(validator2.ID(), validator2.Weight()),
+		validators.AddWeight(validator3.ID(), validator3.Weight()),
+		validators.AddWeight(validator4.ID(), validator4.Weight()),
 	)
 	if errs.Errored() {
 		t.Fatal(errs.Err)
@@ -50,7 +50,7 @@ func TestBenchlistAdd(t *testing.T) {
 		ids.Empty,
 		logging.NoLog{},
 		benchable,
-		vdrs,
+		validators,
 		threshold,
 		minimumFailingDuration,
 		duration,
@@ -67,37 +67,37 @@ func TestBenchlistAdd(t *testing.T) {
 
 	// Nobody should be benched at the start
 	b.lock.Lock()
-	assert.False(t, b.isBenched(vdr0.ID()))
-	assert.False(t, b.isBenched(vdr1.ID()))
-	assert.False(t, b.isBenched(vdr2.ID()))
-	assert.False(t, b.isBenched(vdr3.ID()))
-	assert.False(t, b.isBenched(vdr4.ID()))
+	assert.False(t, b.isBenched(validator0.ID()))
+	assert.False(t, b.isBenched(validator1.ID()))
+	assert.False(t, b.isBenched(validator2.ID()))
+	assert.False(t, b.isBenched(validator3.ID()))
+	assert.False(t, b.isBenched(validator4.ID()))
 	assert.Len(t, b.failureStreaks, 0)
 	assert.Equal(t, b.benchedQueue.Len(), 0)
 	assert.Equal(t, b.benchlistSet.Len(), 0)
 	b.lock.Unlock()
 
-	// Register [threshold - 1] failures in a row for vdr0
+	// Register [threshold - 1] failures in a row for validator0
 	for i := 0; i < threshold-1; i++ {
-		b.RegisterFailure(vdr0.ID())
+		b.RegisterFailure(validator0.ID())
 	}
 
 	// Still shouldn't be benched due to not enough consecutive failure
-	assert.False(t, b.isBenched(vdr0.ID()))
+	assert.False(t, b.isBenched(validator0.ID()))
 	assert.Equal(t, b.benchedQueue.Len(), 0)
 	assert.Equal(t, b.benchlistSet.Len(), 0)
 	assert.Len(t, b.failureStreaks, 1)
-	fs := b.failureStreaks[vdr0.ID()]
+	fs := b.failureStreaks[validator0.ID()]
 	assert.Equal(t, threshold-1, fs.consecutive)
 	assert.True(t, fs.firstFailure.Equal(now))
 
 	// Register another failure
-	b.RegisterFailure(vdr0.ID())
+	b.RegisterFailure(validator0.ID())
 
 	// Still shouldn't be benched because not enough time (any in this case)
 	// has passed since the first failure
 	b.lock.Lock()
-	assert.False(t, b.isBenched(vdr0.ID()))
+	assert.False(t, b.isBenched(validator0.ID()))
 	assert.Equal(t, b.benchedQueue.Len(), 0)
 	assert.Equal(t, b.benchlistSet.Len(), 0)
 	b.lock.Unlock()
@@ -114,16 +114,16 @@ func TestBenchlistAdd(t *testing.T) {
 	b.lock.Unlock()
 
 	// Register another failure
-	b.RegisterFailure(vdr0.ID())
+	b.RegisterFailure(validator0.ID())
 
 	// Now this validator should be benched
 	b.lock.Lock()
-	assert.True(t, b.isBenched(vdr0.ID()))
+	assert.True(t, b.isBenched(validator0.ID()))
 	assert.Equal(t, b.benchedQueue.Len(), 1)
 	assert.Equal(t, b.benchlistSet.Len(), 1)
 
 	next := b.benchedQueue[0]
-	assert.Equal(t, vdr0.ID(), next.validatorID)
+	assert.Equal(t, validator0.ID(), next.validatorID)
 	assert.True(t, !next.benchedUntil.After(now.Add(duration)))
 	assert.True(t, !next.benchedUntil.Before(now.Add(duration/2)))
 	assert.Len(t, b.failureStreaks, 0)
@@ -133,7 +133,7 @@ func TestBenchlistAdd(t *testing.T) {
 
 	// Give another validator [threshold-1] failures
 	for i := 0; i < threshold-1; i++ {
-		b.RegisterFailure(vdr1.ID())
+		b.RegisterFailure(validator1.ID())
 	}
 
 	// Advance the time
@@ -142,20 +142,20 @@ func TestBenchlistAdd(t *testing.T) {
 	b.lock.Unlock()
 
 	// Register another failure
-	b.RegisterResponse(vdr1.ID())
+	b.RegisterResponse(validator1.ID())
 
-	// vdr1 shouldn't be benched
+	// validator1 shouldn't be benched
 	// The response should have cleared its consecutive failures
 	b.lock.Lock()
-	assert.True(t, b.isBenched(vdr0.ID()))
-	assert.False(t, b.isBenched(vdr1.ID()))
+	assert.True(t, b.isBenched(validator0.ID()))
+	assert.False(t, b.isBenched(validator1.ID()))
 	assert.Equal(t, b.benchedQueue.Len(), 1)
 	assert.Equal(t, b.benchlistSet.Len(), 1)
 	assert.Len(t, b.failureStreaks, 0)
 	b.lock.Unlock()
 
-	// Register another failure for vdr0, who is benched
-	b.RegisterFailure(vdr0.ID())
+	// Register another failure for validator0, who is benched
+	b.RegisterFailure(validator0.ID())
 
 	// A failure for an already benched validator should not count against it
 	b.lock.Lock()
@@ -165,21 +165,21 @@ func TestBenchlistAdd(t *testing.T) {
 
 // Test that the benchlist won't bench more than the maximum portion of stake
 func TestBenchlistMaxStake(t *testing.T) {
-	vdrs := validation.NewSet()
-	vdr0 := validation.GenerateRandomValidator(1000)
-	vdr1 := validation.GenerateRandomValidator(1000)
-	vdr2 := validation.GenerateRandomValidator(1000)
-	vdr3 := validation.GenerateRandomValidator(2000)
-	vdr4 := validation.GenerateRandomValidator(100)
+	validators := validation.NewSet()
+	validator0 := validation.GenerateRandomValidator(1000)
+	validator1 := validation.GenerateRandomValidator(1000)
+	validator2 := validation.GenerateRandomValidator(1000)
+	validator3 := validation.GenerateRandomValidator(2000)
+	validator4 := validation.GenerateRandomValidator(100)
 	// Total weight is 5100
 
 	errs := wrappers.Errs{}
 	errs.Add(
-		vdrs.AddWeight(vdr0.ID(), vdr0.Weight()),
-		vdrs.AddWeight(vdr1.ID(), vdr1.Weight()),
-		vdrs.AddWeight(vdr2.ID(), vdr2.Weight()),
-		vdrs.AddWeight(vdr3.ID(), vdr3.Weight()),
-		vdrs.AddWeight(vdr4.ID(), vdr4.Weight()),
+		validators.AddWeight(validator0.ID(), validator0.Weight()),
+		validators.AddWeight(validator1.ID(), validator1.Weight()),
+		validators.AddWeight(validator2.ID(), validator2.Weight()),
+		validators.AddWeight(validator3.ID(), validator3.Weight()),
+		validators.AddWeight(validator4.ID(), validator4.Weight()),
 	)
 	if errs.Errored() {
 		t.Fatal(errs.Err)
@@ -193,7 +193,7 @@ func TestBenchlistMaxStake(t *testing.T) {
 		ids.Empty,
 		logging.NoLog{},
 		&TestBenchable{T: t},
-		vdrs,
+		validators,
 		threshold,
 		minimumFailingDuration,
 		duration,
@@ -209,9 +209,9 @@ func TestBenchlistMaxStake(t *testing.T) {
 	b.clock.Set(now)
 
 	// Register [threshold-1] failures for 3 validators
-	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
+	for _, validator := range []validation.Validator{validator0, validator1, validator2} {
 		for i := 0; i < threshold-1; i++ {
-			b.RegisterFailure(vdr.ID())
+			b.RegisterFailure(validator.ID())
 		}
 	}
 
@@ -222,28 +222,28 @@ func TestBenchlistMaxStake(t *testing.T) {
 	b.lock.Unlock()
 
 	// Register another failure for all three
-	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
-		b.RegisterFailure(vdr.ID())
+	for _, validator := range []validation.Validator{validator0, validator1, validator2} {
+		b.RegisterFailure(validator.ID())
 	}
 
-	// Only vdr0 and vdr1 should be benched (total weight 2000)
-	// Benching vdr2 (weight 1000) would cause the amount benched
+	// Only validator0 and validator1 should be benched (total weight 2000)
+	// Benching validator2 (weight 1000) would cause the amount benched
 	// to exceed the maximum
 	b.lock.Lock()
-	assert.True(t, b.isBenched(vdr0.ID()))
-	assert.True(t, b.isBenched(vdr1.ID()))
-	assert.False(t, b.isBenched(vdr2.ID()))
+	assert.True(t, b.isBenched(validator0.ID()))
+	assert.True(t, b.isBenched(validator1.ID()))
+	assert.False(t, b.isBenched(validator2.ID()))
 	assert.Equal(t, b.benchedQueue.Len(), 2)
 	assert.Equal(t, b.benchlistSet.Len(), 2)
 	assert.Len(t, b.failureStreaks, 1)
-	fs := b.failureStreaks[vdr2.ID()]
+	fs := b.failureStreaks[validator2.ID()]
 	fs.consecutive = threshold
 	fs.firstFailure = now
 	b.lock.Unlock()
 
-	// Register threshold - 1 failures for vdr4
+	// Register threshold - 1 failures for validator4
 	for i := 0; i < threshold-1; i++ {
-		b.RegisterFailure(vdr4.ID())
+		b.RegisterFailure(validator4.ID())
 	}
 
 	// Advance the time past min failing duration
@@ -252,44 +252,44 @@ func TestBenchlistMaxStake(t *testing.T) {
 	b.clock.Set(newTime2)
 	b.lock.Unlock()
 
-	// Register another failure for vdr4
-	b.RegisterFailure(vdr4.ID())
+	// Register another failure for validator4
+	b.RegisterFailure(validator4.ID())
 
-	// vdr4 should be benched now
+	// validator4 should be benched now
 	b.lock.Lock()
-	assert.True(t, b.isBenched(vdr0.ID()))
-	assert.True(t, b.isBenched(vdr1.ID()))
-	assert.True(t, b.isBenched(vdr4.ID()))
+	assert.True(t, b.isBenched(validator0.ID()))
+	assert.True(t, b.isBenched(validator1.ID()))
+	assert.True(t, b.isBenched(validator4.ID()))
 	assert.Equal(t, 3, b.benchedQueue.Len())
 	assert.Equal(t, 3, b.benchlistSet.Len())
-	assert.Contains(t, b.benchlistSet, vdr0.ID())
-	assert.Contains(t, b.benchlistSet, vdr1.ID())
-	assert.Contains(t, b.benchlistSet, vdr4.ID())
-	assert.Len(t, b.failureStreaks, 1) // for vdr2
+	assert.Contains(t, b.benchlistSet, validator0.ID())
+	assert.Contains(t, b.benchlistSet, validator1.ID())
+	assert.Contains(t, b.benchlistSet, validator4.ID())
+	assert.Len(t, b.failureStreaks, 1) // for validator2
 	b.lock.Unlock()
 
-	// More failures for vdr2 shouldn't add it to the bench
+	// More failures for validator2 shouldn't add it to the bench
 	// because the max bench amount would be exceeded
 	for i := 0; i < threshold-1; i++ {
-		b.RegisterFailure(vdr2.ID())
+		b.RegisterFailure(validator2.ID())
 	}
 
 	b.lock.Lock()
-	assert.True(t, b.isBenched(vdr0.ID()))
-	assert.True(t, b.isBenched(vdr1.ID()))
-	assert.True(t, b.isBenched(vdr4.ID()))
-	assert.False(t, b.isBenched(vdr2.ID()))
+	assert.True(t, b.isBenched(validator0.ID()))
+	assert.True(t, b.isBenched(validator1.ID()))
+	assert.True(t, b.isBenched(validator4.ID()))
+	assert.False(t, b.isBenched(validator2.ID()))
 	assert.Equal(t, 3, b.benchedQueue.Len())
 	assert.Equal(t, 3, b.benchlistSet.Len())
 	assert.Len(t, b.failureStreaks, 1)
-	assert.Contains(t, b.failureStreaks, vdr2.ID())
+	assert.Contains(t, b.failureStreaks, validator2.ID())
 
 	// Ensure the benched queue root has the min end time
 	minEndTime := b.benchedQueue[0].benchedUntil
-	benchedIDs := []ids.ShortID{vdr0.ID(), vdr1.ID(), vdr4.ID()}
-	for _, benchedVdr := range b.benchedQueue {
-		assert.Contains(t, benchedIDs, benchedVdr.validatorID)
-		assert.True(t, !benchedVdr.benchedUntil.Before(minEndTime))
+	benchedIDs := []ids.ShortID{validator0.ID(), validator1.ID(), validator4.ID()}
+	for _, benchedvalidator := range b.benchedQueue {
+		assert.Contains(t, benchedIDs, benchedvalidator.validatorID)
+		assert.True(t, !benchedvalidator.benchedUntil.Before(minEndTime))
 	}
 
 	b.lock.Unlock()
@@ -297,21 +297,21 @@ func TestBenchlistMaxStake(t *testing.T) {
 
 // Test validators are removed from the bench correctly
 func TestBenchlistRemove(t *testing.T) {
-	vdrs := validation.NewSet()
-	vdr0 := validation.GenerateRandomValidator(1000)
-	vdr1 := validation.GenerateRandomValidator(1000)
-	vdr2 := validation.GenerateRandomValidator(1000)
-	vdr3 := validation.GenerateRandomValidator(1000)
-	vdr4 := validation.GenerateRandomValidator(1000)
+	validators := validation.NewSet()
+	validator0 := validation.GenerateRandomValidator(1000)
+	validator1 := validation.GenerateRandomValidator(1000)
+	validator2 := validation.GenerateRandomValidator(1000)
+	validator3 := validation.GenerateRandomValidator(1000)
+	validator4 := validation.GenerateRandomValidator(1000)
 	// Total weight is 5100
 
 	errs := wrappers.Errs{}
 	errs.Add(
-		vdrs.AddWeight(vdr0.ID(), vdr0.Weight()),
-		vdrs.AddWeight(vdr1.ID(), vdr1.Weight()),
-		vdrs.AddWeight(vdr2.ID(), vdr2.Weight()),
-		vdrs.AddWeight(vdr3.ID(), vdr3.Weight()),
-		vdrs.AddWeight(vdr4.ID(), vdr4.Weight()),
+		validators.AddWeight(validator0.ID(), validator0.Weight()),
+		validators.AddWeight(validator1.ID(), validator1.Weight()),
+		validators.AddWeight(validator2.ID(), validator2.Weight()),
+		validators.AddWeight(validator3.ID(), validator3.Weight()),
+		validators.AddWeight(validator4.ID(), validator4.Weight()),
 	)
 	if errs.Errored() {
 		t.Fatal(errs.Err)
@@ -333,7 +333,7 @@ func TestBenchlistRemove(t *testing.T) {
 		ids.Empty,
 		logging.NoLog{},
 		benchable,
-		vdrs,
+		validators,
 		threshold,
 		minimumFailingDuration,
 		duration,
@@ -351,9 +351,9 @@ func TestBenchlistRemove(t *testing.T) {
 	b.lock.Unlock()
 
 	// Register [threshold-1] failures for 3 validators
-	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
+	for _, validator := range []validation.Validator{validator0, validator1, validator2} {
 		for i := 0; i < threshold-1; i++ {
-			b.RegisterFailure(vdr.ID())
+			b.RegisterFailure(validator.ID())
 		}
 	}
 
@@ -363,25 +363,25 @@ func TestBenchlistRemove(t *testing.T) {
 	b.lock.Lock()
 	b.clock.Set(now)
 	b.lock.Unlock()
-	for _, vdr := range []validation.Validator{vdr0, vdr1, vdr2} {
-		b.RegisterFailure(vdr.ID())
+	for _, validator := range []validation.Validator{validator0, validator1, validator2} {
+		b.RegisterFailure(validator.ID())
 	}
 
 	// All 3 should be benched
 	b.lock.Lock()
-	assert.True(t, b.isBenched(vdr0.ID()))
-	assert.True(t, b.isBenched(vdr1.ID()))
-	assert.True(t, b.isBenched(vdr2.ID()))
+	assert.True(t, b.isBenched(validator0.ID()))
+	assert.True(t, b.isBenched(validator1.ID()))
+	assert.True(t, b.isBenched(validator2.ID()))
 	assert.Equal(t, 3, b.benchedQueue.Len())
 	assert.Equal(t, 3, b.benchlistSet.Len())
 	assert.Len(t, b.failureStreaks, 0)
 
 	// Ensure the benched queue root has the min end time
 	minEndTime := b.benchedQueue[0].benchedUntil
-	benchedIDs := []ids.ShortID{vdr0.ID(), vdr1.ID(), vdr2.ID()}
-	for _, benchedVdr := range b.benchedQueue {
-		assert.Contains(t, benchedIDs, benchedVdr.validatorID)
-		assert.True(t, !benchedVdr.benchedUntil.Before(minEndTime))
+	benchedIDs := []ids.ShortID{validator0.ID(), validator1.ID(), validator2.ID()}
+	for _, benchedvalidator := range b.benchedQueue {
+		assert.Contains(t, benchedIDs, benchedvalidator.validatorID)
+		assert.True(t, !benchedvalidator.benchedUntil.Before(minEndTime))
 	}
 
 	// Set the benchlist's clock past when all validators should be unbenched
@@ -393,7 +393,7 @@ func TestBenchlistRemove(t *testing.T) {
 	assert.Eventually(
 		t,
 		func() bool {
-			return !b.IsBenched(vdr0.ID())
+			return !b.IsBenched(validator0.ID())
 		},
 		duration+time.Second, // extra time.Second as grace period
 		100*time.Millisecond,
@@ -402,7 +402,7 @@ func TestBenchlistRemove(t *testing.T) {
 	assert.Eventually(
 		t,
 		func() bool {
-			return !b.IsBenched(vdr1.ID())
+			return !b.IsBenched(validator1.ID())
 		},
 		duration+time.Second,
 		100*time.Millisecond,
@@ -411,7 +411,7 @@ func TestBenchlistRemove(t *testing.T) {
 	assert.Eventually(
 		t,
 		func() bool {
-			return !b.IsBenched(vdr2.ID())
+			return !b.IsBenched(validator2.ID())
 		},
 		duration+time.Second,
 		100*time.Millisecond,

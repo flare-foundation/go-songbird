@@ -389,7 +389,7 @@ func (n *network) Accept(ctx *snow.ConsensusContext, containerID ids.ID, contain
 func (n *network) selectPeersForGossip(subnetID ids.ID, validatorOnly bool, numValidatorsToSample, numNonValidatorsToSample int) ([]*peer, error) {
 	n.stateLock.RLock()
 	// Gossip the message to numNonValidatorsToSample random nodes in the
-	// network. If this is a validator only subnet, selects only validation.
+	// network. If this is a validator only subnet, selects only validators.
 	peersAll, err := n.peers.sample(subnetID, validatorOnly, numNonValidatorsToSample)
 	if err != nil {
 		n.log.Debug("failed to sample %d peers: %s", numNonValidatorsToSample, err)

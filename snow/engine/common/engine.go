@@ -68,7 +68,7 @@ type GetAcceptedFrontierHandler interface {
 }
 
 // AcceptedFrontierHandler defines how a consensus engine reacts to accepted
-// frontier messages from other validation. Functions only return fatal errors.
+// frontier messages from other validators. Functions only return fatal errors.
 type AcceptedFrontierHandler interface {
 	// Notify this engine of an accepted frontier.
 	//
@@ -115,7 +115,7 @@ type GetAcceptedHandler interface {
 }
 
 // AcceptedHandler defines how a consensus engine reacts to accepted messages
-// from other validation. Functions only return fatal
+// from other validators. Functions only return fatal
 // errors.
 type AcceptedHandler interface {
 	// Notify this engine of a set of accepted vertices.
@@ -165,7 +165,7 @@ type GetAncestorsHandler interface {
 }
 
 // AncestorsHandler defines how a consensus engine reacts to bootstrapping
-// retrieval messages from other validation. Functions only return fatal errors.
+// retrieval messages from other validators. Functions only return fatal errors.
 type AncestorsHandler interface {
 	// Notify this engine of multiple containers.
 	//
@@ -220,7 +220,7 @@ type GetHandler interface {
 }
 
 // PutHandler defines how a consensus engine reacts to put messages from other
-// validation. Functions only return fatal errors.
+// validators. Functions only return fatal errors.
 type PutHandler interface {
 	// Notify this engine of a container.
 	//
@@ -244,7 +244,7 @@ type PutHandler interface {
 }
 
 // QueryHandler defines how a consensus engine reacts to query messages from
-// other validation. Functions only return fatal errors.
+// other validators. Functions only return fatal errors.
 type QueryHandler interface {
 	// Notify this engine of a request for our preferences.
 	//
@@ -285,7 +285,7 @@ type QueryHandler interface {
 }
 
 // ChitsHandler defines how a consensus engine reacts to query response messages
-// from other validation. Functions only return fatal errors.
+// from other validators. Functions only return fatal errors.
 type ChitsHandler interface {
 	// Notify this engine of the specified validators preferences.
 	//

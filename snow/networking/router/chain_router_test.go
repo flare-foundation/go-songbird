@@ -25,8 +25,8 @@ import (
 )
 
 func TestShutdown(t *testing.T) {
-	vdrs := validation.NewSet()
-	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	benchlist := benchlist.NewNoBenchlist()
 	tm := timeout.Manager{}
@@ -61,7 +61,7 @@ func TestShutdown(t *testing.T) {
 	handler, err := handler.New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -114,8 +114,8 @@ func TestShutdown(t *testing.T) {
 
 func TestShutdownTimesOut(t *testing.T) {
 	nodeID := ids.ShortEmpty
-	vdrs := validation.NewSet()
-	err := vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	benchlist := benchlist.NewNoBenchlist()
 	tm := timeout.Manager{}
@@ -160,7 +160,7 @@ func TestShutdownTimesOut(t *testing.T) {
 	handler, err := handler.New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -261,14 +261,14 @@ func TestRouterTimeout(t *testing.T) {
 	)
 
 	ctx := snow.DefaultConsensusContextTest()
-	vdrs := validation.NewSet()
-	err = vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err = validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 
 	handler, err := handler.New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -374,14 +374,14 @@ func TestRouterClearTimeouts(t *testing.T) {
 
 	// Create bootstrapper, engine and handler
 	ctx := snow.DefaultConsensusContextTest()
-	vdrs := validation.NewSet()
-	err = vdrs.AddWeight(ids.GenerateTestShortID(), 1)
+	validators := validation.NewSet()
+	err = validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 
 	handler, err := handler.New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -486,15 +486,15 @@ func TestValidatorOnlyMessageDrops(t *testing.T) {
 
 	ctx := snow.DefaultConsensusContextTest()
 	ctx.SetValidatorOnly()
-	vdrs := validation.NewSet()
+	validators := validation.NewSet()
 	vID := ids.GenerateTestShortID()
-	err = vdrs.AddWeight(vID, 1)
+	err = validators.AddWeight(vID, 1)
 	assert.NoError(t, err)
 
 	handler, err := handler.New(
 		mc,
 		ctx,
-		vdrs,
+		validators,
 		nil,
 		nil,
 		time.Second,
@@ -560,7 +560,7 @@ func TestValidatorOnlyMessageDrops(t *testing.T) {
 	assert.Equal(t, 1, chainRouter.timedRequests.Len())
 
 	// remove it from validators
-	err = vdrs.Set(validation.NewSet().List())
+	err = validators.Set(validation.NewSet().List())
 	assert.NoError(t, err)
 
 	inMsg = mc.InboundPut(ctx.ChainID, reqID, ids.GenerateTestID(), nil, nID)

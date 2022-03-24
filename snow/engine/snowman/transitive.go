@@ -582,15 +582,15 @@ func (t *Transitive) sendRequest(vdr ids.ShortID, blkID ids.ID) {
 func (t *Transitive) pullQuery(blkID ids.ID) {
 	t.Ctx.Log.Verbo("about to sample from: %s", t.Validators)
 	// The validators we will query
-	vdrs, err := t.Validators.Sample(t.Params.K)
-	vdrBag := ids.ShortBag{}
-	for _, vdr := range vdrs {
-		vdrBag.Add(vdr.ID())
+	validators, err := t.Validators.Sample(t.Params.K)
+	bag := ids.ShortBag{}
+	for _, vdr := range validators {
+		bag.Add(vdr.ID())
 	}
 
 	t.RequestID++
-	if err == nil && t.polls.Add(t.RequestID, vdrBag) {
-		vdrList := vdrBag.List()
+	if err == nil && t.polls.Add(t.RequestID, bag) {
+		vdrList := bag.List()
 		vdrSet := ids.NewShortSet(len(vdrList))
 		vdrSet.Add(vdrList...)
 		t.Sender.SendPullQuery(vdrSet, t.RequestID, blkID)
@@ -602,15 +602,15 @@ func (t *Transitive) pullQuery(blkID ids.ID) {
 // send a push query for this block
 func (t *Transitive) pushQuery(blk snowman.Block) {
 	t.Ctx.Log.Verbo("about to sample from: %s", t.Validators)
-	vdrs, err := t.Validators.Sample(t.Params.K)
-	vdrBag := ids.ShortBag{}
-	for _, vdr := range vdrs {
-		vdrBag.Add(vdr.ID())
+	validators, err := t.Validators.Sample(t.Params.K)
+	bag := ids.ShortBag{}
+	for _, vdr := range validators {
+		bag.Add(vdr.ID())
 	}
 
 	t.RequestID++
-	if err == nil && t.polls.Add(t.RequestID, vdrBag) {
-		vdrList := vdrBag.List()
+	if err == nil && t.polls.Add(t.RequestID, bag) {
+		vdrList := bag.List()
 		vdrSet := ids.NewShortSet(len(vdrList))
 		vdrSet.Add(vdrList...)
 

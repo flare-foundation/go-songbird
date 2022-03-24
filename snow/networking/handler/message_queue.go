@@ -48,7 +48,7 @@ type messageQueue struct {
 
 	log logging.Logger
 	// Validator set for the chain associated with this
-	vdrs validation.Set
+	validators validation.Set
 	// Tracks CPU utilization of each node
 	cpuTracker tracker.TimeTracker
 
@@ -62,14 +62,14 @@ type messageQueue struct {
 
 func NewMessageQueue(
 	log logging.Logger,
-	vdrs validation.Set,
+	validators validation.Set,
 	cpuTracker tracker.TimeTracker,
 	metricsNamespace string,
 	metricsRegisterer prometheus.Registerer,
 ) (MessageQueue, error) {
 	m := &messageQueue{
 		log:                   log,
-		vdrs:                  vdrs,
+		validators:            validators,
 		cpuTracker:            cpuTracker,
 		cond:                  sync.NewCond(&sync.Mutex{}),
 		nodeToUnprocessedMsgs: make(map[ids.ShortID]int),
@@ -189,14 +189,14 @@ func (m *messageQueue) canPop(msg message.InboundMessage) bool {
 	// the number of nodes with unprocessed messages.
 	baseMaxCPU := 1 / float64(len(m.nodeToUnprocessedMsgs))
 	nodeID := msg.NodeID()
-	weight, isVdr := m.vdrs.GetWeight(nodeID)
+	weight, isVdr := m.validators.GetWeight(nodeID)
 	if !isVdr {
 		weight = 0
 	}
 	// The sum of validator weights should never be 0, but handle
 	// that case for completeness here to avoid divide by 0.
 	portionWeight := float64(0)
-	totalVdrsWeight := m.vdrs.Weight()
+	totalVdrsWeight := m.validators.Weight()
 	if totalVdrsWeight != 0 {
 		portionWeight = float64(weight) / float64(totalVdrsWeight)
 	}

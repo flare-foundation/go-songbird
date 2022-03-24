@@ -104,15 +104,15 @@ type set struct {
 }
 
 // Set implements the Set interface.
-func (s *set) Set(vdrs []Validator) error {
+func (s *set) Set(validators []Validator) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	return s.set(vdrs)
+	return s.set(validators)
 }
 
-func (s *set) set(vdrs []Validator) error {
-	lenVdrs := len(vdrs)
+func (s *set) set(validators []Validator) error {
+	lenVdrs := len(validators)
 	// If the underlying arrays are much larger than necessary, resize them to
 	// allow garbage collection of unused memory
 	if cap(s.vdrSlice) > len(s.vdrSlice)*maxExcessCapacityFactor {
@@ -132,7 +132,7 @@ func (s *set) set(vdrs []Validator) error {
 	s.totalWeight = 0
 	s.initialized = false
 
-	for _, vdr := range vdrs {
+	for _, vdr := range validators {
 		vdrID := vdr.ID()
 		if s.contains(vdrID) {
 			continue

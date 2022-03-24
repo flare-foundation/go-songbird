@@ -38,14 +38,14 @@ func NewInboundMsgThrottler(
 	log logging.Logger,
 	namespace string,
 	registerer prometheus.Registerer,
-	vdrs validation.Set,
+	validators validation.Set,
 	config InboundMsgThrottlerConfig,
 ) (InboundMsgThrottler, error) {
 	byteThrottler, err := newInboundMsgByteThrottler(
 		log,
 		namespace,
 		registerer,
-		vdrs,
+		validators,
 		config.MsgByteThrottlerConfig,
 	)
 	if err != nil {
