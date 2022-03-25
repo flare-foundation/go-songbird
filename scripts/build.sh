@@ -15,7 +15,7 @@ source "$FLARE_PATH"/scripts/constants.sh
 echo "Downloading dependencies..."
 go mod download
 
-#build rocksdb from source, replacing broken grocksdb build script
+#build rocksdb from source
 
 # only use the latest rocksdb in the /xrpdevs/ namespace in the go package cache
 
