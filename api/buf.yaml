@@ -4,7 +4,7 @@ breaking:
   use:
     - FILE
 deps:
-  - buf.build/prometheus/client-model 
+  - buf.build/prometheus/client-model
 lint:
   use:
     - DEFAULT
@@ -18,7 +18,7 @@ lint:
     # or response type for multiple RPCs
     - galiasreaderproto/aliasreader.proto
   # allows RPC requests or responses to be google.protobuf.Empty messages. This can be set if you
-  # want to allow messages to be void forever, that is they will never take any parameters. 
+  # want to allow messages to be void forever, that is they will never take any parameters.
   rpc_allow_google_protobuf_empty_requests: true
   rpc_allow_google_protobuf_empty_responses: true
   # allows the same message type to be used for a single RPC's request and response type.

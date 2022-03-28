@@ -12,7 +12,7 @@ import (
 
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 
 	safemath "github.com/flare-foundation/flare/utils/math"
@@ -48,7 +48,7 @@ type currentStakerChainState interface {
 	Apply(InternalState)
 
 	// Return the current validator set of [subnetID].
-	ValidatorSet(subnetID ids.ID) (validators.Set, error)
+	ValidatorSet(subnetID ids.ID) (validation.Set, error)
 }
 
 // currentStakerChainStateImpl is a copy on write implementation for versioning
@@ -285,45 +285,45 @@ func (cs *currentStakerChainStateImpl) Apply(is InternalState) {
 	cs.deletedStakers = nil
 }
 
-func (cs *currentStakerChainStateImpl) ValidatorSet(subnetID ids.ID) (validators.Set, error) {
+func (cs *currentStakerChainStateImpl) ValidatorSet(subnetID ids.ID) (validation.Set, error) {
 	if subnetID == constants.PrimaryNetworkID {
 		return cs.primaryValidatorSet()
 	}
 	return cs.subnetValidatorSet(subnetID)
 }
 
-func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validators.Set, error) {
-	vdrs := validators.NewSet()
+func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validation.Set, error) {
+	validators := validation.NewSet()
 
 	var err error
 	for nodeID, vdr := range cs.validatorsByNodeID {
-		vdrWeight := vdr.addValidatorTx.Validator.Wght
-		vdrWeight, err = safemath.Add64(vdrWeight, vdr.delegatorWeight)
+		weight := vdr.addValidatorTx.Validator.Wght
+		weight, err = safemath.Add64(weight, vdr.delegatorWeight)
 		if err != nil {
 			return nil, err
 		}
-		if err := vdrs.AddWeight(nodeID, vdrWeight); err != nil {
+		if err := validators.AddWeight(nodeID, weight); err != nil {
 			return nil, err
 		}
 	}
 
-	return vdrs, nil
+	return validators, nil
 }
 
-func (cs *currentStakerChainStateImpl) subnetValidatorSet(subnetID ids.ID) (validators.Set, error) {
-	vdrs := validators.NewSet()
+func (cs *currentStakerChainStateImpl) subnetValidatorSet(subnetID ids.ID) (validation.Set, error) {
+	validators := validation.NewSet()
 
 	for nodeID, vdr := range cs.validatorsByNodeID {
 		subnetVDR, exists := vdr.subnets[subnetID]
 		if !exists {
 			continue
 		}
-		if err := vdrs.AddWeight(nodeID, subnetVDR.Validator.Wght); err != nil {
+		if err := validators.AddWeight(nodeID, subnetVDR.Validator.Wght); err != nil {
 			return nil, err
 		}
 	}
 
-	return vdrs, nil
+	return validators, nil
 }
 
 func (cs *currentStakerChainStateImpl) GetStaker(txID ids.ID) (tx *Tx, reward uint64, err error) {

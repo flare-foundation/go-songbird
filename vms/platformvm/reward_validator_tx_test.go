@@ -15,7 +15,7 @@ import (
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/version"
@@ -239,9 +239,7 @@ func TestRewardDelegatorTxExecuteOnCommit(t *testing.T) {
 	err = vm.internalState.(*internalStateImpl).loadCurrentValidators()
 	assert.NoError(err)
 	// test validator stake
-	set, ok := vm.Validators.GetValidators()
-	assert.True(ok)
-	stake, ok := set.GetWeight(vdrNodeID)
+	stake, ok := vm.Validators.GetWeight(vdrNodeID)
 	assert.True(ok)
 	assert.Equal(vm.MinValidatorStake+vm.MinDelegatorStake, stake)
 
@@ -284,7 +282,7 @@ func TestRewardDelegatorTxExecuteOnCommit(t *testing.T) {
 	assert.Less(vdrReward, delReward, "the delegator's reward should be greater than the delegatee's because the delegatee's share is 25%")
 	assert.Equal(expectedReward, delReward+vdrReward, "expected total reward to be %d but is %d", expectedReward, delReward+vdrReward)
 
-	stake, ok = set.GetWeight(vdrNodeID)
+	stake, ok = vm.Validators.GetWeight(vdrNodeID)
 	assert.True(ok)
 	assert.Equal(vm.MinValidatorStake, stake)
 }
@@ -394,7 +392,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewManager(0),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -429,7 +427,7 @@ func TestUptimeDisallowedWithRestart(t *testing.T) {
 	secondVM := &VM{Factory: Factory{
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .21,
-		Validators:             validators.NewManager(0),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 
@@ -593,7 +591,7 @@ func TestUptimeDisallowedAfterNeverConnecting(t *testing.T) {
 		Chains:                 chains.MockManager{},
 		UptimePercentage:       .2,
 		RewardConfig:           defaultRewardConfig,
-		Validators:             validators.NewManager(0),
+		Validators:             validation.NewSet(),
 		UptimeLockedCalculator: uptime.NewLockedCalculator(),
 	}}
 

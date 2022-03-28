@@ -19,9 +19,9 @@ func NewEarlyTermNoTraversalFactory(alpha int) Factory {
 	return &earlyTermNoTraversalFactory{alpha: alpha}
 }
 
-func (f *earlyTermNoTraversalFactory) New(vdrs ids.ShortBag) Poll {
+func (f *earlyTermNoTraversalFactory) New(validators ids.ShortBag) Poll {
 	return &earlyTermNoTraversalPoll{
-		polled: vdrs,
+		polled: validators,
 		alpha:  f.alpha,
 	}
 }

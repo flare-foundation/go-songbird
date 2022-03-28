@@ -9,7 +9,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // Config wraps all the parameters needed for a snowman engine
@@ -19,7 +19,7 @@ type Config struct {
 	Ctx        *snow.ConsensusContext
 	VM         block.ChainVM
 	Sender     common.Sender
-	Validators validators.Set
+	Validators validation.Set
 	Params     snowball.Parameters
 	Consensus  snowman.Consensus
 }

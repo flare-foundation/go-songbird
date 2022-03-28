@@ -54,41 +54,41 @@ func TestPrimaryValidatorSet(t *testing.T) {
 	nodeID3 := ids.GenerateTestShortID()
 
 	{
-		// Apply the on-chain validator set to [vdrs]
-		vdrs, err := cs.ValidatorSet(constants.PrimaryNetworkID)
+		// Apply the on-chain validator set to [validators]
+		validators, err := cs.ValidatorSet(constants.PrimaryNetworkID)
 		assert.NoError(t, err)
 
 		// Validate that the state was applied and the old state was cleared
-		assert.EqualValues(t, 3, vdrs.Len())
-		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, vdrs.Weight())
-		gotNode0Weight, exists := vdrs.GetWeight(nodeID0)
+		assert.EqualValues(t, 3, validators.Len())
+		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, validators.Weight())
+		gotNode0Weight, exists := validators.GetWeight(nodeID0)
 		assert.True(t, exists)
 		assert.EqualValues(t, node0Weight, gotNode0Weight)
-		gotNode1Weight, exists := vdrs.GetWeight(nodeID1)
+		gotNode1Weight, exists := validators.GetWeight(nodeID1)
 		assert.True(t, exists)
 		assert.EqualValues(t, node1Weight, gotNode1Weight)
-		gotNode2Weight, exists := vdrs.GetWeight(nodeID2)
+		gotNode2Weight, exists := validators.GetWeight(nodeID2)
 		assert.True(t, exists)
 		assert.EqualValues(t, node2Weight, gotNode2Weight)
-		_, exists = vdrs.GetWeight(nodeID3)
+		_, exists = validators.GetWeight(nodeID3)
 		assert.False(t, exists)
 	}
 
 	{
 		// Apply the on-chain validator set again
-		vdrs, err := cs.ValidatorSet(constants.PrimaryNetworkID)
+		validators, err := cs.ValidatorSet(constants.PrimaryNetworkID)
 		assert.NoError(t, err)
 
 		// The state should be the same
-		assert.EqualValues(t, 3, vdrs.Len())
-		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, vdrs.Weight())
-		gotNode0Weight, exists := vdrs.GetWeight(nodeID0)
+		assert.EqualValues(t, 3, validators.Len())
+		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, validators.Weight())
+		gotNode0Weight, exists := validators.GetWeight(nodeID0)
 		assert.True(t, exists)
 		assert.EqualValues(t, node0Weight, gotNode0Weight)
-		gotNode1Weight, exists := vdrs.GetWeight(nodeID1)
+		gotNode1Weight, exists := validators.GetWeight(nodeID1)
 		assert.True(t, exists)
 		assert.EqualValues(t, node1Weight, gotNode1Weight)
-		gotNode2Weight, exists := vdrs.GetWeight(nodeID2)
+		gotNode2Weight, exists := validators.GetWeight(nodeID2)
 		assert.True(t, exists)
 		assert.EqualValues(t, node2Weight, gotNode2Weight)
 	}
@@ -157,41 +157,41 @@ func TestSubnetValidatorSet(t *testing.T) {
 	nodeID3 := ids.GenerateTestShortID()
 
 	{
-		// Apply the on-chain validator set to [vdrs]
-		vdrs, err := cs.ValidatorSet(subnetID)
+		// Apply the on-chain validator set to [validators]
+		validators, err := cs.ValidatorSet(subnetID)
 		assert.NoError(t, err)
 
 		// Validate that the state was applied and the old state was cleared
-		assert.EqualValues(t, 3, vdrs.Len())
-		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, vdrs.Weight())
-		gotNode0Weight, exists := vdrs.GetWeight(nodeID0)
+		assert.EqualValues(t, 3, validators.Len())
+		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, validators.Weight())
+		gotNode0Weight, exists := validators.GetWeight(nodeID0)
 		assert.True(t, exists)
 		assert.EqualValues(t, node0Weight, gotNode0Weight)
-		gotNode1Weight, exists := vdrs.GetWeight(nodeID1)
+		gotNode1Weight, exists := validators.GetWeight(nodeID1)
 		assert.True(t, exists)
 		assert.EqualValues(t, node1Weight, gotNode1Weight)
-		gotNode2Weight, exists := vdrs.GetWeight(nodeID2)
+		gotNode2Weight, exists := validators.GetWeight(nodeID2)
 		assert.True(t, exists)
 		assert.EqualValues(t, node2Weight, gotNode2Weight)
-		_, exists = vdrs.GetWeight(nodeID3)
+		_, exists = validators.GetWeight(nodeID3)
 		assert.False(t, exists)
 	}
 
 	{
 		// Apply the on-chain validator set again
-		vdrs, err := cs.ValidatorSet(subnetID)
+		validators, err := cs.ValidatorSet(subnetID)
 		assert.NoError(t, err)
 
 		// The state should be the same
-		assert.EqualValues(t, 3, vdrs.Len())
-		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, vdrs.Weight())
-		gotNode0Weight, exists := vdrs.GetWeight(nodeID0)
+		assert.EqualValues(t, 3, validators.Len())
+		assert.EqualValues(t, node0Weight+node1Weight+node2Weight, validators.Weight())
+		gotNode0Weight, exists := validators.GetWeight(nodeID0)
 		assert.True(t, exists)
 		assert.EqualValues(t, node0Weight, gotNode0Weight)
-		gotNode1Weight, exists := vdrs.GetWeight(nodeID1)
+		gotNode1Weight, exists := validators.GetWeight(nodeID1)
 		assert.True(t, exists)
 		assert.EqualValues(t, node1Weight, gotNode1Weight)
-		gotNode2Weight, exists := vdrs.GetWeight(nodeID2)
+		gotNode2Weight, exists := validators.GetWeight(nodeID2)
 		assert.True(t, exists)
 		assert.EqualValues(t, node2Weight, gotNode2Weight)
 	}

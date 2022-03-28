@@ -89,20 +89,20 @@ func (i *issuer) Update() {
 
 	// Issue a poll for this vertex.
 	p := i.t.Consensus.Parameters()
-	vdrs, err := i.t.Validators.Sample(p.K) // Validators to sample
+	validators, err := i.t.Validators.Sample(p.K) // Validators to sample
 
-	vdrBag := ids.ShortBag{} // Validators to sample repr. as a set
-	for _, vdr := range vdrs {
-		vdrBag.Add(vdr.ID())
+	bag := ids.ShortBag{} // Validators to sample repr. as a set
+	for _, validator := range validators {
+		bag.Add(validator.ID())
 	}
 
-	vdrList := vdrBag.List()
-	vdrSet := ids.NewShortSet(len(vdrList))
-	vdrSet.Add(vdrList...)
+	list := bag.List()
+	set := ids.NewShortSet(len(list))
+	set.Add(list...)
 
 	i.t.RequestID++
-	if err == nil && i.t.polls.Add(i.t.RequestID, vdrBag) {
-		i.t.Sender.SendPushQuery(vdrSet, i.t.RequestID, vtxID, i.vtx.Bytes())
+	if err == nil && i.t.polls.Add(i.t.RequestID, bag) {
+		i.t.Sender.SendPushQuery(set, i.t.RequestID, vtxID, i.vtx.Bytes())
 	} else if err != nil {
 		i.t.Ctx.Log.Error("Query for %s was dropped due to an insufficient number of validators", vtxID)
 	}

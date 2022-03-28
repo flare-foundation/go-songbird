@@ -106,7 +106,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 	// has been synced up to this point yet.
 	if p.vm.bootstrapped {
 		childID := child.ID()
-		currentPChainHeight, err := p.vm.ctx.ValidatorState.GetCurrentHeight()
+		currentPChainHeight, err := p.vm.ctx.PlatformVMState.GetCurrentHeight()
 		if err != nil {
 			p.vm.ctx.Log.Error("failed to get current P-Chain height while processing %s: %s",
 				childID, err)
@@ -118,7 +118,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 
 		childHeight := child.Height()
 		proposerID := child.Proposer()
-		minDelay, err := p.vm.Windower.Delay(childHeight, parentPChainHeight, proposerID)
+		minDelay, err := p.vm.Windower.Delay(childHeight, innerParentID, proposerID)
 		if err != nil {
 			return err
 		}
@@ -143,6 +143,7 @@ func (p *postForkCommonComponents) Verify(parentTimestamp time.Time, parentPChai
 
 // Return the child (a *postForkBlock) of this block
 func (p *postForkCommonComponents) buildChild(
+	innerParentID ids.ID,
 	parentID ids.ID,
 	parentTimestamp time.Time,
 	parentPChainHeight uint64,
@@ -164,7 +165,7 @@ func (p *postForkCommonComponents) buildChild(
 	if delay < proposer.MaxDelay {
 		parentHeight := p.innerBlk.Height()
 		proposerID := p.vm.ctx.NodeID
-		minDelay, err := p.vm.Windower.Delay(parentHeight+1, parentPChainHeight, proposerID)
+		minDelay, err := p.vm.Windower.Delay(parentHeight+1, innerParentID, proposerID)
 		if err != nil {
 			return nil, err
 		}

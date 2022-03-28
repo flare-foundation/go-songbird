@@ -20,8 +20,9 @@ type postForkBlock struct {
 
 // Accept:
 // 1) Sets this blocks status to Accepted.
-// 2) Persists this block in storage
-// 3) Calls Reject() on siblings of this block and their descendants.
+// 2) Updates the validator set.
+// 3) Persists this block in storage
+// 4) Calls Reject() on siblings of this block and their descendants.
 func (b *postForkBlock) Accept() error {
 	blkID := b.ID()
 	if err := b.vm.State.SetLastAccepted(blkID); err != nil {
@@ -39,7 +40,18 @@ func (b *postForkBlock) Accept() error {
 
 	// mark the inner block as accepted and all conflicting inner blocks as
 	// rejected
-	return b.vm.Tree.Accept(b.innerBlk)
+	if err := b.vm.Tree.Accept(b.innerBlk); err != nil {
+		return err
+	}
+
+	innerID := b.innerBlk.ID()
+	if err := b.vm.ctx.ValidatorsUpdater.UpdateValidators(innerID); err != nil {
+		return err
+	}
+
+	b.vm.ctx.Log.Debug("updated validators to post-fork block (hash: %s)", innerID.Hex())
+
+	return nil
 }
 
 func (b *postForkBlock) Reject() error {
@@ -140,6 +152,7 @@ func (b *postForkBlock) verifyPostForkOption(child *postForkOption) error {
 // Return the child (a *postForkBlock) of this block
 func (b *postForkBlock) buildChild() (Block, error) {
 	return b.postForkCommonComponents.buildChild(
+		b.innerBlk.ID(),
 		b.ID(),
 		b.Timestamp(),
 		b.PChainHeight(),

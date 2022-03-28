@@ -21,6 +21,22 @@ type preForkBlock struct {
 	vm *VM
 }
 
+func (b *preForkBlock) Accept() error {
+
+	if err := b.Block.Accept(); err != nil {
+		return err
+	}
+
+	innerID := b.Block.ID()
+	if err := b.vm.ctx.ValidatorsUpdater.UpdateValidators(innerID); err != nil {
+		return err
+	}
+
+	b.vm.ctx.Log.Debug("updated validators to pre-fork block (hash: %s)", innerID.Hex())
+
+	return nil
+}
+
 func (b *preForkBlock) Parent() ids.ID {
 	return b.Block.Parent()
 }
@@ -90,7 +106,7 @@ func (b *preForkBlock) verifyPostForkChild(child *postForkBlock) error {
 
 	childID := child.ID()
 	childPChainHeight := child.PChainHeight()
-	currentPChainHeight, err := b.vm.ctx.ValidatorState.GetCurrentHeight()
+	currentPChainHeight, err := b.vm.ctx.PlatformVMState.GetCurrentHeight()
 	if err != nil {
 		b.vm.ctx.Log.Error("couldn't retrieve current P-Chain height while verifying %s: %s", childID, err)
 		return err

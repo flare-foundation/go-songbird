@@ -726,7 +726,6 @@ func (p *peer) handleVersion(msg message.InboundMessage) {
 
 	p.versionStruct.SetValue(peerVersion)
 	p.versionStr.SetValue(peerVersion.String())
-
 	p.gotVersion.SetValue(true)
 
 	p.tryMarkFinishedHandshake()

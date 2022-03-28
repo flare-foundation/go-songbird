@@ -10,7 +10,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/vms/platformvm/reward"
 )
 
@@ -20,7 +20,7 @@ type Factory struct {
 	Chains chains.Manager
 
 	// Node's validator set maps subnetID -> validators of the subnet
-	Validators validators.Manager
+	Validators validation.Set
 
 	// Provides access to the uptime manager as a thread safe data structure
 	UptimeLockedCalculator uptime.LockedCalculator

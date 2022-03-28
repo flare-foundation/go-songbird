@@ -52,16 +52,16 @@ func TestCreateAndFinishPollOutOfOrder_NewerFinishesFirst(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	vdrs := []ids.ShortID{vdr1, vdr2, vdr3}
+	validators := []ids.ShortID{vdr1, vdr2, vdr3}
 
 	// create two polls for the two vtxs
 	vdrBag := ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added := s.Add(1, vdrBag)
 	assert.True(t, added)
 
 	vdrBag = ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added = s.Add(2, vdrBag)
 	assert.True(t, added)
 	assert.Equal(t, s.Len(), 2)
@@ -105,16 +105,16 @@ func TestCreateAndFinishPollOutOfOrder_OlderFinishesFirst(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	vdrs := []ids.ShortID{vdr1, vdr2, vdr3}
+	validators := []ids.ShortID{vdr1, vdr2, vdr3}
 
 	// create two polls for the two vtxs
 	vdrBag := ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added := s.Add(1, vdrBag)
 	assert.True(t, added)
 
 	vdrBag = ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added = s.Add(2, vdrBag)
 	assert.True(t, added)
 	assert.Equal(t, s.Len(), 2)
@@ -158,21 +158,21 @@ func TestCreateAndFinishPollOutOfOrder_UnfinishedPollsGaps(t *testing.T) {
 	vdr2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	vdrs := []ids.ShortID{vdr1, vdr2, vdr3}
+	validators := []ids.ShortID{vdr1, vdr2, vdr3}
 
 	// create three polls for the two vtxs
 	vdrBag := ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added := s.Add(1, vdrBag)
 	assert.True(t, added)
 
 	vdrBag = ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added = s.Add(2, vdrBag)
 	assert.True(t, added)
 
 	vdrBag = ids.ShortBag{}
-	vdrBag.Add(vdrs...)
+	vdrBag.Add(validators...)
 	added = s.Add(3, vdrBag)
 	assert.True(t, added)
 	assert.Equal(t, s.Len(), 3)
@@ -227,19 +227,19 @@ func TestCreateAndFinishSuccessfulPoll(t *testing.T) {
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2} // k = 2
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	if s.Len() != 0 {
 		t.Fatalf("Shouldn't have any active polls yet")
-	} else if !s.Add(0, vdrs) {
+	} else if !s.Add(0, validators) {
 		t.Fatalf("Should have been able to add a new poll")
 	} else if s.Len() != 1 {
 		t.Fatalf("Should only have one active poll")
-	} else if s.Add(0, vdrs) {
+	} else if s.Add(0, validators) {
 		t.Fatalf("Shouldn't have been able to add a duplicated poll")
 	} else if s.Len() != 1 {
 		t.Fatalf("Should only have one active poll")
@@ -272,19 +272,19 @@ func TestCreateAndFinishFailedPoll(t *testing.T) {
 	vdr1 := ids.ShortID{1}
 	vdr2 := ids.ShortID{2} // k = 2
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(
+	validators := ids.ShortBag{}
+	validators.Add(
 		vdr1,
 		vdr2,
 	)
 
 	if s.Len() != 0 {
 		t.Fatalf("Shouldn't have any active polls yet")
-	} else if !s.Add(0, vdrs) {
+	} else if !s.Add(0, validators) {
 		t.Fatalf("Should have been able to add a new poll")
 	} else if s.Len() != 1 {
 		t.Fatalf("Should only have one active poll")
-	} else if s.Add(0, vdrs) {
+	} else if s.Add(0, validators) {
 		t.Fatalf("Shouldn't have been able to add a duplicated poll")
 	} else if s.Len() != 1 {
 		t.Fatalf("Should only have one active poll")
@@ -310,15 +310,15 @@ func TestSetString(t *testing.T) {
 
 	vdr1 := ids.ShortID{1} // k = 1
 
-	vdrs := ids.ShortBag{}
-	vdrs.Add(vdr1)
+	validators := ids.ShortBag{}
+	validators.Add(vdr1)
 
 	expected := `current polls: (Size = 1)
     RequestID 0:
         waiting on Bag: (Size = 1)
             ID[6HgC8KRBEhXYbF4riJyJFLSHt37UNuRt]: Count = 1
         received Bag: (Size = 0)`
-	if !s.Add(0, vdrs) {
+	if !s.Add(0, validators) {
 		t.Fatalf("Should have been able to add a new poll")
 	} else if str := s.String(); expected != str {
 		t.Fatalf("Set return wrong string, Expected:\n%s\nReturned:\n%s",

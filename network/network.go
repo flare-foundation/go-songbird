@@ -31,7 +31,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/networking/sender"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/formatting"
@@ -44,9 +44,8 @@ import (
 )
 
 var (
-	errNetworkClosed       = errors.New("network closed")
-	errPeerIsMyself        = errors.New("peer is myself")
-	errNoPrimaryValidators = errors.New("no default subnet validators")
+	errNetworkClosed = errors.New("network closed")
+	errPeerIsMyself  = errors.New("peer is myself")
 
 	_ Network = &network{}
 )
@@ -246,12 +245,12 @@ type Config struct {
 	TLSKey crypto.Signer `json:"-"`
 	// WhitelistedSubnets of the node
 	WhitelistedSubnets ids.Set        `json:"whitelistedSubnets"`
-	Beacons            validators.Set `json:"beacons"`
+	Beacons            validation.Set `json:"beacons"`
 	// Current validators in the Avalanche network
-	Validators        validators.Manager `json:"validators"`
-	UptimeCalculator  uptime.Calculator  `json:"-"`
-	UptimeMetricFreq  time.Duration      `json:"uptimeMetricFreq"`
-	UptimeRequirement float64            `json:"uptimeRequirement"`
+	Validators        validation.Set    `json:"validators"`
+	UptimeCalculator  uptime.Calculator `json:"-"`
+	UptimeMetricFreq  time.Duration     `json:"uptimeMetricFreq"`
+	UptimeRequirement float64           `json:"uptimeRequirement"`
 
 	// Require that all connections must have at least one validator between the
 	// 2 peers. This can be useful to enable if the node wants to connect to the
@@ -304,16 +303,12 @@ func NewNetwork(
 	netw.clientUpgrader = NewTLSClientUpgrader(config.TLSConfig)
 
 	netw.dialer = dialer.NewDialer(constants.NetworkType, config.DialerConfig, log)
-	validators, ok := config.Validators.GetValidators()
-	if !ok {
-		return nil, errNoPrimaryValidators
-	}
 
 	inboundMsgThrottler, err := throttling.NewInboundMsgThrottler(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		validators,
+		config.Validators,
 		config.ThrottlerConfig.InboundMsgThrottlerConfig,
 	)
 	if err != nil {
@@ -325,7 +320,7 @@ func NewNetwork(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		validators,
+		config.Validators,
 		config.ThrottlerConfig.OutboundMsgThrottlerConfig,
 	)
 	if err != nil {
@@ -702,23 +697,19 @@ func (n *network) IP() utils.IPDesc {
 func (n *network) NodeUptime() (UptimeResult, bool) {
 	n.stateLock.RLock()
 	defer n.stateLock.RUnlock()
-	validators, ok := n.config.Validators.GetValidators()
-	if !ok {
-		return UptimeResult{}, false
-	}
 
-	myStake, isValidator := validators.GetWeight(n.config.MyNodeID)
+	myStake, isValidator := n.config.Validators.GetWeight(n.config.MyNodeID)
 	if !isValidator {
 		return UptimeResult{}, false
 	}
 
 	var (
-		totalWeight          = float64(validators.Weight())
+		totalWeight          = float64(n.config.Validators.Weight())
 		totalWeightedPercent = 100 * float64(myStake)
 		rewardingStake       = float64(myStake)
 	)
 	for _, peer := range n.peers.peersList {
-		weight, ok := validators.GetWeight(peer.nodeID)
+		weight, ok := n.config.Validators.GetWeight(peer.nodeID)
 		if !ok {
 			// this is not a validator skip it.
 			continue

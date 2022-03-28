@@ -7,15 +7,15 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // Config wraps the common configurations that are needed by a Snow consensus
 // engine
 type Config struct {
 	Ctx        *snow.ConsensusContext
-	Validators validators.Set
-	Beacons    validators.Set
+	Validators validation.Set
+	Beacons    validation.Set
 
 	SampleK       int
 	StartupAlpha  uint64
