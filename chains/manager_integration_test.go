@@ -42,7 +42,7 @@ func TestManagerIntegration(t *testing.T) {
 	r, ok := vm.(validation.Retriever)
 	require.True(t, ok)
 	ctx.ValidatorsRetriever = validation.NewCachingRetriever(r)
-	ctx.ValidatorsUpdater = validation.NewUpdater(m.Validators, ctx.ValidatorsRetriever)
+	ctx.ValidatorsUpdater = validation.NewRetrievingUpdater(m.Validators, ctx.ValidatorsRetriever)
 
 	got, err := ctx.ValidatorsRetriever.GetValidators(ids.ID{})
 	require.NoError(t, err)

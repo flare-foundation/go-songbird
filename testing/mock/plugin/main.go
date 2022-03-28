@@ -13,14 +13,14 @@ import (
 )
 
 func main() {
+	mockSet := validation.NewSet()
+	for i := 0; i < 10; i++ {
+		_ = mockSet.AddWeight(fakeShortID(i), uint64(i))
+	}
+
 	mock := chainvm.ChainVMMock{
 		GetValidatorsFunc: func(_ ids.ID) (validation.Set, error) {
-			// FIXME: Make this controllable instead of hardcoded.
-			set := validation.NewSet()
-			for i := 0; i < 10; i++ {
-				_ = set.AddWeight(fakeShortID(i), uint64(i))
-			}
-			return set, nil
+			return mockSet, nil
 		},
 	}
 
