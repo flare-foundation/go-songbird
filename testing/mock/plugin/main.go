@@ -14,7 +14,7 @@ import (
 
 func main() {
 	mockSet := validation.NewSet()
-	for i := 0; i < 10; i++ {
+	for i := 1; i <= 10; i++ {
 		_ = mockSet.AddWeight(fakeShortID(i), uint64(i))
 	}
 

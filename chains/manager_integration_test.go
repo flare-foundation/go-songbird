@@ -47,7 +47,7 @@ func TestManagerIntegration(t *testing.T) {
 	got, err := ctx.ValidatorsRetriever.GetValidators(ids.ID{})
 	require.NoError(t, err)
 
-	assert.Equal(t, got.Len(), 9)
+	assert.Equal(t, got.Len(), 10)
 	for i, v := range got.List() {
 		id := v.ID()
 		assert.Equal(t, byte(i)+1, id[0])
