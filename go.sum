@@ -157,8 +157,8 @@ github.com/flare-foundation/coreth v0.3.1-0.20220219015829-9d244fc3b9cd/go.mod h
 github.com/flare-foundation/coreth v0.3.1-0.20220219134233-0c0a76526e9d/go.mod h1:61k1pJMYUn33jA0zwPIDWbEV++FkMxoIz24pdklD3+A=
 github.com/flare-foundation/coreth v0.3.1/go.mod h1:EBvV826hD+GX9AX1k/PpLrenCAPzEJk9yct8CDIcGQo=
 github.com/flare-foundation/coreth v0.4.0/go.mod h1:ZUIwNUsgK4Dax/HifkP8RdwIGUa4ci6RTB0ZQMfFWRg=
-github.com/flare-foundation/coreth v0.4.2-0.20220330160852-907fa19ed774 h1:ADQx2hEsnFjhAXmyBAPp94iR4QkdeAqJWvt20W/TGBM=
-github.com/flare-foundation/coreth v0.4.2-0.20220330160852-907fa19ed774/go.mod h1:jaIifhb5eU3IyCE1KPbIYwGbR+N8LNUfnDNYS7ez9DI=
+github.com/flare-foundation/coreth v0.4.2-0.20220330170841-5d5d70036cf2 h1:fzv25qHk4plalENmScOINpDllhFxHjkpHXHlpe2GfQA=
+github.com/flare-foundation/coreth v0.4.2-0.20220330170841-5d5d70036cf2/go.mod h1:jaIifhb5eU3IyCE1KPbIYwGbR+N8LNUfnDNYS7ez9DI=
 github.com/flare-foundation/flare v0.5.0/go.mod h1:ai++PWjLrLOZYheY7qutUJbReWsJSe5XO47QcIQQW0U=
 github.com/flare-foundation/flare v0.5.1-0.20220218223919-053cf219b47c/go.mod h1:s7Pdz389BY8S4R59VEO43qfO59NGVOANIjbqGm99FcE=
 github.com/flare-foundation/flare v0.5.1-0.20220219122715-d2993195fa0a/go.mod h1:9xMiQ+VgZQdBPxJoNAiwfrkFHFKreBn17yKMZiUbXx0=
