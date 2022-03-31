@@ -15,21 +15,21 @@ import (
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 )
 
 func TestHandlerDropsTimedOutMessages(t *testing.T) {
 	called := make(chan struct{})
 
 	metrics := prometheus.NewRegistry()
-	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
+	mc, err := message.NewCreator(metrics, true, "dummyNamespace", 10*time.Second)
 	assert.NoError(t, err)
 
 	ctx := snow.DefaultConsensusContextTest()
 
 	validators := validation.NewSet()
-	validator0 := ids.GenerateTestShortID()
-	err = validators.AddWeight(validator0, 1)
+	validator := ids.GenerateTestShortID()
+	err = validators.AddWeight(validator, 1)
 	assert.NoError(t, err)
 
 	handlerIntf, err := New(
@@ -102,7 +102,7 @@ func TestHandlerClosesOnError(t *testing.T) {
 	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
-	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
+	mc, err := message.NewCreator(metrics, true, "dummyNamespace", 10*time.Second)
 	assert.NoError(t, err)
 
 	handlerIntf, err := New(
@@ -168,7 +168,7 @@ func TestHandlerDropsGossipDuringBootstrapping(t *testing.T) {
 	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
-	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
+	mc, err := message.NewCreator(metrics, true, "dummyNamespace", 10*time.Second)
 	assert.NoError(t, err)
 
 	handlerIntf, err := New(
@@ -226,7 +226,7 @@ func TestHandlerDispatchInternal(t *testing.T) {
 	err := validators.AddWeight(ids.GenerateTestShortID(), 1)
 	assert.NoError(t, err)
 	metrics := prometheus.NewRegistry()
-	mc, err := message.NewCreator(metrics, true /*compressionEnabled*/, "dummyNamespace")
+	mc, err := message.NewCreator(metrics, true, "dummyNamespace", 10*time.Second)
 	assert.NoError(t, err)
 
 	handler, err := New(

@@ -5,10 +5,12 @@ package snowstorm
 
 import (
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/events"
 	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
-// acceptor implements Blockable
+var _ events.Blockable = &acceptor{}
+
 type acceptor struct {
 	g        *Directed
 	errs     *wrappers.Errs

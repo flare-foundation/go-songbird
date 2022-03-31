@@ -9,11 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/uptime/mocks"
 	"github.com/flare-foundation/flare/utils"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestLockedCalculator(t *testing.T) {

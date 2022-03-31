@@ -48,7 +48,6 @@ type VMClient interface {
 	BatchedParseBlock(ctx context.Context, in *BatchedParseBlockRequest, opts ...grpc.CallOption) (*BatchedParseBlockResponse, error)
 	VerifyHeightIndex(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*VerifyHeightIndexResponse, error)
 	GetBlockIDAtHeight(ctx context.Context, in *GetBlockIDAtHeightRequest, opts ...grpc.CallOption) (*GetBlockIDAtHeightResponse, error)
-	FetchValidators(ctx context.Context, in *FetchValidatorsRequest, opts ...grpc.CallOption) (*FetchValidatorsResponse, error)
 }
 
 type vMClient struct {
@@ -284,15 +283,6 @@ func (c *vMClient) GetBlockIDAtHeight(ctx context.Context, in *GetBlockIDAtHeigh
 	return out, nil
 }
 
-func (c *vMClient) FetchValidators(ctx context.Context, in *FetchValidatorsRequest, opts ...grpc.CallOption) (*FetchValidatorsResponse, error) {
-	out := new(FetchValidatorsResponse)
-	err := c.cc.Invoke(ctx, "/vmproto.VM/FetchValidators", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // VMServer is the server API for VM service.
 // All implementations must embed UnimplementedVMServer
 // for forward compatibility
@@ -322,7 +312,6 @@ type VMServer interface {
 	BatchedParseBlock(context.Context, *BatchedParseBlockRequest) (*BatchedParseBlockResponse, error)
 	VerifyHeightIndex(context.Context, *emptypb.Empty) (*VerifyHeightIndexResponse, error)
 	GetBlockIDAtHeight(context.Context, *GetBlockIDAtHeightRequest) (*GetBlockIDAtHeightResponse, error)
-	FetchValidators(context.Context, *FetchValidatorsRequest) (*FetchValidatorsResponse, error)
 	mustEmbedUnimplementedVMServer()
 }
 
@@ -404,9 +393,6 @@ func (UnimplementedVMServer) VerifyHeightIndex(context.Context, *emptypb.Empty) 
 }
 func (UnimplementedVMServer) GetBlockIDAtHeight(context.Context, *GetBlockIDAtHeightRequest) (*GetBlockIDAtHeightResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBlockIDAtHeight not implemented")
-}
-func (UnimplementedVMServer) FetchValidators(context.Context, *FetchValidatorsRequest) (*FetchValidatorsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FetchValidators not implemented")
 }
 func (UnimplementedVMServer) mustEmbedUnimplementedVMServer() {}
 
@@ -871,24 +857,6 @@ func _VM_GetBlockIDAtHeight_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _VM_FetchValidators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FetchValidatorsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(VMServer).FetchValidators(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/vmproto.VM/FetchValidators",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VMServer).FetchValidators(ctx, req.(*FetchValidatorsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // VM_ServiceDesc is the grpc.ServiceDesc for VM service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -995,10 +963,6 @@ var VM_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBlockIDAtHeight",
 			Handler:    _VM_GetBlockIDAtHeight_Handler,
-		},
-		{
-			MethodName: "FetchValidators",
-			Handler:    _VM_FetchValidators_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

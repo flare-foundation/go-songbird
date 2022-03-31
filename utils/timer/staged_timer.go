@@ -3,7 +3,9 @@
 
 package timer
 
-import "time"
+import (
+	"time"
+)
 
 // NewStagedTimer returns a timer that will execute [f]
 // when a timeout occurs and execute an additional timeout after

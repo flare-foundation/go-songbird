@@ -9,14 +9,10 @@ import (
 	"math"
 	"sync"
 
+	"github.com/gorilla/rpc/v2"
+
 	"github.com/flare-foundation/flare/api/server"
 	"github.com/flare-foundation/flare/chains"
-	"github.com/flare-foundation/flare/utils/constants"
-	"github.com/flare-foundation/flare/utils/hashing"
-	"github.com/flare-foundation/flare/utils/json"
-	"github.com/flare-foundation/flare/utils/timer/mockable"
-	"github.com/flare-foundation/flare/utils/wrappers"
-
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/codec/linearcodec"
 	"github.com/flare-foundation/flare/codec/reflectcodec"
@@ -27,8 +23,12 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman"
 	"github.com/flare-foundation/flare/snow/triggers"
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/hashing"
+	"github.com/flare-foundation/flare/utils/json"
 	"github.com/flare-foundation/flare/utils/logging"
-	"github.com/gorilla/rpc/v2"
+	"github.com/flare-foundation/flare/utils/timer/mockable"
+	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
 const (
@@ -61,7 +61,7 @@ type Config struct {
 	IndexingEnabled                         bool
 	AllowIncompleteIndex                    bool
 	DecisionDispatcher, ConsensusDispatcher *triggers.EventDispatcher
-	APIServer                               server.RouteAdder
+	APIServer                               server.PathAdder
 	ShutdownF                               func()
 }
 
@@ -88,7 +88,7 @@ func NewIndexer(config Config) (Indexer, error) {
 		txIndices:            map[ids.ID]Index{},
 		vtxIndices:           map[ids.ID]Index{},
 		blockIndices:         map[ids.ID]Index{},
-		routeAdder:           config.APIServer,
+		pathAdder:            config.APIServer,
 		shutdownF:            config.ShutdownF,
 	}
 	if err := indexer.codec.RegisterCodec(
@@ -105,7 +105,6 @@ func NewIndexer(config Config) (Indexer, error) {
 	return indexer, indexer.markHasRun()
 }
 
-// indexer implements Indexer
 type indexer struct {
 	codec  codec.Manager
 	clock  mockable.Clock
@@ -121,7 +120,7 @@ type indexer struct {
 	hasRunBefore bool
 
 	// Used to add API endpoint for new indices
-	routeAdder server.RouteAdder
+	pathAdder server.PathAdder
 
 	// If true, allow running in such a way that could allow the creation
 	// of an index which could be missing accepted containers.
@@ -295,7 +294,7 @@ func (i *indexer) registerChainHelper(
 		return nil, err
 	}
 	handler := &common.HTTPHandler{LockOptions: common.NoLock, Handler: apiServer}
-	if err := i.routeAdder.AddRoute(handler, &sync.RWMutex{}, "index/"+name, "/"+endpoint, i.log); err != nil {
+	if err := i.pathAdder.AddRoute(handler, &sync.RWMutex{}, "index/"+name, "/"+endpoint, i.log); err != nil {
 		_ = index.Close()
 		return nil, err
 	}

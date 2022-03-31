@@ -13,13 +13,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 
 	safemath "github.com/flare-foundation/flare/utils/math"
 )
+
+var _ heap.Interface = &benchedQueue{}
 
 // If a peer consistently does not respond to queries, it will
 // increase latencies on the network whenever that peer is polled.
@@ -47,7 +49,7 @@ type benchData struct {
 	index        int
 }
 
-// Implements heap.Interface. Each element is a benched validator
+// Each element is a benched validator
 type benchedQueue []*benchData
 
 func (bq benchedQueue) Len() int           { return len(bq) }

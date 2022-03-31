@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/memdb"
 	"github.com/flare-foundation/flare/database/versiondb"
@@ -18,7 +20,6 @@ import (
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/vms/proposervm/block"
 	"github.com/flare-foundation/flare/vms/proposervm/state"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestHeightBlockIndexPostFork(t *testing.T) {

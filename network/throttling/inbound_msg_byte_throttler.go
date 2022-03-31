@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/linkedhashmap"
 	"github.com/flare-foundation/flare/utils/logging"
@@ -53,7 +53,6 @@ type msgMetadata struct {
 	closeOnAcquireChan chan struct{}
 }
 
-// msgThrottler implements MsgThrottler.
 // It gives more space to validators with more stake.
 // Messages are guaranteed to make progress toward
 // acquiring enough bytes to be read.

@@ -2,3 +2,5 @@
 /coreth/
 /db/
 /logs/
+*.log
+*.profile

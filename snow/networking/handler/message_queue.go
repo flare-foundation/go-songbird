@@ -11,7 +11,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/tracker"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
@@ -66,15 +66,16 @@ func NewMessageQueue(
 	cpuTracker tracker.TimeTracker,
 	metricsNamespace string,
 	metricsRegisterer prometheus.Registerer,
+	ops []message.Op,
 ) (MessageQueue, error) {
 	m := &messageQueue{
 		log:                   log,
-		validators:            validators,
+		vdrs:                  vdrs,
 		cpuTracker:            cpuTracker,
 		cond:                  sync.NewCond(&sync.Mutex{}),
 		nodeToUnprocessedMsgs: make(map[ids.ShortID]int),
 	}
-	return m, m.metrics.initialize(metricsNamespace, metricsRegisterer)
+	return m, m.metrics.initialize(metricsNamespace, metricsRegisterer, ops)
 }
 
 func (m *messageQueue) Push(msg message.InboundMessage) {
@@ -93,6 +94,7 @@ func (m *messageQueue) Push(msg message.InboundMessage) {
 	// Update metrics
 	m.metrics.nodesWithMessages.Set(float64(len(m.nodeToUnprocessedMsgs)))
 	m.metrics.len.Inc()
+	m.metrics.ops[msg.Op()].Inc()
 
 	// Signal a waiting thread
 	m.cond.Signal()
@@ -121,6 +123,7 @@ func (m *messageQueue) Pop() (message.InboundMessage, bool) {
 			m.log.Debug("canPop is false for all %d unprocessed messages", n)
 		}
 		msg := m.msgs[0]
+		m.msgs[0] = nil
 		nodeID := msg.NodeID()
 		// See if it's OK to process [msg] next
 		if m.canPop(msg) || i == n { // i should never == n but handle anyway as a fail-safe
@@ -135,6 +138,7 @@ func (m *messageQueue) Pop() (message.InboundMessage, bool) {
 			}
 			m.metrics.nodesWithMessages.Set(float64(len(m.nodeToUnprocessedMsgs)))
 			m.metrics.len.Dec()
+			m.metrics.ops[msg.Op()].Dec()
 			return msg, true
 		}
 		// [msg.nodeID] is causing excessive CPU usage.

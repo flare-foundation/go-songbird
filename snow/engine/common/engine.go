@@ -9,7 +9,7 @@ import (
 	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 )
 
 // Engine describes the standard interface of a consensus engine

@@ -7,44 +7,45 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/message"
-	"github.com/flare-foundation/flare/snow/networking/tracker"
-	"github.com/flare-foundation/flare/snow/validation"
-	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/message"
+	"github.com/flare-foundation/flare/snow/networking/tracker"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 func TestQueue(t *testing.T) {
 	assert := assert.New(t)
 	cpuTracker := &tracker.MockTimeTracker{}
 	validators := validation.NewSet()
-	validator1, validator2 := ids.GenerateTestShortID(), ids.GenerateTestShortID()
-	assert.NoError(validators.AddWeight(validator1, 1))
-	assert.NoError(validators.AddWeight(validator2, 1))
-	mIntf, err := NewMessageQueue(logging.NoLog{}, validators, cpuTracker, "", prometheus.NewRegistry())
+	vdr1ID, vdr2ID := ids.GenerateTestShortID(), ids.GenerateTestShortID()
+	assert.NoError(validators.AddWeight(vdr1ID, 1))
+	assert.NoError(validators.AddWeight(vdr2ID, 1))
+	mIntf, err := NewMessageQueue(logging.NoLog{}, validators, cpuTracker, "", prometheus.NewRegistry(), message.SynchronousOps)
 	assert.NoError(err)
 	u := mIntf.(*messageQueue)
 	currentTime := time.Now()
 	u.clock.Set(currentTime)
 
-	mc, err := message.NewCreator(prometheus.NewRegistry(), true /*compressionEnabled*/, "dummyNamespace")
+	mc, err := message.NewCreator(prometheus.NewRegistry(), true, "dummyNamespace", 10*time.Second)
 	assert.NoError(err)
 	mc.SetTime(currentTime)
 	msg1 := mc.InboundPut(ids.Empty,
 		0,
 		ids.GenerateTestID(),
 		nil,
-		validator1,
+		vdr1ID,
 	)
 
 	// Push then pop should work regardless of utilization when there are
 	// no other messages on [u.msgs]
-	cpuTracker.On("Utilization", validator1, mock.Anything).Return(0.1).Once()
+	cpuTracker.On("Utilization", vdr1ID, mock.Anything).Return(0.1).Once()
 	u.Push(msg1)
-	assert.EqualValues(1, u.nodeToUnprocessedMsgs[validator1])
+	assert.EqualValues(1, u.nodeToUnprocessedMsgs[vdr1ID])
 	assert.EqualValues(1, u.Len())
 	gotMsg1, ok := u.Pop()
 	assert.True(ok)
@@ -52,9 +53,9 @@ func TestQueue(t *testing.T) {
 	assert.EqualValues(0, u.Len())
 	assert.EqualValues(msg1, gotMsg1)
 
-	cpuTracker.On("Utilization", validator1, mock.Anything).Return(0.0).Once()
+	cpuTracker.On("Utilization", vdr1ID, mock.Anything).Return(0.0).Once()
 	u.Push(msg1)
-	assert.EqualValues(1, u.nodeToUnprocessedMsgs[validator1])
+	assert.EqualValues(1, u.nodeToUnprocessedMsgs[vdr1ID])
 	assert.EqualValues(1, u.Len())
 	gotMsg1, ok = u.Pop()
 	assert.True(ok)
@@ -62,9 +63,9 @@ func TestQueue(t *testing.T) {
 	assert.EqualValues(0, u.Len())
 	assert.EqualValues(msg1, gotMsg1)
 
-	cpuTracker.On("Utilization", validator1, mock.Anything).Return(1.0).Once()
+	cpuTracker.On("Utilization", vdr1ID, mock.Anything).Return(1.0).Once()
 	u.Push(msg1)
-	assert.EqualValues(1, u.nodeToUnprocessedMsgs[validator1])
+	assert.EqualValues(1, u.nodeToUnprocessedMsgs[vdr1ID])
 	assert.EqualValues(1, u.Len())
 	gotMsg1, ok = u.Pop()
 	assert.True(ok)
@@ -72,9 +73,9 @@ func TestQueue(t *testing.T) {
 	assert.EqualValues(0, u.Len())
 	assert.EqualValues(msg1, gotMsg1)
 
-	cpuTracker.On("Utilization", validator1, mock.Anything).Return(0.0).Once()
+	cpuTracker.On("Utilization", vdr1ID, mock.Anything).Return(0.0).Once()
 	u.Push(msg1)
-	assert.EqualValues(1, u.nodeToUnprocessedMsgs[validator1])
+	assert.EqualValues(1, u.nodeToUnprocessedMsgs[vdr1ID])
 	assert.EqualValues(1, u.Len())
 	gotMsg1, ok = u.Pop()
 	assert.True(ok)
@@ -82,20 +83,20 @@ func TestQueue(t *testing.T) {
 	assert.EqualValues(0, u.Len())
 	assert.EqualValues(msg1, gotMsg1)
 
-	// Push msg1 from validator1
+	// Push msg1 from vdr1ID
 	u.Push(msg1)
-	assert.EqualValues(1, u.nodeToUnprocessedMsgs[validator1])
+	assert.EqualValues(1, u.nodeToUnprocessedMsgs[vdr1ID])
 	assert.EqualValues(1, u.Len())
 
-	msg2 := mc.InboundGet(ids.Empty, 0, 0, ids.Empty, validator2)
+	msg2 := mc.InboundGet(ids.Empty, 0, 0, ids.Empty, vdr2ID)
 
-	// Push msg2 from validator2
+	// Push msg2 from vdr2ID
 	u.Push(msg2)
 	assert.EqualValues(2, u.Len())
-	assert.EqualValues(1, u.nodeToUnprocessedMsgs[validator2])
+	assert.EqualValues(1, u.nodeToUnprocessedMsgs[vdr2ID])
 	// Set vdr1's CPU utilization to 99% and vdr2's to .01
-	cpuTracker.On("Utilization", validator1, mock.Anything).Return(.99).Twice()
-	cpuTracker.On("Utilization", validator2, mock.Anything).Return(.01).Once()
+	cpuTracker.On("Utilization", vdr1ID, mock.Anything).Return(.99).Twice()
+	cpuTracker.On("Utilization", vdr2ID, mock.Anything).Return(.01).Once()
 	// Pop should return msg2 first because vdr1 has exceeded it's portion of CPU time
 	gotMsg2, ok := u.Pop()
 	assert.True(ok)
@@ -121,7 +122,7 @@ func TestQueue(t *testing.T) {
 	// exceeded their limit
 	cpuTracker.On("Utilization", nonVdrNodeID1, mock.Anything).Return(.34).Once()
 	cpuTracker.On("Utilization", nonVdrNodeID2, mock.Anything).Return(.34).Times(3)
-	cpuTracker.On("Utilization", validator1, mock.Anything).Return(0.0).Once()
+	cpuTracker.On("Utilization", vdr1ID, mock.Anything).Return(0.0).Once()
 
 	// u.msgs is [msg3, msg4, msg1]
 	gotMsg1, ok = u.Pop()

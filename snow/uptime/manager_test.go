@@ -8,8 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestStartTracking(t *testing.T) {

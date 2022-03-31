@@ -3,7 +3,9 @@
 
 package metervm
 
-import "github.com/flare-foundation/flare/snow/consensus/snowman"
+import (
+	"github.com/flare-foundation/flare/snow/consensus/snowman"
+)
 
 var (
 	_ snowman.Block       = &meterBlock{}

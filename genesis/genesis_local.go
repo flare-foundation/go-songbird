@@ -103,3 +103,24 @@ var (
 		},
 	}
 )
+
+func init() {
+	errs := wrappers.Errs{}
+	vmrqBytes, err := formatting.Decode(formatting.CB58, VMRQKeyStr)
+	errs.Add(err)
+	ewoqBytes, err := formatting.Decode(formatting.CB58, EWOQKeyStr)
+	errs.Add(err)
+
+	factory := crypto.FactorySECP256K1R{}
+	vmrqIntf, err := factory.ToPrivateKey(vmrqBytes)
+	errs.Add(err)
+	ewoqIntf, err := factory.ToPrivateKey(ewoqBytes)
+	errs.Add(err)
+
+	if errs.Err != nil {
+		panic(errs.Err)
+	}
+
+	VMRQKey = vmrqIntf.(*crypto.PrivateKeySECP256K1R)
+	EWOQKey = ewoqIntf.(*crypto.PrivateKeySECP256K1R)
+}

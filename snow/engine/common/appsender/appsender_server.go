@@ -6,10 +6,11 @@ package appsender
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/emptypb"
+
 	"github.com/flare-foundation/flare/api/proto/appsenderproto"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/engine/common"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ appsenderproto.AppSenderServer = &Server{}

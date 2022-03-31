@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/vms/platformvm/message"
-	"github.com/stretchr/testify/assert"
 )
 
 func getValidTx(vm *VM, t *testing.T) *Tx {

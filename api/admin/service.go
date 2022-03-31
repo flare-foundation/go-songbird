@@ -18,6 +18,8 @@ import (
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/perms"
 	"github.com/flare-foundation/flare/utils/profiler"
+	"github.com/flare-foundation/flare/vms"
+	"github.com/flare-foundation/flare/vms/registry"
 
 	cjson "github.com/flare-foundation/flare/utils/json"
 )
@@ -40,7 +42,9 @@ type Config struct {
 	LogFactory   logging.Factory
 	NodeConfig   interface{}
 	ChainManager chains.Manager
-	HTTPServer   *server.Server
+	HTTPServer   server.PathAdderWithReadLock
+	VMRegistry   registry.VMRegistry
+	VMManager    vms.Manager
 }
 
 // Admin is the API service for node admin management
@@ -268,4 +272,32 @@ func (service *Admin) GetConfig(_ *http.Request, args *struct{}, reply *interfac
 	service.Log.Debug("Admin: GetConfig called")
 	*reply = service.NodeConfig
 	return nil
+}
+
+// LoadVMsReply contains the response metadata for LoadVMs
+type LoadVMsReply struct {
+	// VMs and their aliases which were successfully loaded
+	NewVMs map[ids.ID][]string `json:"newVMs"`
+	// VMs that failed to be loaded and the error message
+	FailedVMs map[ids.ID]string `json:"failedVMs,omitempty"`
+}
+
+// LoadVMs loads any new VMs available to the node and returns the added VMs.
+func (service *Admin) LoadVMs(_ *http.Request, _ *struct{}, reply *LoadVMsReply) error {
+	service.Log.Debug("Admin: LoadVMs called")
+
+	loadedVMs, failedVMs, err := service.VMRegistry.ReloadWithReadLock()
+	if err != nil {
+		return err
+	}
+
+	// extract the inner error messages
+	failedVMsParsed := make(map[ids.ID]string)
+	for vmID, err := range failedVMs {
+		failedVMsParsed[vmID] = err.Error()
+	}
+
+	reply.FailedVMs = failedVMsParsed
+	reply.NewVMs, err = ids.GetRelevantAliases(service.VMManager, loadedVMs)
+	return err
 }

@@ -7,14 +7,15 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validation"
-	"gotest.tools/assert"
+	"github.com/flare-foundation/flare/snow/validators"
 )
 
 var errUnknownBlock = errors.New("unknown block")

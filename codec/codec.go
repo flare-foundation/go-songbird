@@ -3,7 +3,9 @@
 
 package codec
 
-import "github.com/flare-foundation/flare/utils/wrappers"
+import (
+	"github.com/flare-foundation/flare/utils/wrappers"
+)
 
 // Codec marshals and unmarshals
 type Codec interface {

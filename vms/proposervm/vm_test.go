@@ -20,7 +20,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/flare-foundation/flare/utils/timer/mockable"

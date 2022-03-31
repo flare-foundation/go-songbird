@@ -12,7 +12,7 @@ import (
 
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
 
 	safemath "github.com/flare-foundation/flare/utils/math"
@@ -297,12 +297,12 @@ func (cs *currentStakerChainStateImpl) primaryValidatorSet() (validation.Set, er
 
 	var err error
 	for nodeID, vdr := range cs.validatorsByNodeID {
-		weight := vdr.addValidatorTx.Validator.Wght
-		weight, err = safemath.Add64(weight, vdr.delegatorWeight)
+		vdrWeight := vdr.addValidatorTx.Validator.Wght
+		vdrWeight, err = safemath.Add64(vdrWeight, vdr.delegatorWeight)
 		if err != nil {
 			return nil, err
 		}
-		if err := validators.AddWeight(nodeID, weight); err != nil {
+		if err := validators.AddWeight(nodeID, vdrWeight); err != nil {
 			return nil, err
 		}
 	}

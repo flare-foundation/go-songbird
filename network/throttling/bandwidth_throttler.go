@@ -8,13 +8,15 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/time/rate"
+
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/metric"
 	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/prometheus/client_golang/prometheus"
-	"golang.org/x/time/rate"
 )
 
 var _ BandwidthThrottler = &bandwidthThrottler{}
@@ -117,7 +119,7 @@ func (t *bandwidthThrottler) Acquire(msgSize uint64, nodeID ids.ShortID) {
 		return
 	}
 	// TODO Allow cancellation using context?
-	if err := limiter.WaitN(context.Background(), int(msgSize)); err != nil {
+	if err := limiter.WaitN(context.TODO(), int(msgSize)); err != nil {
 		// This should never happen.
 		t.log.Warn("error while awaiting %d bytes for %s: %s", msgSize, nodeID.PrefixedString(constants.NodeIDPrefix), err)
 	}

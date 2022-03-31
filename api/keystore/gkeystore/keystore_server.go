@@ -6,9 +6,8 @@ package gkeystore
 import (
 	"context"
 
-	"google.golang.org/grpc"
-
 	"github.com/hashicorp/go-plugin"
+	"google.golang.org/grpc"
 
 	"github.com/flare-foundation/flare/api/keystore"
 	"github.com/flare-foundation/flare/api/proto/gkeystoreproto"

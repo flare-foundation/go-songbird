@@ -3,7 +3,9 @@
 
 package platformvm
 
-import "time"
+import (
+	"time"
+)
 
 var _ TimedTxHeap = &txHeapByStartTime{}
 

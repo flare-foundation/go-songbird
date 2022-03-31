@@ -3,7 +3,9 @@
 
 package throttling
 
-import "github.com/flare-foundation/flare/ids"
+import (
+	"github.com/flare-foundation/flare/ids"
+)
 
 var _ InboundMsgThrottler = &noInboundMsgThrottler{}
 
@@ -12,7 +14,6 @@ func NewNoInboundThrottler() InboundMsgThrottler {
 	return &noInboundMsgThrottler{}
 }
 
-// noMsgThrottler implements MsgThrottler.
 // [Acquire] always returns immediately.
 type noInboundMsgThrottler struct{}
 

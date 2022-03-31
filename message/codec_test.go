@@ -4,45 +4,44 @@
 package message
 
 import (
-	"crypto/x509"
 	"math"
 	"net"
 	"testing"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/units"
 )
 
 func TestCodecPackInvalidOp(t *testing.T) {
-	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB)
+	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB, 10*time.Second)
 	assert.NoError(t, err)
 
-	_, err = codec.Pack(math.MaxUint8, make(map[Field]interface{}), false)
+	_, err = codec.Pack(math.MaxUint8, make(map[Field]interface{}), false, false)
 	assert.Error(t, err)
 
-	_, err = codec.Pack(math.MaxUint8, make(map[Field]interface{}), true)
+	_, err = codec.Pack(math.MaxUint8, make(map[Field]interface{}), true, false)
 	assert.Error(t, err)
 }
 
 func TestCodecPackMissingField(t *testing.T) {
-	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB)
+	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB, 10*time.Second)
 	assert.NoError(t, err)
 
-	_, err = codec.Pack(Get, make(map[Field]interface{}), false)
+	_, err = codec.Pack(Get, make(map[Field]interface{}), false, false)
 	assert.Error(t, err)
 
-	_, err = codec.Pack(Get, make(map[Field]interface{}), true)
+	_, err = codec.Pack(Get, make(map[Field]interface{}), true, false)
 	assert.Error(t, err)
 }
 
 func TestCodecParseInvalidOp(t *testing.T) {
-	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB)
+	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB, 10*time.Second)
 	assert.NoError(t, err)
 
 	_, err = codec.Parse([]byte{math.MaxUint8}, dummyNodeID, dummyOnFinishedHandling)
@@ -50,29 +49,55 @@ func TestCodecParseInvalidOp(t *testing.T) {
 }
 
 func TestCodecParseExtraSpace(t *testing.T) {
-	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB)
+	codec, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB, 10*time.Second)
 	assert.NoError(t, err)
 
-	_, err = codec.Parse([]byte{byte(GetVersion), 0x00, 0x00}, dummyNodeID, dummyOnFinishedHandling)
+	_, err = codec.Parse([]byte{byte(Ping), 0x00, 0x00}, dummyNodeID, dummyOnFinishedHandling)
 	assert.Error(t, err)
 
-	_, err = codec.Parse([]byte{byte(GetVersion), 0x00, 0x01}, dummyNodeID, dummyOnFinishedHandling)
+	_, err = codec.Parse([]byte{byte(Ping), 0x00, 0x01}, dummyNodeID, dummyOnFinishedHandling)
 	assert.Error(t, err)
+}
+
+func TestDeadlineOverride(t *testing.T) {
+	c, err := NewCodecWithMemoryPool("", prometheus.NewRegistry(), 2*units.MiB, 10*time.Second)
+	assert.NoError(t, err)
+
+	id := ids.GenerateTestID()
+	m := inboundMessage{
+		op: PushQuery,
+		fields: map[Field]interface{}{
+			ChainID:        id[:],
+			RequestID:      uint32(1337),
+			Deadline:       uint64(time.Now().Add(1337 * time.Hour).Unix()),
+			ContainerID:    id[:],
+			ContainerBytes: make([]byte, 1024),
+		},
+	}
+
+	packedIntf, err := c.Pack(m.op, m.fields, m.op.Compressible(), false)
+	assert.NoError(t, err, "failed to pack on operation %s", m.op)
+
+	unpackedIntf, err := c.Parse(packedIntf.Bytes(), dummyNodeID, dummyOnFinishedHandling)
+	assert.NoError(t, err, "failed to parse w/ compression on operation %s", m.op)
+
+	unpacked := unpackedIntf.(*inboundMessage)
+	assert.NotEqual(t, unpacked.ExpirationTime(), time.Now().Add(1337*time.Hour))
+	assert.True(t, time.Since(unpacked.ExpirationTime()) <= 10*time.Second)
 }
 
 // Test packing and then parsing messages
 // when using a gzip compressor
 func TestCodecPackParseGzip(t *testing.T) {
-	c, err := NewCodecWithMemoryPool("", prometheus.DefaultRegisterer, 2*units.MiB)
+	c, err := NewCodecWithMemoryPool("", prometheus.DefaultRegisterer, 2*units.MiB, 10*time.Second)
 	assert.NoError(t, err)
 	id := ids.GenerateTestID()
-	cert := &x509.Certificate{}
+
+	tlsCert, err := staking.NewTLSCert()
+	assert.NoError(t, err)
+	cert := tlsCert.Leaf
 
 	msgs := []inboundMessage{
-		{
-			op:     GetVersion,
-			fields: map[Field]interface{}{},
-		},
 		{
 			op: Version,
 			fields: map[Field]interface{}{
@@ -87,13 +112,9 @@ func TestCodecPackParseGzip(t *testing.T) {
 			},
 		},
 		{
-			op:     GetPeerList,
-			fields: map[Field]interface{}{},
-		},
-		{
 			op: PeerList,
 			fields: map[Field]interface{}{
-				SignedPeers: []utils.IPCertDesc{
+				Peers: []utils.IPCertDesc{
 					{
 						Cert:      cert,
 						IPDesc:    utils.IPDesc{IP: net.IPv4(1, 2, 3, 4)},
@@ -201,7 +222,7 @@ func TestCodecPackParseGzip(t *testing.T) {
 		},
 	}
 	for _, m := range msgs {
-		packedIntf, err := c.Pack(m.op, m.fields, m.op.Compressable())
+		packedIntf, err := c.Pack(m.op, m.fields, m.op.Compressible(), false)
 		assert.NoError(t, err, "failed to pack on operation %s", m.op)
 
 		unpackedIntf, err := c.Parse(packedIntf.Bytes(), dummyNodeID, dummyOnFinishedHandling)

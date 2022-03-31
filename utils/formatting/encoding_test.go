@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"gotest.tools/assert"
+	"github.com/stretchr/testify"
 )
 
 func TestEncodingMarshalJSON(t *testing.T) {

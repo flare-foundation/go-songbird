@@ -13,15 +13,15 @@ func TestNoEarlyTermResults(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1} // k = 1
+	validator1 := ids.ShortID{1} // k = 1
 
 	validators := ids.ShortBag{}
-	validators.Add(vdr1)
+	validators.Add(validator1)
 
 	factory := NewNoEarlyTermFactory()
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if !poll.Finished() {
 		t.Fatalf("Poll did not terminate after receiving k votes")
 	}
@@ -40,19 +40,19 @@ func TestNoEarlyTermString(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2} // k = 2
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2} // k = 2
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	factory := NewNoEarlyTermFactory()
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 
 	expected := `waiting on Bag: (Size = 1)
     ID[BaMPFdqMUQ46BV8iRcwbVfsam55kMqcp]: Count = 1
@@ -67,27 +67,27 @@ func TestNoEarlyTermDropsDuplicatedVotes(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2} // k = 2
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2} // k = 2
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	factory := NewNoEarlyTermFactory()
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if poll.Finished() {
 		t.Fatalf("Poll finished after less than alpha votes")
 	}
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if poll.Finished() {
 		t.Fatalf("Poll finished after getting a duplicated vote")
 	}
-	poll.Vote(vdr2, votes)
+	poll.Vote(validator2, votes)
 	if !poll.Finished() {
 		t.Fatalf("Poll did not terminate after receiving k votes")
 	}

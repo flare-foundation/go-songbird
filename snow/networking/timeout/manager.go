@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/utils/timer"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Manager registers and fires timeouts for the snow API.

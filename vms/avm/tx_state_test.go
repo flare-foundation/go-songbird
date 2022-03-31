@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/database"

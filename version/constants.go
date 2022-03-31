@@ -18,7 +18,6 @@ var (
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
-
 	VersionParser = NewDefaultApplicationParser()
 
 	CurrentDatabase = DatabaseVersion1_4_5
@@ -68,6 +67,13 @@ var (
 		constants.SongbirdID: time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
 	}
 	FlareHardFork1DefaultTime = time.Date(2022, time.March, 20, 18, 0, 0, 0, time.UTC)
+
+	// FIXME: update this before release
+	XChainMigrationTimes = map[uint32]time.Time{
+		constants.MainnetID: time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
+		constants.FujiID:    time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
+	}
+	XChainMigrationDefaultTime = time.Date(2022, time.January, 1, 1, 0, 0, 0, time.UTC)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
@@ -130,6 +136,12 @@ func GetFlareHardFork1Time(networkID uint32) time.Time {
 		return upgradeTime
 	}
 	return FlareHardFork1DefaultTime
+
+func GetXChainMigrationTime(networkID uint32) time.Time {
+	if upgradeTime, exists := XChainMigrationTimes[networkID]; exists {
+		return upgradeTime
+	}
+	return XChainMigrationDefaultTime
 }
 
 func GetCompatibility(networkID uint32) Compatibility {

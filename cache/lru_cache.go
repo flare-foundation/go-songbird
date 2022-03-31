@@ -29,7 +29,6 @@ type LRU struct {
 	Size      int
 }
 
-// Put implements the cache interface
 func (c *LRU) Put(key, value interface{}) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -37,7 +36,6 @@ func (c *LRU) Put(key, value interface{}) {
 	c.put(key, value)
 }
 
-// Get implements the cache interface
 func (c *LRU) Get(key interface{}) (interface{}, bool) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -45,7 +43,6 @@ func (c *LRU) Get(key interface{}) (interface{}, bool) {
 	return c.get(key)
 }
 
-// Evict implements the cache interface
 func (c *LRU) Evict(key interface{}) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -53,7 +50,6 @@ func (c *LRU) Evict(key interface{}) {
 	c.evict(key)
 }
 
-// Flush implements the cache interface
 func (c *LRU) Flush() {
 	c.lock.Lock()
 	defer c.lock.Unlock()

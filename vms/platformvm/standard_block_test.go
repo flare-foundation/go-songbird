@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/database/prefixdb"
 	"github.com/flare-foundation/flare/ids"
@@ -15,7 +17,6 @@ import (
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/platformvm/status"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAtomicTxImports(t *testing.T) {

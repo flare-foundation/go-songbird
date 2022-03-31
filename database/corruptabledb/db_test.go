@@ -7,9 +7,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/memdb"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestInterface(t *testing.T) {

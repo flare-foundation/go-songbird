@@ -6,7 +6,7 @@ package common
 import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 )
 
 // DefaultConfigTest returns a test configuration

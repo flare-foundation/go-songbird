@@ -14,8 +14,7 @@ import (
 	"github.com/flare-foundation/flare/api/metrics"
 	"github.com/flare-foundation/flare/chains/atomic"
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/snow/platform"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/logging"
 )
@@ -61,7 +60,7 @@ type Context struct {
 	SNLookup     SubnetLookup
 	Metrics      metrics.OptionalGatherer
 
-	// snowman++ attributes
+	// snowman++ related fields
 	PlatformVMState     platform.VMState     // state of platform VM
 	ValidatorsRetriever validation.Retriever // retrieves validators from EVM
 	ValidatorsUpdater   validation.Updater   // updates validators across components

@@ -14,7 +14,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/networking/tracker"
 	"github.com/flare-foundation/flare/snow/networking/worker"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/utils/uptime"
@@ -31,18 +31,13 @@ var _ Handler = &handler{}
 
 type Handler interface {
 	common.Timer
-
 	Context() *snow.ConsensusContext
 	IsValidator(nodeID ids.ShortID) bool
-
 	SetBootstrapper(engine common.BootstrapableEngine)
 	Bootstrapper() common.BootstrapableEngine
-
 	SetConsensus(engine common.Engine)
 	Consensus() common.Engine
-
 	SetOnStopped(onStopped func())
-
 	Start(recoverPanic bool)
 	Push(msg message.InboundMessage)
 	Stop()
@@ -123,11 +118,11 @@ func New(
 	if err != nil {
 		return nil, fmt.Errorf("initializing handler metrics errored with: %w", err)
 	}
-	h.syncMessageQueue, err = NewMessageQueue(h.ctx.Log, h.validators, h.cpuTracker, "handler", h.ctx.Registerer)
+	h.syncMessageQueue, err = NewMessageQueue(h.ctx.Log, h.validators, h.cpuTracker, "handler", h.ctx.Registerer, message.SynchronousOps)
 	if err != nil {
 		return nil, fmt.Errorf("initializing sync message queue errored with: %w", err)
 	}
-	h.asyncMessageQueue, err = NewMessageQueue(h.ctx.Log, h.validators, h.cpuTracker, "handler_async", h.ctx.Registerer)
+	h.asyncMessageQueue, err = NewMessageQueue(h.ctx.Log, h.validators, h.cpuTracker, "handler_async", h.ctx.Registerer, message.AsynchronousOps)
 	if err != nil {
 		return nil, fmt.Errorf("initializing async message queue errored with: %w", err)
 	}

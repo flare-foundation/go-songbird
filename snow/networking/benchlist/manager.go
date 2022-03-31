@@ -10,10 +10,13 @@ import (
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/utils/constants"
 )
 
-var errUnknownValidators = errors.New("unknown validator set for provided chain")
+var (
+	_ Manager = &manager{}
+)
 
 // Manager provides an interface for a benchlist to register whether
 // queries have been successful or unsuccessful and place validators with
@@ -47,7 +50,6 @@ type Config struct {
 	MinimumFailingDuration time.Duration  `json:"minimumFailingDuration"`
 	Duration               time.Duration  `json:"duration"`
 	MaxPortion             float64        `json:"maxPortion"`
-	PeerSummaryEnabled     bool           `json:"peerSummaryEnabled"`
 }
 
 type manager struct {
@@ -130,7 +132,6 @@ func (m *manager) RegisterChain(ctx *snow.ConsensusContext) error {
 	return nil
 }
 
-// RegisterResponse implements the Manager interface
 func (m *manager) RegisterResponse(chainID ids.ID, validatorID ids.ShortID) {
 	m.lock.RLock()
 	benchlist, exists := m.chainBenchlists[chainID]
@@ -142,7 +143,6 @@ func (m *manager) RegisterResponse(chainID ids.ID, validatorID ids.ShortID) {
 	benchlist.RegisterResponse(validatorID)
 }
 
-// RegisterFailure implements the Manager interface
 func (m *manager) RegisterFailure(chainID ids.ID, validatorID ids.ShortID) {
 	m.lock.RLock()
 	benchlist, exists := m.chainBenchlists[chainID]

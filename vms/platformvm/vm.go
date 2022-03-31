@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/gorilla/rpc/v2"
-
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/chains"
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/codec/linearcodec"
+	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
@@ -24,7 +24,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validation"
+	"github.com/flare-foundation/flare/snow/validators"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
@@ -56,14 +56,14 @@ var (
 	errDSCantValidate    = errors.New("new blockchain can't be validated by primary network")
 	errStartTimeTooEarly = errors.New("start time is before the current chain time")
 	errStartAfterEndTime = errors.New("start time is after the end time")
+	errWrongCacheType    = errors.New("unexpectedly cached type")
 
 	_ block.ChainVM        = &VM{}
-	_ validation.Connector = &VM{}
+	_ validators.Connector = &VM{}
 	_ secp256k1fx.VM       = &VM{}
 	_ Fx                   = &secp256k1fx.Fx{}
 )
 
-// VM implements the snowman.ChainVM interface
 type VM struct {
 	Factory
 	metrics
@@ -86,9 +86,6 @@ type VM struct {
 	// The context of this vm
 	ctx       *snow.Context
 	dbManager manager.Manager
-
-	// channel to send messages to the consensus engine
-	toEngine chan<- common.Message
 
 	internalState InternalState
 
@@ -130,7 +127,7 @@ func (vm *VM) Initialize(
 	genesisBytes []byte,
 	upgradeBytes []byte,
 	configBytes []byte,
-	msgs chan<- common.Message,
+	toEngine chan<- common.Message,
 	_ []*common.Fx,
 	appSender common.AppSender,
 ) error {
@@ -156,7 +153,6 @@ func (vm *VM) Initialize(
 
 	vm.ctx = ctx
 	vm.dbManager = dbManager
-	vm.toEngine = msgs
 
 	vm.codecRegistry = linearcodec.NewDefault()
 	if err := vm.fx.Initialize(vm); err != nil {
@@ -167,7 +163,7 @@ func (vm *VM) Initialize(
 	vm.validatorSetCaches = make(map[ids.ID]cache.Cacher)
 	vm.currentBlocks = make(map[ids.ID]Block)
 
-	if err := vm.blockBuilder.Initialize(vm, registerer); err != nil {
+	if err := vm.blockBuilder.Initialize(vm, toEngine, registerer); err != nil {
 		return fmt.Errorf(
 			"failed to initialize the block builder: %w",
 			err,
@@ -334,7 +330,6 @@ func (vm *VM) Shutdown() error {
 // BuildBlock builds a block to be added to consensus
 func (vm *VM) BuildBlock() (snowman.Block, error) { return vm.blockBuilder.BuildBlock() }
 
-// ParseBlock implements the snowman.ChainVM interface
 func (vm *VM) ParseBlock(b []byte) (snowman.Block, error) {
 	var blk Block
 	if _, err := Codec.Unmarshal(b, &blk); err != nil {
@@ -353,7 +348,6 @@ func (vm *VM) ParseBlock(b []byte) (snowman.Block, error) {
 	return blk, nil
 }
 
-// GetBlock implements the snowman.ChainVM interface
 func (vm *VM) GetBlock(blkID ids.ID) (snowman.Block, error) { return vm.getBlock(blkID) }
 
 func (vm *VM) getBlock(blkID ids.ID) (Block, error) {
@@ -382,16 +376,6 @@ func (vm *VM) SetPreference(blkID ids.ID) error {
 
 func (vm *VM) Preferred() (Block, error) {
 	return vm.getBlock(vm.preferred)
-}
-
-// NotifyBlockReady tells the consensus engine that a new block is ready to be
-// created
-func (vm *VM) NotifyBlockReady() {
-	select {
-	case vm.toEngine <- common.PendingTxs:
-	default:
-		vm.ctx.Log.Debug("dropping message to consensus engine")
-	}
 }
 
 func (vm *VM) Version() (string, error) {
@@ -437,12 +421,10 @@ func (vm *VM) CreateStaticHandlers() (map[string]*common.HTTPHandler, error) {
 	}, nil
 }
 
-// Connected implements validation.Connector
-func (vm *VM) Connected(vdrID ids.ShortID, nodeVersion version.Application) error {
+func (vm *VM) Connected(vdrID ids.ShortID, _ version.Application) error {
 	return vm.uptimeManager.Connect(vdrID)
 }
 
-// Disconnected implements validation.Connector
 func (vm *VM) Disconnected(vdrID ids.ShortID) error {
 	if err := vm.uptimeManager.Disconnect(vdrID); err != nil {
 		return err
@@ -459,36 +441,30 @@ func (vm *VM) GetCurrentHeight() (uint64, error) {
 	return lastAccepted.Height(), nil
 }
 
-// Returns the time when the next staker of any subnet starts/stops staking
-// after the current timestamp
-func (vm *VM) nextStakerChangeTime(vs ValidatorState) (time.Time, error) {
-	currentStakers := vs.CurrentStakerChainState()
-	pendingStakers := vs.PendingStakerChainState()
+func (vm *VM) updateValidators() error {
+	currentValidators := vm.internalState.CurrentStakerChainState()
+	primaryValidators, err := currentValidators.ValidatorSet(constants.PrimaryNetworkID)
+	if err != nil {
+		return err
+	}
+	if err := vm.Validators.Set(constants.PrimaryNetworkID, primaryValidators); err != nil {
+		return err
+	}
 
-	earliest := mockable.MaxTime
-	if currentStakers := currentStakers.Stakers(); len(currentStakers) > 0 {
-		nextStakerToRemove := currentStakers[0]
-		staker, ok := nextStakerToRemove.UnsignedTx.(TimedTx)
-		if !ok {
-			return time.Time{}, errWrongTxType
+	weight, _ := primaryValidators.GetWeight(vm.ctx.NodeID)
+	vm.localStake.Set(float64(weight))
+	vm.totalStake.Set(float64(primaryValidators.Weight()))
+
+	for subnetID := range vm.WhitelistedSubnets {
+		subnetValidators, err := currentValidators.ValidatorSet(subnetID)
+		if err != nil {
+			return err
 		}
-		endTime := staker.EndTime()
-		if endTime.Before(earliest) {
-			earliest = endTime
-		}
-	}
-	if pendingStakers := pendingStakers.Stakers(); len(pendingStakers) > 0 {
-		nextStakerToAdd := pendingStakers[0]
-		staker, ok := nextStakerToAdd.UnsignedTx.(TimedTx)
-		if !ok {
-			return time.Time{}, errWrongTxType
-		}
-		startTime := staker.StartTime()
-		if startTime.Before(earliest) {
-			earliest = startTime
+		if err := vm.Validators.Set(subnetID, subnetValidators); err != nil {
+			return err
 		}
 	}
-	return earliest, nil
+	return nil
 }
 
 func (vm *VM) CodecRegistry() codec.Registry { return vm.codecRegistry }

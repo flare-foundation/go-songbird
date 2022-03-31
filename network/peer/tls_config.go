@@ -1,9 +1,11 @@
 // Copyright (C) 2019-2021, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
-package network
+package peer
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+)
 
 func TLSConfig(cert tls.Certificate) *tls.Config {
 	// #nosec G402
