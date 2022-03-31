@@ -73,7 +73,7 @@ var (
 		constants.CostonID:   time.Date(2022, time.April, 21, 14, 0, 0, 0, time.UTC),
 		constants.SongbirdID: time.Date(2022, time.April, 28, 14, 0, 0, 0, time.UTC),
 	}
-	FlareHardFork1DefaultTime = time.Date(2022, time.March, 20, 18, 0, 0, 0, time.UTC)
+	FlareHardFork1DefaultTime = time.Date(2022, time.April, 15, 14, 0, 0, 0, time.UTC)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
