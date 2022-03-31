@@ -19,7 +19,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/queue"
 	"github.com/flare-foundation/flare/snow/engine/common/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 
 	avagetter "github.com/flare-foundation/flare/snow/engine/avalanche/getter"
 )

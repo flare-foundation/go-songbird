@@ -15,7 +15,7 @@ import (
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/network/throttling"
 	"github.com/flare-foundation/flare/snow/networking/router"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/staking"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
@@ -105,7 +105,7 @@ func StartTestPeer(
 			VersionCompatibility: version.GetCompatibility(networkID),
 			VersionParser:        version.NewDefaultApplicationParser(),
 			MySubnets:            ids.Set{},
-			Beacons:              validators.NewSet(),
+			Beacons:              validation.NewSet(),
 			NetworkID:            networkID,
 			PingFrequency:        constants.DefaultPingFrequency,
 			PongTimeout:          constants.DefaultPingPongTimeout,

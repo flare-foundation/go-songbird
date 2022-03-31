@@ -18,7 +18,7 @@ var (
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
-	VersionParser = NewDefaultApplicationParser()
+	VersionParser                = NewDefaultApplicationParser()
 
 	CurrentDatabase = DatabaseVersion1_4_5
 	PrevDatabase    = DatabaseVersion1_0_0
@@ -70,8 +70,8 @@ var (
 
 	// FIXME: update this before release
 	XChainMigrationTimes = map[uint32]time.Time{
-		constants.MainnetID: time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
-		constants.FujiID:    time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
 	}
 	XChainMigrationDefaultTime = time.Date(2022, time.January, 1, 1, 0, 0, 0, time.UTC)
 )
@@ -136,6 +136,7 @@ func GetFlareHardFork1Time(networkID uint32) time.Time {
 		return upgradeTime
 	}
 	return FlareHardFork1DefaultTime
+}
 
 func GetXChainMigrationTime(networkID uint32) time.Time {
 	if upgradeTime, exists := XChainMigrationTimes[networkID]; exists {

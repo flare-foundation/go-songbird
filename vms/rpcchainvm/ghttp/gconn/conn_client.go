@@ -12,6 +12,7 @@ import (
 
 	"github.com/flare-foundation/flare/api/proto/gconnproto"
 	"github.com/flare-foundation/flare/utils/wrappers"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ net.Conn = &Client{}

@@ -9,9 +9,9 @@ go 1.16
 require (
 	github.com/Microsoft/go-winio v0.4.16
 	github.com/NYTimes/gziphandler v1.1.1
-	github.com/flare-foundation/coreth v0.8.8-rc.0
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/decred/dcrd/dcrec/secp256k1/v3 v3.0.0-20200627015759-01fd2de07837
+	github.com/flare-foundation/coreth v0.4.2-0.20220331104901-792252ffe490
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/google/btree v1.0.1
@@ -21,6 +21,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/go-hclog v1.0.0
 	github.com/hashicorp/go-plugin v1.4.3
+	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d
 	github.com/holiman/bloomfilter/v2 v2.0.3
 	github.com/huin/goupnp v1.0.2
 	github.com/jackpal/gateway v1.0.6
@@ -29,8 +30,6 @@ require (
 	github.com/linxGnu/grocksdb v1.6.34
 	github.com/mr-tron/base58 v1.2.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
-	github.com/onsi/ginkgo/v2 v2.1.0
-	github.com/onsi/gomega v1.17.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/client_model v0.2.0
 	github.com/rs/cors v1.7.0

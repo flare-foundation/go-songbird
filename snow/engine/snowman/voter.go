@@ -7,10 +7,10 @@ import (
 	"github.com/flare-foundation/flare/ids"
 )
 
-// Voter records chits received from [vdr] once its dependencies are met.
+// Voter records chits received from [validator] once its dependencies are met.
 type voter struct {
 	t         *Transitive
-	vdr       ids.ShortID
+	validator ids.ShortID
 	requestID uint32
 	response  ids.ID
 	deps      ids.Set
@@ -34,9 +34,9 @@ func (v *voter) Update() {
 
 	var results []ids.Bag
 	if v.response == ids.Empty {
-		results = v.t.polls.Drop(v.requestID, v.vdr)
+		results = v.t.polls.Drop(v.requestID, v.validator)
 	} else {
-		results = v.t.polls.Vote(v.requestID, v.vdr, v.response)
+		results = v.t.polls.Vote(v.requestID, v.validator, v.response)
 	}
 
 	if len(results) == 0 {

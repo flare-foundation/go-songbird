@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEncodingMarshalJSON(t *testing.T) {
@@ -133,7 +133,7 @@ func TestEncodeDecode(t *testing.T) {
 			t.Fatal(err)
 		}
 		// Make sure we got the same bytes back
-		assert.DeepEqual(t, test.bytes, bytesResult)
+		assert.Equal(t, test.bytes, bytesResult)
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/flare-foundation/flare/api/health"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/snow"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 )
 
 // VM describes the interface that all consensus VMs must implement

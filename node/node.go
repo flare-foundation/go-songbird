@@ -46,7 +46,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/timeout"
 	"github.com/flare-foundation/flare/snow/triggers"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/filesystem"
@@ -204,7 +204,7 @@ func (n *Node) initNetworking() error {
 	_ = n.validators.AddWeight(n.ID, 1)
 
 	// Configure benchlist
-	n.Config.BenchlistConfig.Validators = n.vdrs
+	n.Config.BenchlistConfig.Validators = n.validators
 	n.Config.BenchlistConfig.Benchable = n.Config.ConsensusRouter
 	n.Config.BenchlistConfig.StakingEnabled = n.Config.EnableStaking
 	n.benchlistManager = benchlist.NewManager(&n.Config.BenchlistConfig)
@@ -213,12 +213,12 @@ func (n *Node) initNetworking() error {
 
 	consensusRouter := n.Config.ConsensusRouter
 	if !n.Config.EnableStaking {
-		if err := validators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
+		if err := n.validators.AddWeight(n.ID, n.Config.DisabledStakingWeight); err != nil {
 			return err
 		}
 		consensusRouter = &insecureValidatorManager{
 			Router:     consensusRouter,
-			validators: validators,
+			validators: n.validators,
 			weight:     n.Config.DisabledStakingWeight,
 		}
 	}
@@ -653,13 +653,13 @@ func (n *Node) initChainManager(avaxAssetID ids.ID) error {
 func (n *Node) initVMs() error {
 	n.Log.Info("initializing VMs")
 
-	vdrs := n.vdrs
+	validators := n.validators
 
 	// If staking is disabled, ignore updates to Subnets' validator sets
 	// Instead of updating node's validator manager, platform chain makes changes
 	// to its own local validator manager (which isn't used for sampling)
 	if !n.Config.EnableStaking {
-		vdrs = validators.NewManager()
+		validators = validation.NewSet()
 	}
 
 	vmRegisterer := registry.NewVMRegisterer(registry.VMRegistererConfig{
@@ -673,7 +673,7 @@ func (n *Node) initVMs() error {
 	errs.Add(
 		vmRegisterer.Register(constants.PlatformVMID, &platformvm.Factory{
 			Chains:                 n.chainManager,
-			Validators:             vdrs,
+			Validators:             validators,
 			UptimeLockedCalculator: n.uptimeCalculator,
 			StakingEnabled:         n.Config.EnableStaking,
 			WhitelistedSubnets:     n.Config.WhitelistedSubnets,

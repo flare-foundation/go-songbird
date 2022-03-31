@@ -11,7 +11,7 @@ import (
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/snow/networking/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
@@ -70,7 +70,7 @@ func NewMessageQueue(
 ) (MessageQueue, error) {
 	m := &messageQueue{
 		log:                   log,
-		vdrs:                  vdrs,
+		validators:            validators,
 		cpuTracker:            cpuTracker,
 		cond:                  sync.NewCond(&sync.Mutex{}),
 		nodeToUnprocessedMsgs: make(map[ids.ShortID]int),

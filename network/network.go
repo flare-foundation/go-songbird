@@ -154,16 +154,12 @@ func NewNetwork(
 	router router.ExternalHandler,
 	benchlistManager benchlist.Manager,
 ) (Network, error) {
-	primaryNetworkValidators, ok := config.Validators.GetValidators(constants.PrimaryNetworkID)
-	if !ok {
-		return nil, errNoPrimaryValidators
-	}
 
 	inboundMsgThrottler, err := throttling.NewInboundMsgThrottler(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		primaryNetworkValidators,
+		config.Validators,
 		config.ThrottlerConfig.InboundMsgThrottlerConfig,
 	)
 	if err != nil {
@@ -174,7 +170,7 @@ func NewNetwork(
 		log,
 		config.Namespace,
 		metricsRegisterer,
-		primaryNetworkValidators,
+		config.Validators,
 		config.ThrottlerConfig.OutboundMsgThrottlerConfig,
 	)
 	if err != nil {
@@ -359,7 +355,7 @@ func (n *network) Connected(nodeID ids.ShortID) {
 // peer is a validator/beacon.
 func (n *network) AllowConnection(nodeID ids.ShortID) bool {
 	return !n.config.RequireValidatorToConnect ||
-		n.config.Validators.Contains(constants.PrimaryNetworkID, n.config.MyNodeID) ||
+		n.config.Validators.Contains(n.config.MyNodeID) ||
 		n.WantsConnection(nodeID)
 }
 
@@ -539,7 +535,7 @@ func (n *network) Dispatch() error {
 }
 
 func (n *network) WantsConnection(nodeID ids.ShortID) bool {
-	return n.config.Validators.Contains(constants.PrimaryNetworkID, nodeID) ||
+	return n.config.Validators.Contains(nodeID) ||
 		n.config.Beacons.Contains(nodeID)
 }
 
@@ -572,7 +568,7 @@ func (n *network) sampleValidatorIPs() []utils.IPCertDesc {
 		int(n.config.PeerListNumValidatorIPs),
 		func(p peer.Peer) bool {
 			// Only sample validators
-			return n.config.Validators.Contains(constants.PrimaryNetworkID, p.ID())
+			return n.config.Validators.Contains(p.ID())
 		},
 	)
 	n.peersLock.RUnlock()
@@ -619,7 +615,7 @@ func (n *network) getPeers(
 			continue
 		}
 
-		if validatorOnly && !n.config.Validators.Contains(subnetID, nodeID) {
+		if validatorOnly && !n.config.Validators.Contains(nodeID) {
 			continue
 		}
 
@@ -652,7 +648,7 @@ func (n *network) samplePeers(
 				return false
 			}
 
-			if n.config.Validators.Contains(subnetID, p.ID()) {
+			if n.config.Validators.Contains(p.ID()) {
 				numValidatorsToSample--
 				return numValidatorsToSample >= 0
 			}
@@ -998,18 +994,14 @@ func (n *network) StartClose() {
 }
 
 func (n *network) NodeUptime() (UptimeResult, bool) {
-	primaryValidators, ok := n.config.Validators.GetValidators(constants.PrimaryNetworkID)
-	if !ok {
-		return UptimeResult{}, false
-	}
 
-	myStake, isValidator := primaryValidators.GetWeight(n.config.MyNodeID)
+	myStake, isValidator := n.config.Validators.GetWeight(n.config.MyNodeID)
 	if !isValidator {
 		return UptimeResult{}, false
 	}
 
 	var (
-		totalWeight          = float64(primaryValidators.Weight())
+		totalWeight          = float64(n.config.Validators.Weight())
 		totalWeightedPercent = 100 * float64(myStake)
 		rewardingStake       = float64(myStake)
 	)
@@ -1021,7 +1013,7 @@ func (n *network) NodeUptime() (UptimeResult, bool) {
 		peer, _ := n.connectedPeers.GetByIndex(i)
 
 		nodeID := peer.ID()
-		weight, ok := primaryValidators.GetWeight(nodeID)
+		weight, ok := n.config.Validators.GetWeight(nodeID)
 		if !ok {
 			// this is not a validator skip it.
 			continue

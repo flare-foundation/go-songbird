@@ -10,7 +10,7 @@ import (
 	"github.com/flare-foundation/flare/message"
 	"github.com/flare-foundation/flare/network/throttling"
 	"github.com/flare-foundation/flare/snow/networking/router"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
 	"github.com/flare-foundation/flare/version"
@@ -32,7 +32,7 @@ type Config struct {
 	VersionCompatibility version.Compatibility
 	VersionParser        version.ApplicationParser
 	MySubnets            ids.Set
-	Beacons              validators.Set
+	Beacons              validation.Set
 	NetworkID            uint32
 	PingFrequency        time.Duration
 	PongTimeout          time.Duration

@@ -20,7 +20,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/common/tracker"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/version"
@@ -1527,7 +1527,7 @@ func TestEngineGetVertex(t *testing.T) {
 	sender.CantSendGetAcceptedFrontier = false
 	engCfg.Sender = sender
 
-	validator := validators.GenerateRandomValidator(1)
+	validator := validation.GenerateRandomValidator(1)
 
 	manager := vertex.NewTestManager(t)
 	manager.Default(true)

@@ -10,11 +10,11 @@ import (
 	"github.com/flare-foundation/flare/utils/wrappers"
 )
 
-// convincer sends chits to [vdr] once all its dependencies are met
+// convincer sends chits to [validator] once all its dependencies are met
 type convincer struct {
 	consensus snowman.Consensus
 	sender    common.Sender
-	vdr       ids.ShortID
+	validator ids.ShortID
 	requestID uint32
 	sent      bool
 	abandoned bool
@@ -43,5 +43,5 @@ func (c *convincer) Update() {
 	c.sent = true
 
 	pref := []ids.ID{c.consensus.Preference()}
-	c.sender.SendChits(c.vdr, c.requestID, pref)
+	c.sender.SendChits(c.validator, c.requestID, pref)
 }

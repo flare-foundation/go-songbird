@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
 	"github.com/flare-foundation/flare/vms/platformvm/reward"
 	"github.com/flare-foundation/flare/vms/platformvm/status"
@@ -459,8 +458,8 @@ func TestAdvanceTimeTxRemoveSubnetValidator(t *testing.T) {
 	// Check VM Validators are removed successfully
 	onCommitState.Apply(vm.internalState)
 	assert.NoError(t, vm.internalState.Commit())
-	assert.False(t, vm.Validators.Contains(testSubnet1.ID(), subnetVdr2NodeID))
-	assert.False(t, vm.Validators.Contains(testSubnet1.ID(), subnetValidatorNodeID))
+	assert.False(t, vm.Validators.Contains(subnetVdr2NodeID))
+	assert.False(t, vm.Validators.Contains(subnetValidatorNodeID))
 }
 
 func TestWhitelistedSubnet(t *testing.T) {
@@ -518,7 +517,7 @@ func TestWhitelistedSubnet(t *testing.T) {
 
 			onCommitState.Apply(vm.internalState)
 			assert.NoError(t, vm.internalState.Commit())
-			assert.Equal(t, whitelist, vm.Validators.Contains(testSubnet1.ID(), subnetValidatorNodeID))
+			assert.Equal(t, whitelist, vm.Validators.Contains(subnetValidatorNodeID))
 		})
 	}
 }
@@ -580,7 +579,7 @@ func TestAdvanceTimeTxDelegatorStakerWeight(t *testing.T) {
 	assert.NoError(t, vm.internalState.Commit())
 
 	// Test validator weight after delegation
-	vdrWeight, _ = primarySet.GetWeight(nodeID)
+	vdrWeight, _ = vm.Validators.GetWeight(nodeID)
 	assert.Equal(t, vm.MinDelegatorStake+vm.MinValidatorStake, vdrWeight)
 }
 

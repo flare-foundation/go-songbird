@@ -11,7 +11,7 @@ import (
 
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/message"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 )
 
@@ -211,7 +211,7 @@ func TestBypassThrottling(t *testing.T) {
 		AtLargeAllocSize:    100,
 		NodeMaxAtLargeBytes: 10,
 	}
-	vdrs := validators.NewSet()
+	vdrs := validation.NewSet()
 	validator1 := ids.GenerateTestShortID()
 	assert.NoError(vdrs.AddWeight(validator1, 1))
 	throttlerIntf, err := NewSybilOutboundMsgThrottler(

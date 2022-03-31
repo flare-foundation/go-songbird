@@ -12,7 +12,7 @@ import (
 	"github.com/flare-foundation/flare/network/dialer"
 	"github.com/flare-foundation/flare/network/throttling"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 )
 
@@ -119,10 +119,10 @@ type Config struct {
 
 	// WhitelistedSubnets of the node.
 	WhitelistedSubnets ids.Set        `json:"whitelistedSubnets"`
-	Beacons            validators.Set `json:"beacons"`
+	Beacons            validation.Set `json:"beacons"`
 
 	// Validators are the current validators in the Avalanche network
-	Validators validators.Manager `json:"validators"`
+	Validators validation.Set `json:"validators"`
 
 	UptimeCalculator uptime.Calculator `json:"-"`
 

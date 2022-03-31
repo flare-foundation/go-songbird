@@ -21,7 +21,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/handler"
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/networking/timeout"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/timer"
 	"github.com/flare-foundation/flare/version"

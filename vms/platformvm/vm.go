@@ -15,7 +15,6 @@ import (
 	"github.com/flare-foundation/flare/chains"
 	"github.com/flare-foundation/flare/codec"
 	"github.com/flare-foundation/flare/codec/linearcodec"
-	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/database/manager"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
@@ -24,7 +23,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/crypto"
@@ -59,7 +58,7 @@ var (
 	errWrongCacheType    = errors.New("unexpectedly cached type")
 
 	_ block.ChainVM        = &VM{}
-	_ validators.Connector = &VM{}
+	_ validation.Connector = &VM{}
 	_ secp256k1fx.VM       = &VM{}
 	_ Fx                   = &secp256k1fx.Fx{}
 )
@@ -439,32 +438,6 @@ func (vm *VM) GetCurrentHeight() (uint64, error) {
 		return 0, err
 	}
 	return lastAccepted.Height(), nil
-}
-
-func (vm *VM) updateValidators() error {
-	currentValidators := vm.internalState.CurrentStakerChainState()
-	primaryValidators, err := currentValidators.ValidatorSet(constants.PrimaryNetworkID)
-	if err != nil {
-		return err
-	}
-	if err := vm.Validators.Set(constants.PrimaryNetworkID, primaryValidators); err != nil {
-		return err
-	}
-
-	weight, _ := primaryValidators.GetWeight(vm.ctx.NodeID)
-	vm.localStake.Set(float64(weight))
-	vm.totalStake.Set(float64(primaryValidators.Weight()))
-
-	for subnetID := range vm.WhitelistedSubnets {
-		subnetValidators, err := currentValidators.ValidatorSet(subnetID)
-		if err != nil {
-			return err
-		}
-		if err := vm.Validators.Set(subnetID, subnetValidators); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (vm *VM) CodecRegistry() codec.Registry { return vm.codecRegistry }

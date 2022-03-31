@@ -16,7 +16,7 @@ import (
 	"github.com/flare-foundation/flare/network/peer"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/json"
@@ -39,7 +39,7 @@ type Info struct {
 	chainManager  chains.Manager
 	vmManager     vms.Manager
 	versionParser version.ApplicationParser
-	validators    validators.Set
+	validators    validation.Set
 	benchlist     benchlist.Manager
 }
 
@@ -63,7 +63,7 @@ func NewService(
 	myIP *utils.DynamicIPDesc,
 	network network.Network,
 	versionParser version.ApplicationParser,
-	validators validators.Set,
+	validators validation.Set,
 	benchlist benchlist.Manager,
 ) (*common.HTTPHandler, error) {
 	newServer := rpc.NewServer()

@@ -17,7 +17,7 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
 	"github.com/flare-foundation/flare/snow/engine/snowman/bootstrap"
 	snowgetter "github.com/flare-foundation/flare/snow/engine/snowman/getter"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +38,7 @@ func (dh *dummyHandler) onDoneBootstrapping(lastReqID uint32) error {
 	return dh.startEngineF(lastReqID)
 }
 
-func setup(t *testing.T) (ids.ShortID, validators.Set, *common.SenderTest, *block.TestVM, *Transitive, snowman.Block) {
+func setup(t *testing.T) (ids.ShortID, validation.Set, *common.SenderTest, *block.TestVM, *Transitive, snowman.Block) {
 	bootCfg, engCfg := DefaultConfigs()
 
 	validators := validation.NewSet()

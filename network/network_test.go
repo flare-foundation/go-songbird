@@ -19,7 +19,7 @@ import (
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/router"
 	"github.com/flare-foundation/flare/snow/uptime"
-	"github.com/flare-foundation/flare/snow/validators"
+	"github.com/flare-foundation/flare/snow/validation"
 	"github.com/flare-foundation/flare/utils/constants"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/units"
@@ -145,13 +145,13 @@ func newFullyConnectedTestNetwork(t *testing.T, handlers []router.InboundHandler
 
 	dialer, listeners, nodeIDs, configs := newTestNetwork(t, len(handlers))
 
-	beacons := validators.NewSet()
+	beacons := validation.NewSet()
 	err := beacons.AddWeight(nodeIDs[0], 1)
 	assert.NoError(err)
 
-	vdrs := validators.NewManager()
+	validators := validation.NewSet()
 	for _, nodeID := range nodeIDs {
-		err := vdrs.AddWeight(constants.PrimaryNetworkID, nodeID, 1)
+		err := validators.AddWeight(nodeID, 1)
 		assert.NoError(err)
 	}
 
@@ -169,7 +169,7 @@ func newFullyConnectedTestNetwork(t *testing.T, handlers []router.InboundHandler
 		config := config
 
 		config.Beacons = beacons
-		config.Validators = vdrs
+		config.Validators = validators
 
 		var connected ids.ShortSet
 		net, err := NewNetwork(
