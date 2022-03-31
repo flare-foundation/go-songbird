@@ -13,7 +13,9 @@ import (
 	"github.com/flare-foundation/flare/app"
 )
 
-const Name = "nodeProcess"
+const (
+	Name = "nodeProcess"
+)
 
 var (
 	Handshake = plugin.HandshakeConfig{

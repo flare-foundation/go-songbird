@@ -5,7 +5,6 @@ package network
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -42,8 +41,6 @@ const (
 )
 
 var (
-	errNoPrimaryValidators = errors.New("no default subnet validators")
-
 	_ Network = &network{}
 )
 
@@ -237,8 +234,8 @@ func NewNetwork(
 	return n, nil
 }
 
-func (n *network) Send(msg message.OutboundMessage, nodeIDs ids.ShortSet, subnetID ids.ID, validatorOnly bool) ids.ShortSet {
-	peers := n.getPeers(nodeIDs, subnetID, validatorOnly)
+func (n *network) Send(msg message.OutboundMessage, nodeIDs ids.ShortSet, validatorOnly bool) ids.ShortSet {
+	peers := n.getPeers(nodeIDs, validatorOnly)
 	n.peerConfig.Metrics.MultipleSendsFailed(
 		msg.Op(),
 		nodeIDs.Len()-len(peers),
@@ -248,12 +245,11 @@ func (n *network) Send(msg message.OutboundMessage, nodeIDs ids.ShortSet, subnet
 
 func (n *network) Gossip(
 	msg message.OutboundMessage,
-	subnetID ids.ID,
 	validatorOnly bool,
 	numValidatorsToSend int,
 	numNonValidatorsToSend int,
 ) ids.ShortSet {
-	peers := n.samplePeers(subnetID, validatorOnly, numValidatorsToSend, numNonValidatorsToSend)
+	peers := n.samplePeers(validatorOnly, numValidatorsToSend, numNonValidatorsToSend)
 	return n.send(msg, peers)
 }
 
@@ -596,7 +592,6 @@ func (n *network) sampleValidatorIPs() []utils.IPCertDesc {
 //   validators in [subnetID].
 func (n *network) getPeers(
 	nodeIDs ids.ShortSet,
-	subnetID ids.ID,
 	validatorOnly bool,
 ) []peer.Peer {
 	peers := make([]peer.Peer, 0, nodeIDs.Len())
@@ -607,11 +602,6 @@ func (n *network) getPeers(
 	for nodeID := range nodeIDs {
 		peer, ok := n.connectedPeers.GetByID(nodeID)
 		if !ok {
-			continue
-		}
-
-		trackedSubnets := peer.TrackedSubnets()
-		if !trackedSubnets.Contains(subnetID) {
 			continue
 		}
 
@@ -626,7 +616,6 @@ func (n *network) getPeers(
 }
 
 func (n *network) samplePeers(
-	subnetID ids.ID,
 	validatorOnly bool,
 	numValidatorsToSample,
 	numNonValidatorsToSample int,
@@ -642,11 +631,6 @@ func (n *network) samplePeers(
 	return n.connectedPeers.Sample(
 		numValidatorsToSample+numNonValidatorsToSample,
 		func(p peer.Peer) bool {
-			// Only return non-validators that are tracking [subnetID]
-			trackedSubnets := p.TrackedSubnets()
-			if !trackedSubnets.Contains(subnetID) {
-				return false
-			}
 
 			if n.config.Validators.Contains(p.ID()) {
 				numValidatorsToSample--
@@ -1067,7 +1051,6 @@ func (n *network) runTimers() {
 
 			n.Gossip(
 				msg,
-				constants.PrimaryNetworkID,
 				false,
 				int(n.config.PeerListValidatorGossipSize),
 				int(n.config.PeerListNonValidatorGossipSize),

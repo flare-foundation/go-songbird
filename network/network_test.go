@@ -272,7 +272,7 @@ func TestSend(t *testing.T) {
 
 	toSend := ids.ShortSet{}
 	toSend.Add(nodeIDs[1])
-	sentTo := net0.Send(outboundGetMsg, toSend, constants.PrimaryNetworkID, false)
+	sentTo := net0.Send(outboundGetMsg, toSend, false)
 	assert.EqualValues(toSend, sentTo)
 
 	inboundGetMsg := <-received

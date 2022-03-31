@@ -108,7 +108,7 @@ func (s *Sender) SendGetAcceptedFrontier(nodeIDs ids.ShortSet, requestID uint32)
 	s.ctx.Log.AssertNoError(err)
 
 	// Send the message over the network.
-	sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly())
+	sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly())
 	for nodeID := range nodeIDs {
 		if !sentTo.Contains(nodeID) {
 			s.ctx.Log.Debug(
@@ -145,7 +145,7 @@ func (s *Sender) SendAcceptedFrontier(nodeID ids.ShortID, requestID uint32, cont
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send AcceptedFrontier(%s, %s, %d, %s)",
 			nodeID,
@@ -184,7 +184,7 @@ func (s *Sender) SendGetAccepted(nodeIDs ids.ShortSet, requestID uint32, contain
 	// Send the message over the network.
 	var sentTo ids.ShortSet
 	if err == nil {
-		sentTo = s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly())
+		sentTo = s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly())
 	} else {
 		s.ctx.Log.Error(
 			"failed to build GetAccepted(%s, %d, %s): %s",
@@ -231,7 +231,7 @@ func (s *Sender) SendAccepted(nodeID ids.ShortID, requestID uint32, containerIDs
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug("failed to send Accepted(%s, %s, %d, %s)",
 			nodeID,
 			s.ctx.ChainID,
@@ -285,7 +285,7 @@ func (s *Sender) SendGetAncestors(nodeID ids.ShortID, requestID uint32, containe
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send GetAncestors(%s, %s, %d, %s)",
 			nodeID,
@@ -318,7 +318,7 @@ func (s *Sender) SendAncestors(nodeID ids.ShortID, requestID uint32, containers 
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send Ancestors(%s, %s, %d, %d)",
 			nodeID,
@@ -372,7 +372,7 @@ func (s *Sender) SendGet(nodeID ids.ShortID, requestID uint32, containerID ids.I
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send Get(%s, %s, %d, %s)",
 			nodeID,
@@ -416,7 +416,7 @@ func (s *Sender) SendPut(nodeID ids.ShortID, requestID uint32, containerID ids.I
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send Put(%s, %s, %d, %s)",
 			nodeID,
@@ -482,7 +482,7 @@ func (s *Sender) SendPushQuery(nodeIDs ids.ShortSet, requestID uint32, container
 	// Send the message over the network.
 	var sentTo ids.ShortSet
 	if err == nil {
-		sentTo = s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly())
+		sentTo = s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly())
 	} else {
 		s.ctx.Log.Error(
 			"failed to build PushQuery(%s, %d, %s): %s. len(container): %d",
@@ -563,7 +563,7 @@ func (s *Sender) SendPullQuery(nodeIDs ids.ShortSet, requestID uint32, container
 	s.ctx.Log.AssertNoError(err)
 
 	// Send the message over the network.
-	sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly())
+	sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly())
 
 	for nodeID := range nodeIDs {
 		if !sentTo.Contains(nodeID) {
@@ -616,7 +616,7 @@ func (s *Sender) SendChits(nodeID ids.ShortID, requestID uint32, votes []ids.ID)
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send Chits(%s, %s, %d, %s)",
 			nodeID,
@@ -678,7 +678,7 @@ func (s *Sender) SendAppRequest(nodeIDs ids.ShortSet, requestID uint32, appReque
 	// Send the message over the network.
 	var sentTo ids.ShortSet
 	if err == nil {
-		sentTo = s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly())
+		sentTo = s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly())
 	} else {
 		s.ctx.Log.Error(
 			"failed to build AppRequest(%s, %d): %s",
@@ -732,7 +732,7 @@ func (s *Sender) SendAppResponse(nodeID ids.ShortID, requestID uint32, appRespon
 	// Send the message over the network.
 	nodeIDs := ids.NewShortSet(1)
 	nodeIDs.Add(nodeID)
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug(
 			"failed to send AppResponse(%s, %s, %d)",
 			nodeID,
@@ -758,7 +758,7 @@ func (s *Sender) SendAppGossipSpecific(nodeIDs ids.ShortSet, appGossipBytes []by
 	}
 
 	// Send the message over the network.
-	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.SubnetID, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
+	if sentTo := s.sender.Send(outMsg, nodeIDs, s.ctx.IsValidatorOnly()); sentTo.Len() == 0 {
 		s.ctx.Log.Debug("failed to gossip SpecificGossip(%s)", s.ctx.ChainID)
 		s.ctx.Log.Verbo("failed message: %s", formatting.DumpBytes(appGossipBytes))
 	}
@@ -777,7 +777,7 @@ func (s *Sender) SendAppGossip(appGossipBytes []byte) error {
 	validatorSize := int(s.gossipConfig.AppGossipValidatorSize)
 	nonValidatorSize := int(s.gossipConfig.AppGossipNonValidatorSize)
 
-	sentTo := s.sender.Gossip(outMsg, s.ctx.SubnetID, s.ctx.IsValidatorOnly(), validatorSize, nonValidatorSize)
+	sentTo := s.sender.Gossip(outMsg, s.ctx.IsValidatorOnly(), validatorSize, nonValidatorSize)
 	if sentTo.Len() == 0 {
 		s.ctx.Log.Debug("failed to gossip AppGossip(%s)", s.ctx.ChainID)
 		s.ctx.Log.Verbo("failed message: %s", formatting.DumpBytes(appGossipBytes))
@@ -799,7 +799,7 @@ func (s *Sender) SendGossip(containerID ids.ID, container []byte) {
 		return
 	}
 
-	sentTo := s.sender.Gossip(outMsg, s.ctx.SubnetID, s.ctx.IsValidatorOnly(), 0, int(s.gossipConfig.AcceptedFrontierSize))
+	sentTo := s.sender.Gossip(outMsg, s.ctx.IsValidatorOnly(), 0, int(s.gossipConfig.AcceptedFrontierSize))
 	if sentTo.Len() == 0 {
 		s.ctx.Log.Debug("failed to gossip GossipMsg(%s)", s.ctx.ChainID)
 	}
@@ -824,7 +824,7 @@ func (s *Sender) Accept(ctx *snow.ConsensusContext, containerID ids.ID, containe
 		return nil
 	}
 
-	sentTo := s.sender.Gossip(outMsg, s.ctx.SubnetID, s.ctx.IsValidatorOnly(), 0, int(s.gossipConfig.OnAcceptSize))
+	sentTo := s.sender.Gossip(outMsg, s.ctx.IsValidatorOnly(), 0, int(s.gossipConfig.OnAcceptSize))
 	if sentTo.Len() == 0 {
 		s.ctx.Log.Debug("failed to gossip GossipMsg(%s)", s.ctx.ChainID)
 	}
