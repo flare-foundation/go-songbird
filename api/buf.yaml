@@ -4,7 +4,7 @@ breaking:
   use:
     - FILE
 deps:
-  - buf.build/prometheus/client-model 
+  - buf.build/prometheus/client-model
 lint:
   use:
     - DEFAULT
