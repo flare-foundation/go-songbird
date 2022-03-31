@@ -10,11 +10,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
 	"github.com/flare-foundation/flare/snow/engine/common"
 	"github.com/flare-foundation/flare/utils/timer"
-	"github.com/flare-foundation/flare/utils/timer/mockable"
 )
 
 const (
@@ -157,19 +155,6 @@ func (m *blockBuilder) BuildBlock() (snowman.Block, error) {
 		return m.vm.newStandardBlock(preferredID, nextHeight, txs)
 	}
 
-	// Try building a proposal block that rewards a staker.
-	stakerTxID, shouldReward, err := m.getStakerToReward(preferredState)
-	if err != nil {
-		return nil, err
-	}
-	if shouldReward {
-		rewardValidatorTx, err := m.vm.newRewardValidatorTx(stakerTxID)
-		if err != nil {
-			return nil, err
-		}
-		return m.vm.newProposalBlock(preferredID, nextHeight, *rewardValidatorTx)
-	}
-
 	// Try building a proposal block that advances the chain timestamp.
 	nextChainTime, shouldAdvanceTime, err := m.getNextChainTime(preferredState)
 	if err != nil {
@@ -231,16 +216,6 @@ func (m *blockBuilder) ResetTimer() {
 	}
 	preferredState := preferredDecision.onAccept()
 
-	_, shouldReward, err := m.getStakerToReward(preferredState)
-	if err != nil {
-		m.vm.ctx.Log.Error("failed to fetch next staker to reward with %s", err)
-		return
-	}
-	if shouldReward {
-		m.notifyBlockReady()
-		return
-	}
-
 	_, shouldAdvanceTime, err := m.getNextChainTime(preferredState)
 	if err != nil {
 		m.vm.ctx.Log.Error("failed to fetch next chain time with %s", err)
@@ -281,27 +256,6 @@ func (m *blockBuilder) Shutdown() {
 	m.vm.ctx.Lock.Unlock()
 	m.timer.Stop()
 	m.vm.ctx.Lock.Lock()
-}
-
-// getStakerToReward return the staker txID to remove from the primary network
-// staking set, if one exists.
-func (m *blockBuilder) getStakerToReward(preferredState MutableState) (ids.ID, bool, error) {
-	currentChainTimestamp := preferredState.GetTimestamp()
-	if !currentChainTimestamp.Before(mockable.MaxTime) {
-		return ids.Empty, false, errEndOfTime
-	}
-
-	currentStakers := preferredState.CurrentStakerChainState()
-	tx, _, err := currentStakers.GetNextStaker()
-	if err != nil {
-		return ids.Empty, false, err
-	}
-
-	staker, ok := tx.UnsignedTx.(TimedTx)
-	if !ok {
-		return ids.Empty, false, fmt.Errorf("expected staker tx to be TimedTx but got %T", tx.UnsignedTx)
-	}
-	return tx.ID(), currentChainTimestamp.Equal(staker.EndTime()), nil
 }
 
 // getNextChainTime returns the timestamp for the next chain time and if the
