@@ -11,8 +11,9 @@ import (
 	"math"
 	"strings"
 
-	"github.com/flare-foundation/flare/utils/hashing"
 	"github.com/mr-tron/base58/base58"
+
+	"github.com/flare-foundation/flare/utils/hashing"
 )
 
 const (

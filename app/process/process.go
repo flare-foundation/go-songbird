@@ -19,6 +19,7 @@ import (
 	"github.com/flare-foundation/flare/utils/dynamicip"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/utils/perms"
+	"github.com/flare-foundation/flare/utils/ulimit"
 	"github.com/flare-foundation/flare/version"
 )
 
@@ -57,7 +58,8 @@ func NewApp(config node.Config) app.App {
 }
 
 // Start the business logic of the node (as opposed to config reading, etc).
-// Does not block until the node is done.
+// Does not block until the node is done. Errors returned from this method
+// are not logged.
 func (p *process) Start() error {
 	// Set the data directory permissions to be read write.
 	if err := perms.ChmodR(p.config.DatabaseConfig.Path, true, perms.ReadWriteExecute); err != nil {
@@ -71,6 +73,14 @@ func (p *process) Start() error {
 	logFactory := logging.NewFactory(p.config.LoggingConfig)
 	log, err := logFactory.Make("main")
 	if err != nil {
+		logFactory.Close()
+		return err
+	}
+
+	// update fd limit
+	fdLimit := p.config.FdLimit
+	if err := ulimit.Set(fdLimit, log); err != nil {
+		log.Fatal("failed to set fd-limit: %s", err)
 		logFactory.Close()
 		return err
 	}

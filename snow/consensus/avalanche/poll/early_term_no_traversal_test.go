@@ -15,15 +15,15 @@ func TestEarlyTermNoTraversalResults(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1} // k = 1
+	validator1 := ids.ShortID{1} // k = 1
 
 	validators := ids.ShortBag{}
-	validators.Add(vdr1)
+	validators.Add(validator1)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if !poll.Finished() {
 		t.Fatalf("Poll did not terminate after receiving k votes")
 	}
@@ -44,19 +44,19 @@ func TestEarlyTermNoTraversalString(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2} // k = 2
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2} // k = 2
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 
 	expected := `waiting on Bag: (Size = 1)
     ID[BaMPFdqMUQ46BV8iRcwbVfsam55kMqcp]: Count = 1
@@ -73,27 +73,27 @@ func TestEarlyTermNoTraversalDropsDuplicatedVotes(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2} // k = 2
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2} // k = 2
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if poll.Finished() {
 		t.Fatalf("Poll finished after less than alpha votes")
 	}
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if poll.Finished() {
 		t.Fatalf("Poll finished after getting a duplicated vote")
 	}
-	poll.Vote(vdr2, votes)
+	poll.Vote(validator2, votes)
 	if !poll.Finished() {
 		t.Fatalf("Poll did not terminate after receiving k votes")
 	}
@@ -105,17 +105,17 @@ func TestEarlyTermNoTraversalTerminatesEarly(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
-	vdr3 := ids.ShortID{3}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
+	validator3 := ids.ShortID{3}
 	vdr4 := ids.ShortID{4}
 	vdr5 := ids.ShortID{5} // k = 5
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
-		vdr3,
+		validator1,
+		validator2,
+		validator3,
 		vdr4,
 		vdr5,
 	)
@@ -123,15 +123,15 @@ func TestEarlyTermNoTraversalTerminatesEarly(t *testing.T) {
 	factory := NewEarlyTermNoTraversalFactory(alpha)
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, votes)
+	poll.Vote(validator1, votes)
 	if poll.Finished() {
 		t.Fatalf("Poll finished after less than alpha votes")
 	}
-	poll.Vote(vdr2, votes)
+	poll.Vote(validator2, votes)
 	if poll.Finished() {
 		t.Fatalf("Poll finished after less than alpha votes")
 	}
-	poll.Vote(vdr3, votes)
+	poll.Vote(validator3, votes)
 	if !poll.Finished() {
 		t.Fatalf("Poll did not terminate early after receiving alpha votes for one vertex and none for other vertices")
 	}
@@ -150,29 +150,29 @@ func TestEarlyTermNoTraversalForSharedAncestor(t *testing.T) {
 	// A, then we cannot terminate early with alpha = k = 4
 	// If the final vote is cast for any of A, B, C, or D, then
 	// vertex A will have transitively received alpha = 4 votes
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
-	vdr3 := ids.ShortID{3}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
+	validator3 := ids.ShortID{3}
 	vdr4 := ids.ShortID{4}
 
 	validators := ids.ShortBag{}
-	validators.Add(vdr1)
-	validators.Add(vdr2)
-	validators.Add(vdr3)
+	validators.Add(validator1)
+	validators.Add(validator2)
+	validators.Add(validator3)
 	validators.Add(vdr4)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, []ids.ID{vtxB})
+	poll.Vote(validator1, []ids.ID{vtxB})
 	if poll.Finished() {
 		t.Fatalf("Poll finished early after receiving one vote")
 	}
-	poll.Vote(vdr2, []ids.ID{vtxC})
+	poll.Vote(validator2, []ids.ID{vtxC})
 	if poll.Finished() {
 		t.Fatalf("Poll finished early after receiving two votes")
 	}
-	poll.Vote(vdr3, []ids.ID{vtxD})
+	poll.Vote(validator3, []ids.ID{vtxD})
 	if poll.Finished() {
 		t.Fatalf("Poll terminated early, when a shared ancestor could have received alpha votes")
 	}
@@ -185,25 +185,25 @@ func TestEarlyTermNoTraversalForSharedAncestor(t *testing.T) {
 func TestEarlyTermNoTraversalWithFastDrops(t *testing.T) {
 	alpha := 2
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
-	vdr3 := ids.ShortID{3} // k = 3
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
+	validator3 := ids.ShortID{3} // k = 3
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
-		vdr3,
+		validator1,
+		validator2,
+		validator3,
 	)
 
 	factory := NewEarlyTermNoTraversalFactory(alpha)
 	poll := factory.New(validators)
 
-	poll.Vote(vdr1, nil)
+	poll.Vote(validator1, nil)
 	if poll.Finished() {
 		t.Fatalf("Poll finished early after dropping one vote")
 	}
-	poll.Vote(vdr2, nil)
+	poll.Vote(validator2, nil)
 	if !poll.Finished() {
 		t.Fatalf("Poll did not terminate after dropping two votes")
 	}

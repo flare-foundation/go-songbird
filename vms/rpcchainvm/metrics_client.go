@@ -7,10 +7,9 @@ import (
 	"context"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	dto "github.com/prometheus/client_model/go"
-
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ prometheus.Gatherer = &VMClient{}

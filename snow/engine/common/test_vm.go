@@ -8,11 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flare-foundation/flare/ids"
-	"github.com/flare-foundation/flare/version"
-
 	"github.com/flare-foundation/flare/database/manager"
+	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow"
+	"github.com/flare-foundation/flare/version"
 )
 
 var (

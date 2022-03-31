@@ -3,7 +3,9 @@
 
 package avax
 
-import "github.com/flare-foundation/flare/snow"
+import (
+	"github.com/flare-foundation/flare/snow"
+)
 
 type TestVerifiable struct{ Err error }
 

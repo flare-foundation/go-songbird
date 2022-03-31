@@ -20,8 +20,9 @@ import (
 	"github.com/flare-foundation/flare/snow/engine/common/queue"
 	"github.com/flare-foundation/flare/snow/engine/common/tracker"
 	"github.com/flare-foundation/flare/snow/engine/snowman/block"
-	snowgetter "github.com/flare-foundation/flare/snow/engine/snowman/getter"
 	"github.com/flare-foundation/flare/snow/validation"
+
+	snowgetter "github.com/flare-foundation/flare/snow/engine/snowman/getter"
 )
 
 var errUnknownBlock = errors.New("unknown block")

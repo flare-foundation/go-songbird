@@ -41,14 +41,14 @@ func (dh *dummyHandler) onDoneBootstrapping(lastReqID uint32) error {
 func setup(t *testing.T) (ids.ShortID, validation.Set, *common.SenderTest, *block.TestVM, *Transitive, snowman.Block) {
 	bootCfg, engCfg := DefaultConfigs()
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
-	bootCfg.Validators = vals
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
+	bootCfg.Validators = validators
 	bootCfg.WeightTracker = wt
-	engCfg.Validators = vals
+	engCfg.Validators = validators
 
 	validator := ids.GenerateTestShortID()
-	if err := vals.AddWeight(validator, 1); err != nil {
+	if err := validators.AddWeight(validator, 1); err != nil {
 		t.Fatal(err)
 	}
 
@@ -116,7 +116,7 @@ func setup(t *testing.T) (ids.ShortID, validation.Set, *common.SenderTest, *bloc
 	vm.LastAcceptedF = nil
 	sender.CantSendGetAcceptedFrontier = true
 
-	return validator, vals, sender, vm, te, gBlk
+	return validator, validators, sender, vm, te, gBlk
 }
 
 func TestEngineShutdown(t *testing.T) {
@@ -428,21 +428,21 @@ func TestEngineMultipleQuery(t *testing.T) {
 		MaxItemProcessingTime: 1,
 	}
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
-	bootCfg.Validators = vals
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
+	bootCfg.Validators = validators
 	bootCfg.WeightTracker = wt
-	engCfg.Validators = vals
+	engCfg.Validators = validators
 
-	vdr0 := ids.GenerateTestShortID()
-	vdr1 := ids.GenerateTestShortID()
-	vdr2 := ids.GenerateTestShortID()
+	validator1 := ids.GenerateTestShortID()
+	validator2 := ids.GenerateTestShortID()
+	validator3 := ids.GenerateTestShortID()
 
 	errs := wrappers.Errs{}
 	errs.Add(
-		vals.AddWeight(vdr0, 1),
-		vals.AddWeight(vdr1, 1),
-		vals.AddWeight(vdr2, 1),
+		validators.AddWeight(validator1, 1),
+		validators.AddWeight(validator2, 1),
+		validators.AddWeight(validator3, 1),
 	)
 	if errs.Errored() {
 		t.Fatal(errs.Err)
@@ -523,7 +523,7 @@ func TestEngineMultipleQuery(t *testing.T) {
 		*queried = true
 		*queryRequestID = requestID
 		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr0, vdr1, vdr2)
+		vdrSet.Add(validator1, validator2, validator3)
 		if !inVdrs.Equals(vdrSet) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
@@ -576,7 +576,7 @@ func TestEngineMultipleQuery(t *testing.T) {
 		}
 		*asked = true
 		*getRequestID = requestID
-		if vdr0 != inVdr {
+		if validator1 != inVdr {
 			t.Fatalf("Asking wrong validator for block")
 		}
 		if blk1.ID() != blkID {
@@ -584,10 +584,10 @@ func TestEngineMultipleQuery(t *testing.T) {
 		}
 	}
 	blkSet := []ids.ID{blk1.ID()}
-	if err := te.Chits(vdr0, *queryRequestID, blkSet); err != nil {
+	if err := te.Chits(validator1, *queryRequestID, blkSet); err != nil {
 		t.Fatal(err)
 	}
-	if err := te.Chits(vdr1, *queryRequestID, blkSet); err != nil {
+	if err := te.Chits(validator2, *queryRequestID, blkSet); err != nil {
 		t.Fatal(err)
 	}
 
@@ -615,7 +615,7 @@ func TestEngineMultipleQuery(t *testing.T) {
 		*queried = true
 		*secondQueryRequestID = requestID
 		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr0, vdr1, vdr2)
+		vdrSet.Add(validator1, validator2, validator3)
 		if !inVdrs.Equals(vdrSet) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
@@ -623,13 +623,13 @@ func TestEngineMultipleQuery(t *testing.T) {
 			t.Fatalf("Asking for wrong block")
 		}
 	}
-	if err := te.Put(vdr0, *getRequestID, blk1.Bytes()); err != nil {
+	if err := te.Put(validator1, *getRequestID, blk1.Bytes()); err != nil {
 		t.Fatal(err)
 	}
 
 	// Should be dropped because the query was already filled
 	blkSet = []ids.ID{blk0.ID()}
-	if err := te.Chits(vdr2, *queryRequestID, blkSet); err != nil {
+	if err := te.Chits(validator3, *queryRequestID, blkSet); err != nil {
 		t.Fatal(err)
 	}
 
@@ -932,21 +932,21 @@ func TestVoteCanceling(t *testing.T) {
 		MaxItemProcessingTime: 1,
 	}
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
-	bootCfg.Validators = vals
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
+	bootCfg.Validators = validators
 	bootCfg.WeightTracker = wt
-	engCfg.Validators = vals
+	engCfg.Validators = validators
 
-	vdr0 := ids.GenerateTestShortID()
-	vdr1 := ids.GenerateTestShortID()
-	vdr2 := ids.GenerateTestShortID()
+	validator1 := ids.GenerateTestShortID()
+	validator2 := ids.GenerateTestShortID()
+	validator3 := ids.GenerateTestShortID()
 
 	errs := wrappers.Errs{}
 	errs.Add(
-		vals.AddWeight(vdr0, 1),
-		vals.AddWeight(vdr1, 1),
-		vals.AddWeight(vdr2, 1),
+		validators.AddWeight(validator1, 1),
+		validators.AddWeight(validator2, 1),
+		validators.AddWeight(validator3, 1),
 	)
 	if errs.Errored() {
 		t.Fatal(errs.Err)
@@ -1028,7 +1028,7 @@ func TestVoteCanceling(t *testing.T) {
 		*queried = true
 		*queryRequestID = requestID
 		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr0, vdr1, vdr2)
+		vdrSet.Add(validator1, validator2, validator3)
 		if !inVdrs.Equals(vdrSet) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
@@ -1045,7 +1045,7 @@ func TestVoteCanceling(t *testing.T) {
 		t.Fatalf("Shouldn't have finished blocking issue")
 	}
 
-	if err := te.QueryFailed(vdr0, *queryRequestID); err != nil {
+	if err := te.QueryFailed(validator1, *queryRequestID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -1057,7 +1057,7 @@ func TestVoteCanceling(t *testing.T) {
 	sender.SendPullQueryF = func(inVdrs ids.ShortSet, requestID uint32, blkID ids.ID) {
 		*repolled = true
 	}
-	if err := te.QueryFailed(vdr1, *queryRequestID); err != nil {
+	if err := te.QueryFailed(validator2, *queryRequestID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -1069,8 +1069,8 @@ func TestVoteCanceling(t *testing.T) {
 func TestEngineNoQuery(t *testing.T) {
 	bootCfg, engCfg := DefaultConfigs()
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
 	bootCfg.WeightTracker = wt
 
 	sender := &common.SenderTest{}
@@ -1138,8 +1138,8 @@ func TestEngineNoQuery(t *testing.T) {
 func TestEngineNoRepollQuery(t *testing.T) {
 	bootCfg, engCfg := DefaultConfigs()
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
 	bootCfg.WeightTracker = wt
 
 	sender := &common.SenderTest{}
@@ -1609,10 +1609,10 @@ func TestEngineGossip(t *testing.T) {
 }
 
 func TestEngineInvalidBlockIgnoredFromUnexpectedPeer(t *testing.T) {
-	validator, validators, sender, vm, te, gBlk := setup(t)
+	validator, vdrs, sender, vm, te, gBlk := setup(t)
 
 	secondVdr := ids.GenerateTestShortID()
-	if err := validators.AddWeight(secondVdr, 1); err != nil {
+	if err := vdrs.AddWeight(secondVdr, 1); err != nil {
 		t.Fatal(err)
 	}
 
@@ -1823,14 +1823,14 @@ func TestEngineAggressivePolling(t *testing.T) {
 
 	engCfg.Params.ConcurrentRepolls = 2
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
-	bootCfg.Validators = vals
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
+	bootCfg.Validators = validators
 	bootCfg.WeightTracker = wt
-	engCfg.Validators = vals
+	engCfg.Validators = validators
 
 	validator := ids.GenerateTestShortID()
-	if err := vals.AddWeight(validator, 1); err != nil {
+	if err := validators.AddWeight(validator, 1); err != nil {
 		t.Fatal(err)
 	}
 
@@ -1958,19 +1958,19 @@ func TestEngineDoubleChit(t *testing.T) {
 		MaxItemProcessingTime: 1,
 	}
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
-	bootCfg.Validators = vals
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
+	bootCfg.Validators = validators
 	bootCfg.WeightTracker = wt
-	engCfg.Validators = vals
+	engCfg.Validators = validators
 
-	vdr0 := ids.GenerateTestShortID()
-	vdr1 := ids.GenerateTestShortID()
+	validator1 := ids.GenerateTestShortID()
+	validator2 := ids.GenerateTestShortID()
 
-	if err := vals.AddWeight(vdr0, 1); err != nil {
+	if err := validators.AddWeight(validator1, 1); err != nil {
 		t.Fatal(err)
 	}
-	if err := vals.AddWeight(vdr1, 1); err != nil {
+	if err := validators.AddWeight(validator2, 1); err != nil {
 		t.Fatal(err)
 	}
 
@@ -2049,7 +2049,7 @@ func TestEngineDoubleChit(t *testing.T) {
 		*queried = true
 		*queryRequestID = requestID
 		vdrSet := ids.ShortSet{}
-		vdrSet.Add(vdr0, vdr1)
+		vdrSet.Add(validator1, validator2)
 		if !inVdrs.Equals(vdrSet) {
 			t.Fatalf("Asking wrong validator for preference")
 		}
@@ -2079,7 +2079,7 @@ func TestEngineDoubleChit(t *testing.T) {
 		t.Fatalf("Wrong status: %s ; expected: %s", status, choices.Processing)
 	}
 
-	if err := te.Chits(vdr0, *queryRequestID, blkSet); err != nil {
+	if err := te.Chits(validator1, *queryRequestID, blkSet); err != nil {
 		t.Fatal(err)
 	}
 
@@ -2087,7 +2087,7 @@ func TestEngineDoubleChit(t *testing.T) {
 		t.Fatalf("Wrong status: %s ; expected: %s", status, choices.Processing)
 	}
 
-	if err := te.Chits(vdr0, *queryRequestID, blkSet); err != nil {
+	if err := te.Chits(validator1, *queryRequestID, blkSet); err != nil {
 		t.Fatal(err)
 	}
 
@@ -2095,7 +2095,7 @@ func TestEngineDoubleChit(t *testing.T) {
 		t.Fatalf("Wrong status: %s ; expected: %s", status, choices.Processing)
 	}
 
-	if err := te.Chits(vdr1, *queryRequestID, blkSet); err != nil {
+	if err := te.Chits(validator2, *queryRequestID, blkSet); err != nil {
 		t.Fatal(err)
 	}
 
@@ -2111,14 +2111,14 @@ func TestEngineBuildBlockLimit(t *testing.T) {
 	engCfg.Params.Alpha = 1
 	engCfg.Params.OptimalProcessing = 1
 
-	vals := validation.NewSet()
-	wt := tracker.NewWeightTracker(vals, bootCfg.StartupAlpha)
-	bootCfg.Validators = vals
+	validators := validation.NewSet()
+	wt := tracker.NewWeightTracker(validators, bootCfg.StartupAlpha)
+	bootCfg.Validators = validators
 	bootCfg.WeightTracker = wt
-	engCfg.Validators = vals
+	engCfg.Validators = validators
 
 	validator := ids.GenerateTestShortID()
-	if err := vals.AddWeight(validator, 1); err != nil {
+	if err := validators.AddWeight(validator, 1); err != nil {
 		t.Fatal(err)
 	}
 

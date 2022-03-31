@@ -3,7 +3,9 @@
 
 package snow
 
-import "errors"
+import (
+	"errors"
+)
 
 type State uint8
 

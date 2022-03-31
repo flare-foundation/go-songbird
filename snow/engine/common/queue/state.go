@@ -6,6 +6,8 @@ package queue
 import (
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/cache/metercacher"
 	"github.com/flare-foundation/flare/database"
@@ -13,7 +15,6 @@ import (
 	"github.com/flare-foundation/flare/database/prefixdb"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (

@@ -10,10 +10,10 @@ import (
 
 	"github.com/flare-foundation/flare/api"
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/formatting"
 	"github.com/flare-foundation/flare/vms/components/avax"
 	"github.com/flare-foundation/flare/vms/secp256k1fx"
 
-	"github.com/flare-foundation/flare/utils/formatting"
 	safemath "github.com/flare-foundation/flare/utils/math"
 )
 

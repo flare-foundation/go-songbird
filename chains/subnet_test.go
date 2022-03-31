@@ -6,8 +6,9 @@ package chains
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestSubnet(t *testing.T) {

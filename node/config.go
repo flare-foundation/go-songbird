@@ -15,6 +15,7 @@ import (
 	"github.com/flare-foundation/flare/snow/consensus/avalanche"
 	"github.com/flare-foundation/flare/snow/networking/benchlist"
 	"github.com/flare-foundation/flare/snow/networking/router"
+	"github.com/flare-foundation/flare/snow/networking/sender"
 	"github.com/flare-foundation/flare/utils"
 	"github.com/flare-foundation/flare/utils/dynamicip"
 	"github.com/flare-foundation/flare/utils/logging"
@@ -152,6 +153,8 @@ type Config struct {
 	// Network configuration
 	NetworkConfig network.Config `json:"networkConfig"`
 
+	GossipConfig sender.GossipConfig `json:"gossipConfig"`
+
 	AdaptiveTimeoutConfig timer.AdaptiveTimeoutConfig `json:"adaptiveTimeoutConfig"`
 
 	// Benchlist Configuration
@@ -165,6 +168,9 @@ type Config struct {
 
 	// Plugin directory
 	PluginDir string `json:"pluginDir"`
+
+	// File Descriptor Limit
+	FdLimit uint64 `json:"fdLimit"`
 
 	// Consensus configuration
 	ConsensusParams avalanche.Parameters `json:"consensusParams"`

@@ -8,14 +8,17 @@ import (
 	"math"
 	"time"
 
-	safemath "github.com/flare-foundation/flare/utils/math"
 	"github.com/flare-foundation/flare/utils/timer/mockable"
+
+	safemath "github.com/flare-foundation/flare/utils/math"
 )
 
-var errNoValidWeightedSamplers = errors.New("no valid weighted samplers found")
+var (
+	errNoValidWeightedSamplers = errors.New("no valid weighted samplers found")
 
-// weightedBest implements the Weighted interface.
-//
+	_ Weighted = &weightedBest{}
+)
+
 // Sampling is performed by using another implementation of the Weighted
 // interface.
 //

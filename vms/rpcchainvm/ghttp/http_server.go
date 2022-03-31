@@ -4,6 +4,7 @@
 package ghttp
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
@@ -11,16 +12,18 @@ import (
 	"net/url"
 
 	"github.com/hashicorp/go-plugin"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/flare-foundation/flare/api/proto/ghttpproto"
-	"github.com/flare-foundation/flare/api/proto/greadcloserproto"
 	"github.com/flare-foundation/flare/api/proto/gresponsewriterproto"
-	"github.com/flare-foundation/flare/utils/wrappers"
-	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/greadcloser"
 	"github.com/flare-foundation/flare/vms/rpcchainvm/ghttp/gresponsewriter"
+	"github.com/flare-foundation/flare/vms/rpcchainvm/grpcutils"
 )
 
-var _ ghttpproto.HTTPServer = &Server{}
+var (
+	_ ghttpproto.HTTPServer = &Server{}
+	_ http.ResponseWriter   = &ResponseWriter{}
+)
 
 // Server is an http.Handler that is managed over RPC.
 type Server struct {
@@ -37,17 +40,9 @@ func NewServer(handler http.Handler, broker *plugin.GRPCBroker) *Server {
 	}
 }
 
-func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*ghttpproto.HTTPResponse, error) {
-	writerConn, err := s.broker.Dial(req.ResponseWriter.Id)
+func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*emptypb.Empty, error) {
+	readWriteConn, err := s.broker.Dial(req.ResponseWriter.Id)
 	if err != nil {
-		return nil, err
-	}
-
-	readerConn, err := s.broker.Dial(req.Request.Body)
-	if err != nil {
-		// Drop any error that occurs during closing to return the original
-		// error.
-		_ = writerConn.Close()
 		return nil, err
 	}
 
@@ -56,15 +51,14 @@ func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*ghtt
 		writerHeaders[elem.Key] = elem.Values
 	}
 
-	writer := gresponsewriter.NewClient(writerHeaders, gresponsewriterproto.NewWriterClient(writerConn), s.broker)
-	reader := greadcloser.NewClient(greadcloserproto.NewReaderClient(readerConn))
+	writer := gresponsewriter.NewClient(writerHeaders, gresponsewriterproto.NewWriterClient(readWriteConn), s.broker)
 
 	// create the request with the current context
 	request, err := http.NewRequestWithContext(
 		ctx,
 		req.Request.Method,
 		req.Request.RequestUri,
-		reader,
+		bytes.NewBuffer(req.Request.Body),
 	)
 	if err != nil {
 		return nil, err
@@ -119,13 +113,12 @@ func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*ghtt
 			DidResume:                   req.Request.Tls.DidResume,
 			CipherSuite:                 uint16(req.Request.Tls.CipherSuite),
 			NegotiatedProtocol:          req.Request.Tls.NegotiatedProtocol,
-			NegotiatedProtocolIsMutual:  req.Request.Tls.NegotiatedProtocolIsMutual,
+			NegotiatedProtocolIsMutual:  true, // always true per https://pkg.go.dev/crypto/tls#ConnectionState
 			ServerName:                  req.Request.Tls.ServerName,
 			PeerCertificates:            make([]*x509.Certificate, len(req.Request.Tls.PeerCertificates.Cert)),
 			VerifiedChains:              make([][]*x509.Certificate, len(req.Request.Tls.VerifiedChains)),
 			SignedCertificateTimestamps: req.Request.Tls.SignedCertificateTimestamps,
 			OCSPResponse:                req.Request.Tls.OcspResponse,
-			TLSUnique:                   req.Request.Tls.TlsUnique,
 		}
 		for i, certBytes := range req.Request.Tls.PeerCertificates.Cert {
 			cert, err := x509.ParseCertificate(certBytes)
@@ -148,10 +141,70 @@ func (s *Server) Handle(ctx context.Context, req *ghttpproto.HTTPRequest) (*ghtt
 
 	s.handler.ServeHTTP(writer, request)
 
-	errs := wrappers.Errs{}
-	errs.Add(
-		writerConn.Close(),
-		readerConn.Close(),
-	)
-	return &ghttpproto.HTTPResponse{}, errs.Err
+	return &emptypb.Empty{}, readWriteConn.Close()
+}
+
+// HandleSimple handles http requests over http2 using a simple request response model.
+// Websockets are not supported. Based on https://www.weave.works/blog/turtles-way-http-grpc/
+func (s *Server) HandleSimple(ctx context.Context, r *ghttpproto.HandleSimpleHTTPRequest) (*ghttpproto.HandleSimpleHTTPResponse, error) {
+	req, err := http.NewRequest(r.Method, r.Url, bytes.NewBuffer(r.Body))
+	if err != nil {
+		return nil, err
+	}
+
+	grpcutils.MergeHTTPHeader(r.Headers, req.Header)
+
+	req = req.WithContext(ctx)
+	req.RequestURI = r.Url
+	req.ContentLength = int64(len(r.Body))
+
+	w := newResponseWriter()
+	s.handler.ServeHTTP(w, req)
+
+	resp := &ghttpproto.HandleSimpleHTTPResponse{
+		Code:    int32(w.statusCode),
+		Headers: grpcutils.GetHTTPHeader(w.Header()),
+		Body:    w.body.Bytes(),
+	}
+
+	if w.statusCode == http.StatusInternalServerError {
+		return nil, grpcutils.GetGRPCErrorFromHTTPResponse(resp)
+	}
+	return resp, nil
+}
+
+type ResponseWriter struct {
+	body       *bytes.Buffer
+	header     http.Header
+	statusCode int
+}
+
+// newResponseWriter returns very basic implementation of the http.ResponseWriter
+func newResponseWriter() *ResponseWriter {
+	return &ResponseWriter{
+		body:       new(bytes.Buffer),
+		header:     make(http.Header),
+		statusCode: http.StatusOK,
+	}
+}
+
+func (w *ResponseWriter) Header() http.Header {
+	return w.header
+}
+
+func (w *ResponseWriter) Write(buf []byte) (int, error) {
+	w.body.Write(buf)
+	return len(buf), nil
+}
+
+func (w *ResponseWriter) WriteHeader(code int) {
+	w.statusCode = code
+}
+
+func (w *ResponseWriter) StatusCode() int {
+	return w.statusCode
+}
+
+func (w *ResponseWriter) Body() *bytes.Buffer {
+	return w.body
 }

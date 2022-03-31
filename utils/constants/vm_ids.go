@@ -3,7 +3,9 @@
 
 package constants
 
-import "github.com/flare-foundation/flare/ids"
+import (
+	"github.com/flare-foundation/flare/ids"
+)
 
 var (
 	PlatformVMID = ids.ID{'p', 'l', 'a', 't', 'f', 'o', 'r', 'm', 'v', 'm'}

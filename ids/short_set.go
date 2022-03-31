@@ -3,7 +3,9 @@
 
 package ids
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	minShortSetSize = 16
@@ -142,6 +144,14 @@ func (ids ShortSet) String() string {
 	}
 	sb.WriteString("}")
 	return sb.String()
+}
+
+// Returns an element. If the set is empty, returns false
+func (ids *ShortSet) Peek() (ShortID, bool) {
+	for id := range *ids {
+		return id, true
+	}
+	return ShortID{}, false
 }
 
 // Removes and returns an element. If the set is empty, does nothing and returns

@@ -61,7 +61,7 @@ type Context struct {
 	SNLookup     SubnetLookup
 	Metrics      metrics.OptionalGatherer
 
-	// snowman++ attributes
+	// snowman++ related fields
 	PlatformVMState     platform.VMState     // state of platform VM
 	ValidatorsRetriever validation.Retriever // retrieves validators from EVM
 	ValidatorsUpdater   validation.Updater   // updates validators across components

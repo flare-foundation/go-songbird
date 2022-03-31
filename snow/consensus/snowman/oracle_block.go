@@ -3,7 +3,9 @@
 
 package snowman
 
-import "errors"
+import (
+	"errors"
+)
 
 var ErrNotOracle = errors.New("block isn't an oracle")
 

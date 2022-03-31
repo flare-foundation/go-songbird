@@ -6,8 +6,9 @@ package linkedhashmap
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestLinkedHashmap(t *testing.T) {

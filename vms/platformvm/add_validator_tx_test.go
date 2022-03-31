@@ -17,7 +17,6 @@ import (
 )
 
 func TestAddValidatorTxSyntacticVerify(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {
@@ -161,7 +160,6 @@ func TestAddValidatorTxSyntacticVerify(t *testing.T) {
 
 // Test AddValidatorTx.Execute
 func TestAddValidatorTxExecute(t *testing.T) {
-	t.Skip()
 	vm, _, _ := defaultVM()
 	vm.ctx.Lock.Lock()
 	defer func() {

@@ -6,8 +6,9 @@ package snowman
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/ids"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flare-foundation/flare/ids"
 )
 
 func TestAdd(t *testing.T) {

@@ -11,10 +11,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flare-foundation/flare/database/rocksdb"
 	"github.com/flare-foundation/flare/utils/logging"
 	"github.com/flare-foundation/flare/version"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewSingleRocksDB(t *testing.T) {

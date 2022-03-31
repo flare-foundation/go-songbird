@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/go-plugin"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/flare-foundation/flare/api/proto/gconnproto"
 	"github.com/flare-foundation/flare/api/proto/greaderproto"
@@ -79,7 +80,7 @@ func (c *Client) WriteHeader(statusCode int) {
 
 func (c *Client) Flush() {
 	// TODO: is there a way to handle the error here?
-	_, _ = c.client.Flush(context.Background(), &gresponsewriterproto.FlushRequest{})
+	_, _ = c.client.Flush(context.Background(), &emptypb.Empty{})
 }
 
 type addr struct {
@@ -91,33 +92,18 @@ func (a *addr) Network() string { return a.network }
 func (a *addr) String() string  { return a.str }
 
 func (c *Client) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	resp, err := c.client.Hijack(context.Background(), &gresponsewriterproto.HijackRequest{})
+	resp, err := c.client.Hijack(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	connConn, err := c.broker.Dial(resp.ConnServer)
+	clientConn, err := c.broker.Dial(resp.ConnReadWriterServer)
 	if err != nil {
-		return nil, nil, err
-	}
-
-	readerConn, err := c.broker.Dial(resp.ReaderServer)
-	if err != nil {
-		// Ignore error closing resources to return original error
-		_ = connConn.Close()
-		return nil, nil, err
-	}
-
-	writerConn, err := c.broker.Dial(resp.WriterServer)
-	if err != nil {
-		// Ignore errors closing resources to return original error
-		_ = connConn.Close()
-		_ = readerConn.Close()
 		return nil, nil, err
 	}
 
 	conn := gconn.NewClient(
-		gconnproto.NewConnClient(connConn),
+		gconnproto.NewConnClient(clientConn),
 		&addr{
 			network: resp.LocalNetwork,
 			str:     resp.LocalString,
@@ -126,13 +112,11 @@ func (c *Client) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 			network: resp.RemoteNetwork,
 			str:     resp.RemoteString,
 		},
-		connConn,
-		readerConn,
-		writerConn,
+		clientConn,
 	)
 
-	reader := greader.NewClient(greaderproto.NewReaderClient(readerConn))
-	writer := gwriter.NewClient(gwriterproto.NewWriterClient(writerConn))
+	reader := greader.NewClient(greaderproto.NewReaderClient(clientConn))
+	writer := gwriter.NewClient(gwriterproto.NewWriterClient(clientConn))
 
 	readWriter := bufio.NewReadWriter(
 		bufio.NewReader(reader),

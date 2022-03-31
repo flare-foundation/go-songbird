@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/flare-foundation/flare/ids"
-
 	"github.com/flare-foundation/flare/vms/components/avax"
 )
 

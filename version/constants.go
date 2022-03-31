@@ -18,8 +18,7 @@ var (
 	PrevMinimumCompatibleVersion = NewDefaultApplication(constants.PlatformName, 0, 6, 0)
 	MinimumUnmaskedVersion       = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
 	PrevMinimumUnmaskedVersion   = NewDefaultApplication(constants.PlatformName, 0, 5, 1)
-
-	VersionParser = NewDefaultApplicationParser()
+	VersionParser                = NewDefaultApplicationParser()
 
 	CurrentDatabase = DatabaseVersion1_4_5
 	PrevDatabase    = DatabaseVersion1_0_0
@@ -48,11 +47,21 @@ var (
 	}
 	ApricotPhase4DefaultTime = time.Date(2022, time.February, 10, 15, 0, 0, 0, time.UTC)
 
+	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
+	ApricotPhase4DefaultMinPChainHeight = uint64(0)
+
 	ApricotPhase5Times = map[uint32]time.Time{
 		constants.CostonID:   time.Date(2022, time.February, 25, 16, 0, 0, 0, time.UTC),
 		constants.SongbirdID: time.Date(2022, time.March, 7, 16, 0, 0, 0, time.UTC),
 	}
 	ApricotPhase5DefaultTime = time.Date(2022, time.February, 11, 15, 0, 0, 0, time.UTC)
+
+	// FIXME: update this before release
+	XChainMigrationTimes = map[uint32]time.Time{
+		constants.CostonID:   time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(10000, time.December, 1, 0, 0, 0, 0, time.UTC),
+	}
+	XChainMigrationDefaultTime = time.Date(2022, time.January, 1, 1, 0, 0, 0, time.UTC)
 
 	StateConnectorTimes = map[uint32]time.Time{
 		constants.CostonID:   time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
@@ -60,14 +69,11 @@ var (
 	}
 	StateConnectorDefaultTime = time.Date(2022, time.February, 12, 15, 0, 0, 0, time.UTC)
 
-	ApricotPhase4MinPChainHeight        = map[uint32]uint64{}
-	ApricotPhase4DefaultMinPChainHeight = uint64(0)
-
 	FlareHardFork1Times = map[uint32]time.Time{
-		constants.CostonID:   time.Date(2022, time.March, 23, 14, 0, 0, 0, time.UTC),
-		constants.SongbirdID: time.Date(2022, time.March, 28, 14, 0, 0, 0, time.UTC),
+		constants.CostonID:   time.Date(2022, time.April, 21, 14, 0, 0, 0, time.UTC),
+		constants.SongbirdID: time.Date(2022, time.April, 28, 14, 0, 0, 0, time.UTC),
 	}
-	FlareHardFork1DefaultTime = time.Date(2022, time.March, 20, 18, 0, 0, 0, time.UTC)
+	FlareHardFork1DefaultTime = time.Date(2022, time.April, 15, 14, 0, 0, 0, time.UTC)
 )
 
 func GetApricotPhase0Time(networkID uint32) time.Time {
@@ -118,6 +124,14 @@ func GetApricotPhase5Time(networkID uint32) time.Time {
 	}
 	return ApricotPhase5DefaultTime
 }
+
+func GetXChainMigrationTime(networkID uint32) time.Time {
+	if upgradeTime, exists := XChainMigrationTimes[networkID]; exists {
+		return upgradeTime
+	}
+	return XChainMigrationDefaultTime
+}
+
 func GetStateConnectorTime(networkID uint32) time.Time {
 	if upgradeTime, exists := StateConnectorTimes[networkID]; exists {
 		return upgradeTime

@@ -3,7 +3,9 @@
 
 package ids
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestBitSet(t *testing.T) {
 	var bs1 BitSet

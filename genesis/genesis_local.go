@@ -6,11 +6,26 @@ package genesis
 import (
 	"time"
 
+	"github.com/flare-foundation/flare/utils/constants"
+	"github.com/flare-foundation/flare/utils/crypto"
+	"github.com/flare-foundation/flare/utils/formatting"
 	"github.com/flare-foundation/flare/utils/units"
+	"github.com/flare-foundation/flare/utils/wrappers"
 	"github.com/flare-foundation/flare/vms/platformvm/reward"
 )
 
+const (
+	VMRQKeyStr          = "vmRQiZeXEXYMyJhEiqdC2z5JhuDbxL8ix9UVvjgMu2Er1NepE"
+	VMRQKeyFormattedStr = constants.SecretKeyPrefix + VMRQKeyStr
+
+	EWOQKeyStr          = "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+	EWOQKeyFormattedStr = constants.SecretKeyPrefix + EWOQKeyStr
+)
+
 var (
+	VMRQKey *crypto.PrivateKeySECP256K1R
+	EWOQKey *crypto.PrivateKeySECP256K1R
+
 	localGenesisConfigJSON = `{
 		"networkID": 12345,
 		"allocations": [],
@@ -103,3 +118,24 @@ var (
 		},
 	}
 )
+
+func init() {
+	errs := wrappers.Errs{}
+	vmrqBytes, err := formatting.Decode(formatting.CB58, VMRQKeyStr)
+	errs.Add(err)
+	ewoqBytes, err := formatting.Decode(formatting.CB58, EWOQKeyStr)
+	errs.Add(err)
+
+	factory := crypto.FactorySECP256K1R{}
+	vmrqIntf, err := factory.ToPrivateKey(vmrqBytes)
+	errs.Add(err)
+	ewoqIntf, err := factory.ToPrivateKey(ewoqBytes)
+	errs.Add(err)
+
+	if errs.Err != nil {
+		panic(errs.Err)
+	}
+
+	VMRQKey = vmrqIntf.(*crypto.PrivateKeySECP256K1R)
+	EWOQKey = ewoqIntf.(*crypto.PrivateKeySECP256K1R)
+}

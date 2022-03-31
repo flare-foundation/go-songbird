@@ -3,7 +3,9 @@
 
 package pubsub
 
-import "sync"
+import (
+	"sync"
+)
 
 type connections struct {
 	lock      sync.RWMutex

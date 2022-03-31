@@ -1899,20 +1899,26 @@ func (service *Service) IssueTx(_ *http.Request, args *api.FormattedTx, response
 }
 
 // GetTx gets a tx
-func (service *Service) GetTx(_ *http.Request, args *api.GetTxArgs, response *api.FormattedTx) error {
+func (service *Service) GetTx(_ *http.Request, args *api.GetTxArgs, response *api.GetTxReply) error {
 	service.vm.ctx.Log.Debug("Platform: GetTx called")
 
 	tx, _, err := service.vm.internalState.GetTx(args.TxID)
 	if err != nil {
 		return fmt.Errorf("couldn't get tx: %w", err)
 	}
-
 	txBytes := tx.Bytes()
+	response.Encoding = args.Encoding
+
+	if args.Encoding == formatting.JSON {
+		tx.InitCtx(service.vm.ctx)
+		response.Tx = tx
+		return nil
+	}
+
 	response.Tx, err = formatting.EncodeWithChecksum(args.Encoding, txBytes)
 	if err != nil {
 		return fmt.Errorf("couldn't encode tx as a string: %w", err)
 	}
-	response.Encoding = args.Encoding
 	return nil
 }
 
@@ -2268,5 +2274,27 @@ func (service *Service) GetTimestamp(_ *http.Request, args *struct{}, reply *Get
 	service.vm.ctx.Log.Debug("Platform: GetTimestamp called")
 
 	reply.Timestamp = service.vm.internalState.GetTimestamp()
+	return nil
+}
+
+func (service *Service) GetBlock(_ *http.Request, args *api.GetBlockArgs, response *api.GetBlockResponse) error {
+	service.vm.ctx.Log.Debug("Platform: GetBlock called with args %s", args)
+
+	block, err := service.vm.GetBlock(args.BlockID)
+	if err != nil {
+		return fmt.Errorf("couldn't get block with id %s: %w", args.BlockID, err)
+	}
+	response.Encoding = args.Encoding
+
+	if args.Encoding == formatting.JSON {
+		response.Block = block
+		return nil
+	}
+
+	response.Block, err = formatting.EncodeWithChecksum(args.Encoding, block.Bytes())
+	if err != nil {
+		return fmt.Errorf("couldn't encode block %s as string: %w", args.BlockID, err)
+	}
+
 	return nil
 }

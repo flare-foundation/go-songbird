@@ -16,7 +16,6 @@ type ExternalSender interface {
 	Send(
 		msg message.OutboundMessage,
 		nodeIDs ids.ShortSet,
-		subnetID ids.ID,
 		validatorOnly bool,
 	) ids.ShortSet
 
@@ -24,7 +23,6 @@ type ExternalSender interface {
 	// Nodes are sampled based on their validator status.
 	Gossip(
 		msg message.OutboundMessage,
-		subnetID ids.ID,
 		validatorOnly bool,
 		numValidatorsToSend int,
 		numNonValidatorsToSend int,

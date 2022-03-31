@@ -6,11 +6,10 @@ package avalanche
 import (
 	"testing"
 
-	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/snow/engine/avalanche/vertex"
 )
 
 func TestVotingFinishesWithAbandonedDep(t *testing.T) {
@@ -23,14 +22,14 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 	assert.NoError(t, transitive.Start( /*startReqID*/ 0))
 
 	// prepare 3 validators
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
-	vdr3 := ids.ShortID{3}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
+	validator3 := ids.ShortID{3}
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	// add poll for request 1
@@ -38,8 +37,8 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 
 	validators = ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr3,
+		validator1,
+		validator3,
 	)
 
 	// add poll for request 2
@@ -57,7 +56,7 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 		requestID: 2,
 		response:  []ids.ID{vote2},
 		deps:      ids.NewSet(0),
-		vdr:       vdr1,
+		vdr:       validator1,
 	}
 
 	voter3 := &voter{
@@ -65,7 +64,7 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 		requestID: 2,
 		response:  []ids.ID{vote2},
 		deps:      ids.NewSet(0),
-		vdr:       vdr3,
+		vdr:       validator3,
 	}
 
 	voter1.Update()
@@ -85,7 +84,7 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 		requestID: 1,
 		response:  []ids.ID{vote1},
 		deps:      voter1DepSet,
-		vdr:       vdr1,
+		vdr:       validator1,
 	}
 
 	voter2 := &voter{
@@ -93,7 +92,7 @@ func TestVotingFinishesWithAbandonedDep(t *testing.T) {
 		requestID: 1,
 		response:  []ids.ID{vote1},
 		deps:      ids.NewSet(0),
-		vdr:       vdr2,
+		vdr:       validator2,
 	}
 
 	voter1.Update() // does nothing because the dependency is still pending
@@ -115,14 +114,14 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 	assert.NoError(t, transitive.Start( /*startReqID*/ 0))
 
 	// prepare 3 validators
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
-	vdr3 := ids.ShortID{3}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
+	validator3 := ids.ShortID{3}
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	// add poll for request 1
@@ -130,8 +129,8 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 
 	validators = ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr3,
+		validator1,
+		validator3,
 	)
 
 	// add poll for request 2
@@ -139,8 +138,8 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 
 	validators = ids.ShortBag{}
 	validators.Add(
-		vdr2,
-		vdr3,
+		validator2,
+		validator3,
 	)
 
 	// add poll for request 3
@@ -159,7 +158,7 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 		requestID: 3,
 		response:  []ids.ID{vote3},
 		deps:      ids.NewSet(0),
-		vdr:       vdr3,
+		vdr:       validator3,
 	}
 
 	req3Voter2 := &voter{
@@ -167,7 +166,7 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 		requestID: 3,
 		response:  []ids.ID{vote3},
 		deps:      ids.NewSet(0),
-		vdr:       vdr2,
+		vdr:       validator2,
 	}
 
 	req3Voter1.Update()
@@ -187,7 +186,7 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 		requestID: 2,
 		response:  []ids.ID{vote2},
 		deps:      ids.NewSet(0),
-		vdr:       vdr1,
+		vdr:       validator1,
 	}
 
 	req2Voter2 := &voter{
@@ -195,7 +194,7 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 		requestID: 2,
 		response:  []ids.ID{vote2},
 		deps:      req2Voter2DepSet,
-		vdr:       vdr3,
+		vdr:       validator3,
 	}
 
 	req2Voter1.Update() // does nothing because dep is unfulfilled
@@ -214,7 +213,7 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 		requestID: 1,
 		response:  []ids.ID{vote1},
 		deps:      req1Voter1DepSet,
-		vdr:       vdr1,
+		vdr:       validator1,
 	}
 
 	req1Voter2 := &voter{
@@ -222,7 +221,7 @@ func TestVotingFinishesWithAbandonDepMiddleRequest(t *testing.T) {
 		requestID: 1,
 		response:  []ids.ID{vote1},
 		deps:      ids.NewSet(0),
-		vdr:       vdr2,
+		vdr:       validator2,
 	}
 
 	req1Voter1.Update() // does nothing because the req2/voter1 dependency is still pending
@@ -250,14 +249,14 @@ func TestSharedDependency(t *testing.T) {
 	assert.NoError(t, transitive.Start( /*startReqID*/ 0))
 
 	// prepare 3 validators
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
-	vdr3 := ids.ShortID{3}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
+	validator3 := ids.ShortID{3}
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	// add poll for request 1
@@ -265,8 +264,8 @@ func TestSharedDependency(t *testing.T) {
 
 	validators = ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr3,
+		validator1,
+		validator3,
 	)
 
 	// add poll for request 2
@@ -274,8 +273,8 @@ func TestSharedDependency(t *testing.T) {
 
 	validators = ids.ShortBag{}
 	validators.Add(
-		vdr2,
-		vdr3,
+		validator2,
+		validator3,
 	)
 
 	// add poll for request 3
@@ -295,7 +294,7 @@ func TestSharedDependency(t *testing.T) {
 		requestID: 3,
 		response:  []ids.ID{vote3},
 		deps:      ids.NewSet(0),
-		vdr:       vdr3,
+		vdr:       validator3,
 	}
 
 	req3Voter1.Update()
@@ -305,7 +304,7 @@ func TestSharedDependency(t *testing.T) {
 		requestID: 3,
 		response:  []ids.ID{vote3},
 		deps:      ids.NewSet(0),
-		vdr:       vdr2,
+		vdr:       validator2,
 	}
 
 	req3Voter2.Update()
@@ -323,7 +322,7 @@ func TestSharedDependency(t *testing.T) {
 		requestID: 2,
 		response:  []ids.ID{vote2},
 		deps:      depSet,
-		vdr:       vdr1,
+		vdr:       validator1,
 	}
 
 	// does nothing because dependency is unfulfilled
@@ -334,7 +333,7 @@ func TestSharedDependency(t *testing.T) {
 		requestID: 2,
 		response:  []ids.ID{vote2},
 		deps:      ids.NewSet(0),
-		vdr:       vdr3,
+		vdr:       validator3,
 	}
 
 	req2Voter2.Update()
@@ -347,7 +346,7 @@ func TestSharedDependency(t *testing.T) {
 		requestID: 1,
 		response:  []ids.ID{vote1},
 		deps:      depSet,
-		vdr:       vdr1,
+		vdr:       validator1,
 	}
 
 	// does nothing because dependency is unfulfilled
@@ -358,7 +357,7 @@ func TestSharedDependency(t *testing.T) {
 		requestID: 1,
 		response:  []ids.ID{vote1},
 		deps:      ids.NewSet(0),
-		vdr:       vdr2,
+		vdr:       validator2,
 	}
 
 	req1Voter2.Update()

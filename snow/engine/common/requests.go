@@ -15,8 +15,8 @@ const (
 )
 
 type req struct {
-	vdr ids.ShortID
-	id  uint32
+	validator ids.ShortID
+	id        uint32
 }
 
 // Requests tracks pending container messages from a peer.
@@ -27,14 +27,14 @@ type Requests struct {
 
 // Add a request. Assumes that requestIDs are unique. Assumes that containerIDs
 // are only in one request at a time.
-func (r *Requests) Add(vdr ids.ShortID, requestID uint32, containerID ids.ID) {
+func (r *Requests) Add(validator ids.ShortID, requestID uint32, containerID ids.ID) {
 	if r.reqsToID == nil {
 		r.reqsToID = make(map[ids.ShortID]map[uint32]ids.ID, minRequestsSize)
 	}
-	vdrReqs, ok := r.reqsToID[vdr]
+	vdrReqs, ok := r.reqsToID[validator]
 	if !ok {
 		vdrReqs = make(map[uint32]ids.ID)
-		r.reqsToID[vdr] = vdrReqs
+		r.reqsToID[validator] = vdrReqs
 	}
 	vdrReqs[requestID] = containerID
 
@@ -42,16 +42,16 @@ func (r *Requests) Add(vdr ids.ShortID, requestID uint32, containerID ids.ID) {
 		r.idToReq = make(map[ids.ID]req, minRequestsSize)
 	}
 	r.idToReq[containerID] = req{
-		vdr: vdr,
-		id:  requestID,
+		validator: validator,
+		id:        requestID,
 	}
 }
 
 // Remove attempts to abandon a requestID sent to a validator. If the request is
 // currently outstanding, the requested ID will be returned along with true. If
 // the request isn't currently outstanding, false will be returned.
-func (r *Requests) Remove(vdr ids.ShortID, requestID uint32) (ids.ID, bool) {
-	vdrReqs, ok := r.reqsToID[vdr]
+func (r *Requests) Remove(validator ids.ShortID, requestID uint32) (ids.ID, bool) {
+	vdrReqs, ok := r.reqsToID[validator]
 	if !ok {
 		return ids.ID{}, false
 	}
@@ -61,7 +61,7 @@ func (r *Requests) Remove(vdr ids.ShortID, requestID uint32) (ids.ID, bool) {
 	}
 
 	if len(vdrReqs) == 1 {
-		delete(r.reqsToID, vdr)
+		delete(r.reqsToID, validator)
 	} else {
 		delete(vdrReqs, requestID)
 	}
@@ -78,7 +78,7 @@ func (r *Requests) RemoveAny(containerID ids.ID) bool {
 		return false
 	}
 
-	r.Remove(req.vdr, req.id)
+	r.Remove(req.validator, req.id)
 	return true
 }
 
@@ -95,8 +95,8 @@ func (r *Requests) Contains(containerID ids.ID) bool {
 func (r Requests) String() string {
 	sb := strings.Builder{}
 	sb.WriteString(fmt.Sprintf("Requests: (Num Validators = %d)", len(r.reqsToID)))
-	for vdr, reqs := range r.reqsToID {
-		sb.WriteString(fmt.Sprintf("\n  VDR[%s]: (Outstanding Requests %d)", vdr, len(reqs)))
+	for validator, reqs := range r.reqsToID {
+		sb.WriteString(fmt.Sprintf("\n  VDR[%s]: (Outstanding Requests %d)", validator, len(reqs)))
 		for reqID, containerID := range reqs {
 			sb.WriteString(fmt.Sprintf("\n    Request[%d]: %s", reqID, containerID))
 		}

@@ -50,13 +50,13 @@ func TestCreateAndFinishPoll(t *testing.T) {
 	vtxID := ids.ID{1}
 	votes := []ids.ID{vtxID}
 
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2} // k = 2
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2} // k = 2
 
 	validators := ids.ShortBag{}
 	validators.Add(
-		vdr1,
-		vdr2,
+		validator1,
+		validator2,
 	)
 
 	if s.Len() != 0 {
@@ -69,13 +69,13 @@ func TestCreateAndFinishPoll(t *testing.T) {
 		t.Fatalf("Shouldn't have been able to add a duplicated poll")
 	} else if s.Len() != 1 {
 		t.Fatalf("Should only have one active poll")
-	} else if results := s.Vote(1, vdr1, votes); len(results) > 0 {
+	} else if results := s.Vote(1, validator1, votes); len(results) > 0 {
 		t.Fatalf("Shouldn't have been able to finish a non-existent poll")
-	} else if results = s.Vote(0, vdr1, votes); len(results) > 0 {
+	} else if results = s.Vote(0, validator1, votes); len(results) > 0 {
 		t.Fatalf("Shouldn't have been able to finish an ongoing poll")
-	} else if results = s.Vote(0, vdr1, votes); len(results) > 0 {
+	} else if results = s.Vote(0, validator1, votes); len(results) > 0 {
 		t.Fatalf("Should have dropped a duplicated poll")
-	} else if results = s.Vote(0, vdr2, votes); len(results) == 0 {
+	} else if results = s.Vote(0, validator2, votes); len(results) == 0 {
 		t.Fatalf("Should have finished the poll")
 	} else if len(results) != 1 {
 		t.Fatalf("Wrong number of results returned")
@@ -96,11 +96,11 @@ func TestCreateAndFinishPollOutOfOrder_OlderFinishesFirst(t *testing.T) {
 	s := NewSet(factory, log, namespace, registerer)
 
 	// create validators
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	validators := []ids.ShortID{vdr1, vdr2, vdr3}
+	validators := []ids.ShortID{validator1, validator2, vdr3}
 
 	// create two polls for the two vtxs
 	vdrBag := ids.ShortBag{}
@@ -122,22 +122,22 @@ func TestCreateAndFinishPollOutOfOrder_OlderFinishesFirst(t *testing.T) {
 	var results []ids.UniqueBag
 
 	// vote out of order
-	results = s.Vote(1, vdr1, []ids.ID{vtx1})
+	results = s.Vote(1, validator1, []ids.ID{vtx1})
 	assert.Len(t, results, 0)
-	results = s.Vote(2, vdr2, []ids.ID{vtx2})
+	results = s.Vote(2, validator2, []ids.ID{vtx2})
 	assert.Len(t, results, 0)
 	results = s.Vote(2, vdr3, []ids.ID{vtx2})
 	assert.Len(t, results, 0)
 
-	results = s.Vote(1, vdr2, []ids.ID{vtx1})
+	results = s.Vote(1, validator2, []ids.ID{vtx1})
 	assert.Len(t, results, 0)
 
 	results = s.Vote(1, vdr3, []ids.ID{vtx1}) // poll 1 finished, poll 2 still remaining
 	assert.Len(t, results, 1)                 // because 1 is the oldest
 	assert.Equal(t, vtx1, results[0].List()[0])
 
-	results = s.Vote(2, vdr1, []ids.ID{vtx2}) // poll 2 finished
-	assert.Len(t, results, 1)                 // because 2 is the oldest now
+	results = s.Vote(2, validator1, []ids.ID{vtx2}) // poll 2 finished
+	assert.Len(t, results, 1)                       // because 2 is the oldest now
 	assert.Equal(t, vtx2, results[0].List()[0])
 }
 
@@ -149,11 +149,11 @@ func TestCreateAndFinishPollOutOfOrder_UnfinishedPollsGaps(t *testing.T) {
 	s := NewSet(factory, log, namespace, registerer)
 
 	// create validators
-	vdr1 := ids.ShortID{1}
-	vdr2 := ids.ShortID{2}
+	validator1 := ids.ShortID{1}
+	validator2 := ids.ShortID{2}
 	vdr3 := ids.ShortID{3}
 
-	validators := []ids.ShortID{vdr1, vdr2, vdr3}
+	validators := []ids.ShortID{validator1, validator2, vdr3}
 
 	// create three polls for the two vtxs
 	vdrBag := ids.ShortBag{}
@@ -185,23 +185,23 @@ func TestCreateAndFinishPollOutOfOrder_UnfinishedPollsGaps(t *testing.T) {
 	// 2 finishes first to create a gap of finished poll between two unfinished polls 1 and 3
 	results = s.Vote(2, vdr3, []ids.ID{vtx2})
 	assert.Len(t, results, 0)
-	results = s.Vote(2, vdr2, []ids.ID{vtx2})
+	results = s.Vote(2, validator2, []ids.ID{vtx2})
 	assert.Len(t, results, 0)
-	results = s.Vote(2, vdr1, []ids.ID{vtx2})
+	results = s.Vote(2, validator1, []ids.ID{vtx2})
 	assert.Len(t, results, 0)
 
 	// 3 finishes now, 2 has already finished but 1 is not finished so we expect to receive no results still
-	results = s.Vote(3, vdr2, []ids.ID{vtx3})
+	results = s.Vote(3, validator2, []ids.ID{vtx3})
 	assert.Len(t, results, 0)
 	results = s.Vote(3, vdr3, []ids.ID{vtx3})
 	assert.Len(t, results, 0)
-	results = s.Vote(3, vdr1, []ids.ID{vtx3})
+	results = s.Vote(3, validator1, []ids.ID{vtx3})
 	assert.Len(t, results, 0)
 
 	// 1 finishes now, 2 and 3 have already finished so we expect 3 items in results
-	results = s.Vote(1, vdr1, []ids.ID{vtx1})
+	results = s.Vote(1, validator1, []ids.ID{vtx1})
 	assert.Len(t, results, 0)
-	results = s.Vote(1, vdr2, []ids.ID{vtx1})
+	results = s.Vote(1, validator2, []ids.ID{vtx1})
 	assert.Len(t, results, 0)
 	results = s.Vote(1, vdr3, []ids.ID{vtx1})
 	assert.Len(t, results, 3)
@@ -223,10 +223,10 @@ func TestSetString(t *testing.T) {
 	registerer := prometheus.NewRegistry()
 	s := NewSet(factory, log, namespace, registerer)
 
-	vdr1 := ids.ShortID{1} // k = 1
+	validator1 := ids.ShortID{1} // k = 1
 
 	validators := ids.ShortBag{}
-	validators.Add(vdr1)
+	validators.Add(validator1)
 
 	expected := `current polls: (Size = 1)
     RequestID 0:

@@ -3,7 +3,9 @@
 
 package database
 
-import "errors"
+import (
+	"errors"
+)
 
 // common errors
 var (

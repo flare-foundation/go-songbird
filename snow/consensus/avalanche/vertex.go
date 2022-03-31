@@ -6,11 +6,14 @@ package avalanche
 import (
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowstorm"
+	"github.com/flare-foundation/flare/vms/components/verify"
 )
 
 // Vertex is a collection of multiple transactions tied to other vertices
 type Vertex interface {
 	choices.Decidable
+	// Vertex verification should be performed before issuance.
+	verify.Verifiable
 	snowstorm.Whitelister
 
 	// Returns the vertices this vertex depends on

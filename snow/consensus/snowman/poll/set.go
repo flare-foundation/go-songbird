@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/flare-foundation/flare/utils/linkedhashmap"
-
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/flare-foundation/flare/ids"

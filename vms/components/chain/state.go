@@ -6,13 +6,14 @@ package chain
 import (
 	"fmt"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flare-foundation/flare/cache"
 	"github.com/flare-foundation/flare/cache/metercacher"
 	"github.com/flare-foundation/flare/database"
 	"github.com/flare-foundation/flare/ids"
 	"github.com/flare-foundation/flare/snow/choices"
 	"github.com/flare-foundation/flare/snow/consensus/snowman"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // State implements an efficient caching layer used to wrap a VM
@@ -177,11 +178,39 @@ func NewMeteredState(
 	return c, nil
 }
 
+// SetLastAcceptedBlock sets the last accepted block to [lastAcceptedBlock]. This should be called
+// with an internal block - not a wrapped block returned from state.
+//
+// This also flushes [lastAcceptedBlock] from missingBlocks and unverifiedBlocks to
+// ensure that their contents stay valid.
+func (s *State) SetLastAcceptedBlock(lastAcceptedBlock snowman.Block) error {
+	if len(s.verifiedBlocks) != 0 {
+		return fmt.Errorf("cannot set chain state last accepted block with non-zero number of verified blocks in processing: %d", len(s.verifiedBlocks))
+	}
+
+	// [lastAcceptedBlock] is no longer missing or unverified, so we evict it from the corresponding
+	// caches.
+	//
+	// Note: there's no need to evict from the decided blocks cache or bytesToIDCache since their
+	// contents will still be valid.
+	lastAcceptedBlockID := lastAcceptedBlock.ID()
+	s.missingBlocks.Evict(lastAcceptedBlockID)
+	s.unverifiedBlocks.Evict(lastAcceptedBlockID)
+	s.lastAcceptedBlock = &BlockWrapper{
+		Block: lastAcceptedBlock,
+		state: s,
+	}
+	s.decidedBlocks.Put(lastAcceptedBlockID, s.lastAcceptedBlock)
+
+	return nil
+}
+
 // Flush each block cache
 func (s *State) Flush() {
 	s.decidedBlocks.Flush()
 	s.missingBlocks.Flush()
 	s.unverifiedBlocks.Flush()
+	s.bytesToIDCache.Flush()
 }
 
 // GetBlock returns the BlockWrapper as snowman.Block corresponding to [blkID]

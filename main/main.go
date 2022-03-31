@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/pflag"
+
 	"github.com/flare-foundation/flare/app/runner"
 	"github.com/flare-foundation/flare/config"
 	"github.com/flare-foundation/flare/version"
-	"github.com/spf13/pflag"
 )
 
 func main() {
