@@ -522,18 +522,6 @@ func TestGenesis(t *testing.T) {
 		}
 	}
 
-	// Ensure current validator set of primary network is correct
-	vdrSet := vm.Validators
-	currentValidators := vdrSet.List()
-	if len(currentValidators) != len(genesisState.Validators) {
-		t.Fatal("vm's current validator set is wrong")
-	}
-	for _, key := range keys {
-		if addr := key.PublicKey().Address(); !vdrSet.Contains(addr) {
-			t.Fatalf("should have had validator with NodeID %s", addr)
-		}
-	}
-
 	// Ensure genesis timestamp is correct
 	if timestamp := vm.internalState.GetTimestamp(); timestamp.Unix() != int64(genesisState.Time) {
 		t.Fatalf("vm's time is incorrect. Expected %v got %v", genesisState.Time, timestamp)
