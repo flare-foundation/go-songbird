@@ -127,7 +127,7 @@ message Request {
     // remote_addr allows HTTP servers and other software to record
     // the network address that sent the request
     string remote_addr = 14;
-    // request_uri is the unmodified request-target 
+    // request_uri is the unmodified request-target
     string request_uri = 15;
     // tls connection state
     ConnectionState tls = 16;

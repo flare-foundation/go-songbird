@@ -12,7 +12,7 @@ service Conn {
     // Close closes the connection.
     rpc Close(google.protobuf.Empty) returns (google.protobuf.Empty);
     // SetDeadline sets the read and write deadlines associated
-    // with the connection. 
+    // with the connection.
     rpc SetDeadline(SetDeadlineRequest) returns (google.protobuf.Empty);
     // SetReadDeadline sets the deadline for future Read calls
     // and any currently-blocked Read call.
