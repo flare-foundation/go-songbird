@@ -7,4 +7,4 @@
 
 # Set up the versions to be used
 # Don't export them as their used in the context of other calls
-coreth_version=${CORETH_VERSION:-'cd054a7bc620d06f1ee66363e0dac42250b03e84'}
+coreth_version=${CORETH_VERSION:-'0f4f1413cdbe4675c03f097f0d61502cc6081f08'}
