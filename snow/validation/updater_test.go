@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 func TestNewRetrievingUpdater(t *testing.T) {
@@ -31,7 +32,7 @@ func TestNewRetrievingUpdater(t *testing.T) {
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
-		u := NewRetrievingUpdater(loadCostonValidators(t), cr)
+		u := NewRetrievingUpdater(logging.NoLog{}, loadCostonValidators(t), cr)
 
 		err := u.UpdateValidators(testBlockID)
 		require.NoError(t, err)
@@ -52,7 +53,7 @@ func TestNewRetrievingUpdater(t *testing.T) {
 			},
 		}
 		cr := NewCachingRetriever(retrieverMock)
-		u := NewRetrievingUpdater(NewSet(), cr)
+		u := NewRetrievingUpdater(logging.NoLog{}, NewSet(), cr)
 
 		err := u.UpdateValidators(testBlockID)
 		require.Error(t, err)

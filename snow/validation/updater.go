@@ -7,27 +7,30 @@ import (
 	"fmt"
 
 	"github.com/flare-foundation/flare/ids"
+	"github.com/flare-foundation/flare/utils/logging"
 )
 
 type Updater interface {
 	UpdateValidators(blockID ids.ID) error
 }
 
-func NewRetrievingUpdater(validators Set, retriever Retriever) *RetrievingUpdater {
+func NewRetrievingUpdater(log logging.Logger, validators Set, retrieve Retriever) *RetrievingUpdater {
 	u := RetrievingUpdater{
+		log:        log,
 		validators: validators,
-		retriever:  retriever,
+		retrieve:   retrieve,
 	}
 	return &u
 }
 
 type RetrievingUpdater struct {
+	log        logging.Logger
 	validators Set
-	retriever  Retriever
+	retrieve   Retriever
 }
 
 func (u *RetrievingUpdater) UpdateValidators(blockID ids.ID) error {
-	validators, err := u.retriever.GetValidators(blockID)
+	validators, err := u.retrieve.GetValidators(blockID)
 	if err != nil {
 		return fmt.Errorf("could not get validators for updating: %w", err)
 	}
@@ -35,5 +38,6 @@ func (u *RetrievingUpdater) UpdateValidators(blockID ids.ID) error {
 	if err != nil {
 		return fmt.Errorf("could not set validators: %w", err)
 	}
+	u.log.Debug("validators updated: %s", validators)
 	return nil
 }

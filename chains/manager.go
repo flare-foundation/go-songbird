@@ -772,7 +772,7 @@ func (m *manager) createSnowmanChain(
 	retriever, ok := vm.(validation.Retriever)
 	if ok {
 		ctx.ValidatorsRetriever = validation.NewCachingRetriever(retriever)
-		ctx.ValidatorsUpdater = validation.NewRetrievingUpdater(m.Validators, ctx.ValidatorsRetriever)
+		ctx.ValidatorsUpdater = validation.NewRetrievingUpdater(m.Log, m.Validators, ctx.ValidatorsRetriever)
 	}
 
 	// Initialize the ProposerVM and the vm wrapped inside it
