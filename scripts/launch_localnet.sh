@@ -6,7 +6,8 @@ mkdir -p ./logs/node1 ./logs/node2 ./logs/node3 ./logs/node4 ./logs/node5 ./logs
 export CUSTOM_VALIDATORS="NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg,NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu,NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu"
 
 printf "Launching node 1 at 127.0.0.1:9650\n"
-./build/flare --network-id=local \
+./build/flare --network-id=1337 \
+    --genesis=./scripts/genesis/staging.json \
     --public-ip=127.0.0.1 \
     --http-port=9650 \
     --staking-port=9651 \
@@ -22,7 +23,8 @@ NODE_1_PID=`echo $!`
 sleep 1
 
 printf "Launching node 2 at 127.0.0.1:9660\n"
-./build/flare --network-id=local \
+./build/flare --network-id=1337 \
+    --genesis=./scripts/genesis/staging.json \
     --public-ip=127.0.0.1 \
     --http-port=9660 \
     --staking-port=9661 \
@@ -38,14 +40,15 @@ NODE_2_PID=`echo $!`
 sleep 1
 
 printf "Launching node 3 at 127.0.0.1:9670\n"
-./build/flare --network-id=local \
+./build/flare --network-id=1337 \
+    --genesis=./scripts/genesis/staging.json \
     --public-ip=127.0.0.1 \
     --http-port=9670 \
     --staking-port=9671 \
     --log-dir=./logs/node3 \
     --db-dir=./db/node3 \
-    --bootstrap-ips=127.0.0.1:9651 \
-    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg \
+    --bootstrap-ips=127.0.0.1:9651,127.0.0.1:9661 \
+    --bootstrap-ids=NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg,NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu \
     --staking-tls-cert-file=./scripts/keys/NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu.crt \
     --staking-tls-key-file=./scripts/keys/NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu.key \
     --db-type=leveldb \
@@ -54,7 +57,8 @@ NODE_3_PID=`echo $!`
 sleep 1
 
 printf "Launching node 4 at 127.0.0.1:9680\n"
-./build/flare --network-id=local \
+./build/flare --network-id=1337 \
+    --genesis=./scripts/genesis/staging.json \
     --public-ip=127.0.0.1 \
     --http-port=9680 \
     --staking-port=9681 \
@@ -70,7 +74,8 @@ NODE_4_PID=`echo $!`
 sleep 1
 
 printf "Launching node 5 at 127.0.0.1:9690\n"
-./build/flare --network-id=local \
+./build/flare --network-id=1337 \
+    --genesis=./scripts/genesis/staging.json \
     --public-ip=127.0.0.1 \
     --http-port=9690 \
     --staking-port=9691 \
@@ -86,7 +91,8 @@ NODE_5_PID=`echo $!`
 sleep 1
 
 printf "Launching node 6 at 127.0.0.1:9700\n"
-./build/flare --network-id=local \
+./build/flare --network-id=1337 \
+    --genesis=./scripts/genesis/staging.json \
     --public-ip=127.0.0.1 \
     --http-port=9700 \
     --staking-port=9701 \

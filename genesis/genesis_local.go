@@ -59,8 +59,7 @@ var (
 			"apricotPhase2BlockTimestamp": 0,
 			"apricotPhase3BlockTimestamp": 0,
 			"apricotPhase4BlockTimestamp": 0,
-			"apricotPhase5BlockTimestamp": 0,
-			"flareHardFork1BlockTimestamp": 0
+			"apricotPhase5BlockTimestamp": 0
 		},
 		"nonce": "0x0",
 		"timestamp": "0x0",
