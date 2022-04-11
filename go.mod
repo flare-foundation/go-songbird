@@ -11,7 +11,7 @@ require (
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/decred/dcrd/dcrec/secp256k1/v3 v3.0.0-20200627015759-01fd2de07837
-	github.com/flare-foundation/coreth v0.4.2-0.20220407225911-7f94424a9855
+	github.com/flare-foundation/coreth v0.4.2-0.20220411134722-736f7e0ae76f
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/google/btree v1.0.1
