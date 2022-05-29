@@ -3,7 +3,7 @@
 mkdir -p ./db/node1 ./db/node2 ./db/node3 ./db/node4 ./db/node5 ./db/node6
 mkdir -p ./logs/node1 ./logs/node2 ./logs/node3 ./logs/node4 ./logs/node5 ./logs/node6
 
-export CUSTOM_VALIDATORS="NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg,NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu,NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu"
+export CUSTOM_DEFAULT_VALIDATORS="NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg,NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu,NodeID-K9vx5sYL3aAq4Jt4SmXY1FasP2hpwpPNu"
 
 printf "Launching node 1 at 127.0.0.1:9650\n"
 ./build/flare --network-id=1337 \
