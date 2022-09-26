@@ -1,4 +1,4 @@
-# Flare
+# Songbird & Coston 1
 
 Node implementation for the [Flare](https://flare.network) network.
 
@@ -9,9 +9,9 @@ Note that as network usage increases, hardware requirements may change.
 
 The minimum recommended hardware specification for nodes connected to Mainnet is:
 
-- CPU: Equivalent of 8 AWS vCPU
+- CPU: Equivalent of 8 vCPU
 - RAM: 16 GiB
-- Storage: 512 GiB
+- Storage: 2.5TB for a full archive node 1TB for pruning
 - OS: Ubuntu 18.04/20.04 or macOS >= 10.15 (Catalina)
 - Network: Reliable IPv4 or IPv6 network connection, with an open public port.
 
@@ -26,11 +26,13 @@ If you plan to build Flare from source, you will also need the following softwar
 Clone the Flare repository:
 
 ```sh
-git clone https://github.com/flare-foundation/flare.git
-cd flare
+git clone https://github.com/flare-foundation/go-songbird.git
+cd go-songbird
 ```
 
-This will clone and checkout to `master` branch.
+This will clone and checkout to `master` branch. 
+
+Please build and use the latest tag `0.6.2`
 
 ### Building the Flare Executable
 
@@ -40,31 +42,10 @@ Build Flare using the build script:
 ./scripts/build.sh
 ```
 
-If you want to build the binary with RocksDB support, you need to export the corresponding environment variable _before_ building:
-
-```sh
-export ROCKSDBALLOWED=1
-```
-
-The Flare binary, named `flare`, is in the `build` directory.
+The service binary is named `flare` and is in the `build` directory.
 
 
-## Running Flare
-
-### Legacy Version Upgrade
-
-**Please note that the default database engine has changed from RocksDB to LevelDB.**
-
-The RocksDB library used by the upstream Avalanche code base is flawed and the database itself is liable to data corruption.
-LevelDB is a more mature and stable choice, and should provide a more reliable experience, while using less storage space.
-
-**If you still want to use your previous database, there are a number of changes you need to be aware of:**
-
-1. The default parent directory for logs, databases and configuration files changed from `$HOME/.avalanchego` to `$HOME/.flare`.
-2. The name of the sub-directories in the database directory changed from `db/fuji` to `db/songbird` and `db/coston` respectively.
-3. The node needs to be built with the `ROCKSDBALLOWED=1` environment variable and launched with the `--db-type=rocksdb` flag.
-
-**However, we recommend that all node operators resync their nodes from scratch using LevelDB.**
+## Running the Flare binary
 
 ### Connecting to Coston
 
