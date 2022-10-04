@@ -27,7 +27,7 @@ Clone the Flare repository:
 
 ```sh
 git clone https://github.com/flare-foundation/go-songbird.git
-cd go-songbird
+cd go-songbird/avalanchego
 ```
 
 This will clone and checkout to `master` branch. 
