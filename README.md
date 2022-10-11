@@ -32,7 +32,7 @@ cd go-songbird/avalanchego
 
 This will clone and checkout to `master` branch. 
 
-Please build and use the latest tag `0.6.3`
+Please build and use the latest tag `0.6.4`
 
 ### Building the Flare Executable
 
