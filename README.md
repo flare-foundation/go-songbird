@@ -6,6 +6,12 @@ Node implementation for the [Flare](https://flare.network) network.
 
 *The fast and simple way of using go-songbird*
 
+Public container images are hosted on Docker HUB and Github Packages;
+```
+docker.io/flarenetwork/go-songbird
+hgcr.io/flare-foundation/go-songbird
+```
+
 ### Container builds in CI
 
 CI builds on each:
