@@ -6,9 +6,9 @@ Node implementation for the [Flare](https://flare.network) network.
 
 *The fast and simple way of using go-songbird*
 
-Public container images are hosted on Docker HUB and Github Packages;
+Public container images are hosted on [Docker HUB](https://hub.docker.com/r/flarefoundation/go-songbird) and [Github Packages](https://github.com/orgs/flare-foundation/packages?repo_name=go-songbird);
 ```
-docker.io/flarenetwork/go-songbird
+docker.io/flarefoundation/go-songbird
 hgcr.io/flare-foundation/go-songbird
 ```
 
