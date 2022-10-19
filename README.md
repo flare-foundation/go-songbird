@@ -2,6 +2,27 @@
 
 Node implementation for the [Flare](https://flare.network) network.
 
+## Running containers
+
+*The fast and simple way of using go-songbird*
+
+Public container images are hosted on [Docker HUB](https://hub.docker.com/r/flarefoundation/go-songbird) and [Github Packages](https://github.com/orgs/flare-foundation/packages?repo_name=go-songbird);
+```
+docker.io/flarefoundation/go-songbird
+hgcr.io/flare-foundation/go-songbird
+```
+
+### Container builds in CI
+
+CI builds on each:
+- push on `main` branch, pushes image tagged as "dev"
+- creation of a tag, pushes images tagged as the tag itself
+
+Builds: \
+two images, `go-songbird:<TAG>` one with `leveldb`
+
+
+
 ## Installation
 
 Flare uses a relatively lightweight consensus protocol, so the minimum computer requirements are modest.
