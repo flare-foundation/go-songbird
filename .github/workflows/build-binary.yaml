@@ -9,7 +9,6 @@ on:
 
 env:
   go_version: 1.18.5
-  GOPATH: ~/.go
 
 jobs:
   build:
@@ -33,6 +32,8 @@ jobs:
     
     - run: sudo apt-get update -y && sudo apt-get install -y rsync
     - name: build
+      env:
+        GOPATH: /home/runner/work/go-songbird/go
       id: build
       run: |
         cd avalanchego
