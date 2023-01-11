@@ -49,11 +49,11 @@ These are the environment variables you can edit and their default values:
 | `BOOTSTRAP_IDS` | _(empty)_ | A list of bootstrap server ids; ref [--bootstrap-ids-string](https://docs.avax.network/nodes/maintain/avalanchego-config-flags#--bootstrap-ids-string) |
 | `CHAIN_CONFIG_DIR` | `/app/conf` | Configuration folder where you need to mount your configuration files |
 | `LOG_DIR` | `/app/logs` | Logging directory |
-| `LOG_LEVEL` | `info` | Logging level that will be logged into the files |
-| `NETWORK_ID` | `coston` | Name of the network you want to connect to |
+| `LOG_LEVEL` | `info` | Logging level set with AvalancheGo flag [`--log-level`](https://docs.avax.network/nodes/maintain/avalanchego-config-flags#--log-level-string-verbo-debug-trace-info-warn-error-fatal-off). |
+| `NETWORK_ID` | `coston` | Name of the network you want to connect to. Can be `coston` or `songbird` |
 | `AUTOCONFIGURE_PUBLIC_IP` | `0` | Set to `1` to autoconfigure `PUBLIC_IP`, skipped if PUBLIC_IP is set |
 | `AUTOCONFIGURE_BOOTSTRAP` | `0` | Set to `1` to autoconfigure `BOOTSTRAP_IPS` and `BOOTSTRAP_IDS` |
-| `AUTOCONFIGURE_BOOTSTRAP_ENDPOINT` | `https://coston.flare.network/ext/info` or<br> `https://songbird.flare.network/ext/info` | Endpoint that the bootstrap auto-configuration works |
+| `AUTOCONFIGURE_BOOTSTRAP_ENDPOINT` | `https://coston.flare.network/ext/info` | Endpoint that the bootstrap auto-configuration works. Possible values: `https://coston.flare.network/ext/info` or `https://songbird.flare.network/ext/info` |
 | `BOOTSTRAP_BEACON_CONNECTION_TIMEOUT` | `1m` | Set the duration value (eg. `45s` / `5m` / `1h`) for [--bootstrap-beacon-connection-timeout](https://docs.avax.network/nodes/maintain/avalanchego-config-flags#--bootstrap-beacon-connection-timeout-duration) AvalancheGo flag. | 
 | `EXTRA_ARGUMENTS` | | Extra arguments passed to flare binary |
 
