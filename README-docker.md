@@ -53,7 +53,8 @@ These are the environment variables you can edit and their default values:
 | `NETWORK_ID` | `coston` | Name of the network you want to connect to |
 | `AUTOCONFIGURE_PUBLIC_IP` | `0` | Set to `1` to autoconfigure `PUBLIC_IP`, skipped if PUBLIC_IP is set |
 | `AUTOCONFIGURE_BOOTSTRAP` | `0` | Set to `1` to autoconfigure `BOOTSTRAP_IPS` and `BOOTSTRAP_IDS` |
-| `AUTOCONFIGURE_BOOTSTRAP_ENDPOINT` | `https://coston.flare.network/ext/info` <b>or</b> `https://songbird.flare.network/ext/info` | Endpoint that the bootstrap auto-configuration works |
+| `AUTOCONFIGURE_BOOTSTRAP_ENDPOINT` | `https://coston.flare.network/ext/info` or<br> `https://songbird.flare.network/ext/info` | Endpoint that the bootstrap auto-configuration works |
+| `BOOTSTRAP_BEACON_CONNECTION_TIMEOUT` | `1m` | Set the duration value (eg. `45s` / `5m` / `1h`) for [--bootstrap-beacon-connection-timeout](https://docs.avax.network/nodes/maintain/avalanchego-config-flags#--bootstrap-beacon-connection-timeout-duration) AvalancheGo flag. | 
 | `EXTRA_ARGUMENTS` | | Extra arguments passed to flare binary |
 
 ## Node Configuration
