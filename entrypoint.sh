@@ -4,13 +4,22 @@ set -eo pipefail
 
 if [ "$AUTOCONFIGURE_PUBLIC_IP" = "1" ];
 then
-	if [ "$PUBLIC_IP" = "" ];
+	if [ -z "$PUBLIC_IP" ];
 	then
 		echo "Autoconfiguring public IP"
-		PUBLIC_IP=$(curl https://api.ipify.org/)
+		PUBLIC_IP=$(curl -s -m 10 https://flare.network/cdn-cgi/trace | grep 'ip=' | cut -d'=' -f2)
 	else
 		echo "/!\\ AUTOCONFIGURE_PUBLIC_IP is enabled, but PUBLIC_IP is already set to '$PUBLIC_IP'! Skipping autoconfigure and using current PUBLIC_IP value!"
 	fi
+else
+	echo "AUTOCONFIGURE_PUBLIC_IP set to disable, checking PUBLIC_IP environment variable."
+	if [ -z "$PUBLIC_IP" ];
+	then 
+		echo "PUBLIC_IP environment variable is empty!"
+		exit 1
+	else
+		$PUBLIC_IP=$PUBLIC_IP
+
 fi
 
 # Check if we can connect to the bootstrap endpoint (whitelisting)
