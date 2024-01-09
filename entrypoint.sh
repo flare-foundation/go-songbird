@@ -11,9 +11,6 @@ then
 	else
 		echo "/!\\ AUTOCONFIGURE_PUBLIC_IP is enabled, but PUBLIC_IP is already set to '$PUBLIC_IP'! Skipping autoconfigure and using current PUBLIC_IP value!"
 	fi
-else
-		$PUBLIC_IP=$PUBLIC_IP
-
 fi
 
 # Check if we can connect to the bootstrap endpoint (whitelisting)
