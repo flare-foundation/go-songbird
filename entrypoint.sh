@@ -28,7 +28,7 @@ then
 	BOOTSTRAP_IDS=$(curl -m 10 -sX POST --data '{ "jsonrpc":"2.0", "id":1, "method":"info.getNodeID" }' -H 'content-type:application/json;' "$AUTOCONFIGURE_BOOTSTRAP_ENDPOINT" | jq -r ".result.nodeID")
 fi
 
-/app/build/flare \
+exec /app/build/flare \
 	--http-host=$HTTP_HOST \
 	--http-port=$HTTP_PORT \
 	--staking-port=$STAKING_PORT \
