@@ -6,11 +6,25 @@ package core
 import (
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
+	"github.com/flare-foundation/flare/coreth/params"
 
 	"github.com/flare-foundation/flare/coreth/core/vm"
+)
+
+var (
+	// Define activation times for submitter contract
+	submitterContractActivationTimeSongbird = big.NewInt(time.Date(2024, time.March, 1, 12, 0, 0, 0, time.UTC).Unix())
+	submitterContractActivationTimeCoston   = big.NewInt(time.Date(2024, time.January, 31, 12, 0, 0, 0, time.UTC).Unix())
+
+	// Define ftso and submitter contract addresses
+	prioritisedFTSOContractAddress = common.HexToAddress("0x1000000000000000000000000000000000000003")
+
+	prioritisedSubmitterContractAddressSongbird = common.HexToAddress("0x200000000000000000000000000000000000000a")
+	prioritisedSubmitterContractAddressCoston   = common.HexToAddress("0x300000000000000000000000000000000000000b")
 )
 
 // Define errors
@@ -65,12 +79,42 @@ func GetSystemTriggerSelector(blockNumber *big.Int) []byte {
 	}
 }
 
-func GetPrioritisedFTSOContract(blockTime *big.Int) string {
+func isPrioritisedFTSOContract(to *common.Address) bool {
+	return to != nil && *to == prioritisedFTSOContractAddress
+}
+
+func isPrioritisedSubmitterContract(chainID *big.Int, to *common.Address, blockTime *big.Int) bool {
 	switch {
+	case to == nil || chainID == nil || blockTime == nil:
+		return false
+	case chainID.Cmp(params.SongbirdChainID) == 0:
+		return *to == prioritisedSubmitterContractAddressSongbird &&
+			blockTime.Cmp(submitterContractActivationTimeSongbird) >= 0
+	case chainID.Cmp(params.CostonChainID) == 0:
+		return *to == prioritisedSubmitterContractAddressCoston &&
+			blockTime.Cmp(submitterContractActivationTimeCoston) >= 0
 	default:
-		return "0x1000000000000000000000000000000000000003"
+		return false
 	}
 }
+
+func IsPrioritisedContractCall(chainID *big.Int, to *common.Address, ret []byte, blockTime *big.Int) bool {
+	switch {
+	case isPrioritisedFTSOContract(to):
+		return true
+	case isPrioritisedSubmitterContract(chainID, to, blockTime):
+		return !isZeroSlice(ret)
+	default:
+		return false
+	}
+}
+
+// func GetPrioritisedFTSOContract(blockTime *big.Int) string {
+// 	switch {
+// 	default:
+// 		return "0x1000000000000000000000000000000000000003"
+// 	}
+// }
 
 func GetMaximumMintRequest(blockNumber *big.Int) *big.Int {
 	switch {
@@ -146,4 +190,13 @@ func triggerKeeperAndMint(evm EVMCaller, log log.Logger) {
 	} else {
 		log.Warn("Keeper trigger in error", "error", triggerErr)
 	}
+}
+
+func isZeroSlice(s []byte) bool {
+	for i := len(s) - 1; i >= 0; i-- {
+		if s[i] != 0 {
+			return false
+		}
+	}
+	return true
 }
