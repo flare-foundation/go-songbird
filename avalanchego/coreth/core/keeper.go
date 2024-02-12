@@ -89,10 +89,10 @@ func isPrioritisedSubmitterContract(chainID *big.Int, to *common.Address, blockT
 		return false
 	case chainID.Cmp(params.SongbirdChainID) == 0:
 		return *to == prioritisedSubmitterContractAddressSongbird &&
-			blockTime.Cmp(submitterContractActivationTimeSongbird) >= 0
+			blockTime.Cmp(submitterContractActivationTimeSongbird) > 0
 	case chainID.Cmp(params.CostonChainID) == 0:
 		return *to == prioritisedSubmitterContractAddressCoston &&
-			blockTime.Cmp(submitterContractActivationTimeCoston) >= 0
+			blockTime.Cmp(submitterContractActivationTimeCoston) > 0
 	default:
 		return false
 	}
@@ -108,13 +108,6 @@ func IsPrioritisedContractCall(chainID *big.Int, to *common.Address, ret []byte,
 		return false
 	}
 }
-
-// func GetPrioritisedFTSOContract(blockTime *big.Int) string {
-// 	switch {
-// 	default:
-// 		return "0x1000000000000000000000000000000000000003"
-// 	}
-// }
 
 func GetMaximumMintRequest(blockNumber *big.Int) *big.Int {
 	switch {
