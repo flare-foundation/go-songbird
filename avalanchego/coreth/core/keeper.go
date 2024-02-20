@@ -17,14 +17,13 @@ import (
 
 var (
 	// Define activation times for submitter contract
-	submitterContractActivationTimeSongbird = big.NewInt(time.Date(2024, time.March, 1, 12, 0, 0, 0, time.UTC).Unix())
-	submitterContractActivationTimeCoston   = big.NewInt(time.Date(2024, time.January, 31, 12, 0, 0, 0, time.UTC).Unix())
+	submitterContractActivationTimeSongbird = big.NewInt(time.Date(2024, time.March, 15, 12, 0, 0, 0, time.UTC).Unix())
+	submitterContractActivationTimeCoston   = big.NewInt(time.Date(2024, time.February, 22, 14, 0, 0, 0, time.UTC).Unix())
 
 	// Define ftso and submitter contract addresses
 	prioritisedFTSOContractAddress = common.HexToAddress("0x1000000000000000000000000000000000000003")
 
-	prioritisedSubmitterContractAddressSongbird = common.HexToAddress("0x200000000000000000000000000000000000000a")
-	prioritisedSubmitterContractAddressCoston   = common.HexToAddress("0x300000000000000000000000000000000000000b")
+	prioritisedSubmitterContractAddress = common.HexToAddress("0x2cA6571Daa15ce734Bbd0Bf27D5C9D16787fc33f")
 )
 
 // Define errors
@@ -88,10 +87,10 @@ func isPrioritisedSubmitterContract(chainID *big.Int, to *common.Address, blockT
 	case to == nil || chainID == nil || blockTime == nil:
 		return false
 	case chainID.Cmp(params.SongbirdChainID) == 0:
-		return *to == prioritisedSubmitterContractAddressSongbird &&
+		return *to == prioritisedSubmitterContractAddress &&
 			blockTime.Cmp(submitterContractActivationTimeSongbird) > 0
 	case chainID.Cmp(params.CostonChainID) == 0:
-		return *to == prioritisedSubmitterContractAddressCoston &&
+		return *to == prioritisedSubmitterContractAddress &&
 			blockTime.Cmp(submitterContractActivationTimeCoston) > 0
 	default:
 		return false

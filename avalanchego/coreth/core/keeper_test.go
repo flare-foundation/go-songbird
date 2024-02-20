@@ -454,8 +454,8 @@ func TestKeeperTriggerShouldNotMintMoreThanLimit(t *testing.T) {
 
 func TestPrioritisedContract(t *testing.T) {
 	address := common.HexToAddress("0x123456789aBCdEF123456789aBCdef123456789A")
-	preForkTime := big.NewInt(time.Date(2024, time.February, 1, 12, 0, 0, 0, time.UTC).Unix())
-	postForkTime := big.NewInt(time.Date(2024, time.March, 2, 12, 0, 0, 0, time.UTC).Unix())
+	preForkTime := big.NewInt(time.Date(2024, time.March, 13, 12, 0, 0, 0, time.UTC).Unix())
+	postForkTime := big.NewInt(time.Date(2024, time.March, 16, 12, 0, 0, 0, time.UTC).Unix())
 	ret0 := [32]byte{}
 	ret1 := [32]byte{}
 	ret1[31] = 1
@@ -466,16 +466,16 @@ func TestPrioritisedContract(t *testing.T) {
 	if !IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedFTSOContractAddress, nil, preForkTime) {
 		t.Errorf("Expected true for FTSO contract")
 	}
-	if IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddressSongbird, ret1[:], preForkTime) {
+	if IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddress, ret1[:], preForkTime) {
 		t.Errorf("Expected false for submitter contract before activation")
 	}
-	if !IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddressSongbird, ret1[:], postForkTime) {
+	if !IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddress, ret1[:], postForkTime) {
 		t.Errorf("Expected true for submitter contract after activation")
 	}
-	if IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddressSongbird, ret0[:], postForkTime) {
+	if IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddress, ret0[:], postForkTime) {
 		t.Errorf("Expected false for submitter contract with wrong return value")
 	}
-	if IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddressSongbird, nil, postForkTime) {
+	if IsPrioritisedContractCall(params.SongbirdChainID, &prioritisedSubmitterContractAddress, nil, postForkTime) {
 		t.Errorf("Expected false for submitter contract with no return value")
 	}
 }

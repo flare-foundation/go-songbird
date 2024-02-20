@@ -122,15 +122,15 @@ func GetDefaultAttestors(chainID *big.Int, blockTime *big.Int) []common.Address 
 		switch {
 		case blockTime.Cmp(submitterContractActivationTimeSongbird) > 0:
 			return []common.Address{
-				common.HexToAddress("0x2D3e7e4b19bDc920fd9C57BD3072A31F5a59FeC8"),
-				common.HexToAddress("0x442DD539Fe78D43A1a9358FF3460CfE63e2bC9CC"),
-				common.HexToAddress("0x49893c5Dfc035F4eE4E46faC014f6D4bC80F7f92"),
-				common.HexToAddress("0x5D2f75392DdDa69a2818021dd6a64937904c8352"),
-				common.HexToAddress("0x6455dC38fdF739b6fE021b30C7D9672C1c6DEb5c"),
-				common.HexToAddress("0x808441Ec3Fa1721330226E69527Bc160D8d9386a"),
-				common.HexToAddress("0x823B0f5c7758E9d3bE55bA1EA840E29ccd5D5CcB"),
-				common.HexToAddress("0x85016969b9eBDB8977975a4743c9FCEeabCEAf8A"),
-				common.HexToAddress("0x8A3D627D86A81F5D21683F4963565C63DB5e1309"),
+				common.HexToAddress("0xcE397b9a395ace2e328030699bDDf4E2F049A05B"),
+				common.HexToAddress("0xeDBb013BBC314124a9f842c1887e34cfeB03B052"),
+				common.HexToAddress("0xb9eF3951ac2D04C6bdD886bF042041E3954E86aF"),
+				common.HexToAddress("0x816Cec8f3A37Fd673Cfd4229441c59cA8DbD0641"),
+				common.HexToAddress("0x14c9c4583F0b1af8a69452Ec1b29884240f83bDC"),
+				common.HexToAddress("0x0049081C2D6def64800cC011Bd9aDe8682c6593a"),
+				common.HexToAddress("0x53Fcb50a22aFd6e5438d754CB22c4726032d2488"),
+				common.HexToAddress("0x35f4F0Bb73a6040F24927e1735B089d7769F7674"),
+				common.HexToAddress("0x3B583C919fD4C863F3A17d11929346C687FfB7c3"),
 			}
 		case blockTime.Cmp(songbirdOct22ForkTime) > 0:
 			return []common.Address{
