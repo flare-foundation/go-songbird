@@ -18,7 +18,7 @@ import (
 var (
 	// Define activation times for submitter contract
 	submitterContractActivationTimeSongbird = big.NewInt(time.Date(2024, time.March, 15, 12, 0, 0, 0, time.UTC).Unix())
-	submitterContractActivationTimeCoston   = big.NewInt(time.Date(2024, time.February, 22, 14, 0, 0, 0, time.UTC).Unix())
+	submitterContractActivationTimeCoston   = big.NewInt(time.Date(2024, time.February, 29, 12, 0, 0, 0, time.UTC).Unix())
 
 	// Define ftso and submitter contract addresses
 	prioritisedFTSOContractAddress = common.HexToAddress("0x1000000000000000000000000000000000000003")
