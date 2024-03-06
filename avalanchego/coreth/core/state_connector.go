@@ -120,6 +120,18 @@ func GetDefaultAttestors(chainID *big.Int, blockTime *big.Int) []common.Address 
 	switch {
 	case chainID.Cmp(songbirdChainID) == 0:
 		switch {
+		case blockTime.Cmp(submitterContractActivationTimeSongbird) > 0:
+			return []common.Address{
+				common.HexToAddress("0xcE397b9a395ace2e328030699bDDf4E2F049A05B"),
+				common.HexToAddress("0xeDBb013BBC314124a9f842c1887e34cfeB03B052"),
+				common.HexToAddress("0xb9eF3951ac2D04C6bdD886bF042041E3954E86aF"),
+				common.HexToAddress("0x816Cec8f3A37Fd673Cfd4229441c59cA8DbD0641"),
+				common.HexToAddress("0x14c9c4583F0b1af8a69452Ec1b29884240f83bDC"),
+				common.HexToAddress("0x0049081C2D6def64800cC011Bd9aDe8682c6593a"),
+				common.HexToAddress("0x53Fcb50a22aFd6e5438d754CB22c4726032d2488"),
+				common.HexToAddress("0x35f4F0Bb73a6040F24927e1735B089d7769F7674"),
+				common.HexToAddress("0x3B583C919fD4C863F3A17d11929346C687FfB7c3"),
+			}
 		case blockTime.Cmp(songbirdOct22ForkTime) > 0:
 			return []common.Address{
 				common.HexToAddress("0x2D3e7e4b19bDc920fd9C57BD3072A31F5a59FeC8"),
