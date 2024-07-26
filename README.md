@@ -1,3 +1,8 @@
+
+## IMPORTANT NOTE: All nodes for the  Coston 1 Network should upgrade to the version v0.6.6 available [here](https://github.com/flare-foundation/go-flare/tree/songbird-support) before July 23, 2024. This is a part of the Songbird and Coston 1 code integration with the [Flare network code](https://github.com/flare-foundation/go-flare).
+
+
+
 # Songbird & Coston 1
 
 Node implementation for the [Flare](https://flare.network) network.
@@ -51,7 +56,7 @@ git clone https://github.com/flare-foundation/go-songbird.git
 cd go-songbird/avalanchego
 ```
 
-This will clone and checkout to `master` branch. 
+This will clone and checkout to `master` branch.
 
 Please build and use the latest tag `0.6.4`
 
