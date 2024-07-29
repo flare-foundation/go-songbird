@@ -1,6 +1,5 @@
 
-## IMPORTANT NOTE: All nodes for the  Coston 1 Network should upgrade to the version v0.6.6 available [here](https://github.com/flare-foundation/go-flare/tree/songbird-support) before July 23, 2024. This is a part of the Songbird and Coston 1 code integration with the [Flare network code](https://github.com/flare-foundation/go-flare).
-
+## IMPORTANT NOTE: All nodes for the  Coston 1 Network should upgrade to the version v0.6.6 available [here](https://github.com/flare-foundation/go-flare/tree/songbird-support) before July 23, 2024. This is a part of the Songbird and Coston 1 code integration with the [Flare network code](https://github.com/flare-foundation/go-flare). All Songbird nodes should use this repository until futher notice.
 
 
 # Songbird & Coston 1
