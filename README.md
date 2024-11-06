@@ -1,5 +1,5 @@
 
-## DEPRECATION NOTICE: This repository is deprecated due to the transition to the codebase common with the Flare network. All Songbird nodes should upgrade to the version v0.6.6 available [here](https://github.com/flare-foundation/go-flare/releases/tag/v0.6.6-songbird) before October 29, 2024, 12:00:00 UTC. The transition for the Coston network is already in effect since July 23, 2024, 12:00:00 UTC.
+## DEPRECATION NOTICE: This repository is deprecated due to the transition to the codebase common with the Flare network available at [https://github.com/flare-foundation/go-flare](https://github.com/flare-foundation/go-flare).
 
 # Songbird & Coston 1
 
